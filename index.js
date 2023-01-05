@@ -34,11 +34,11 @@ const Actives = require("./models/activeusers");
 const cors=require("cors"); 
 
 const app = express(); 
-const corsOptions ={
-   origin:'*',  
-   credentials:true,             //access-control-allow-credentials:true
-   optionSuccessStatus:200, 
-} 
+const corsOptions ={ 
+    origin:'*',   
+    credentials:true,              //access-control-allow-credentials:true
+    optionSuccessStatus:200,  
+}  
 
 app.use(cors(corsOptions)) 
 app.use(express.json());
@@ -792,7 +792,6 @@ const root= {
 
     return { amount: sum };
   },
-
   players: async (args, req) => {
     const users = await User.find().sort({ createdAt: -1 });
 
@@ -807,16 +806,13 @@ const root= {
       };
     });
   },
-
   users: async (args, req) => {
     // if (!req.isAuth) {
     //   throw new Error("Not authenticated.");
     // }
     const users = await User.find().sort({ createdAt: -1 });
-
-    const usrs = users.filter((item) => item.type !== "User");
-
-    return usrs.map((user) => {
+    const usrs = users.filter((item) => item.type === "User");
+      return usrs.map((user) => {
       return {
         ...user._doc,
         _id: user.id,
@@ -825,7 +821,6 @@ const root= {
       };
     });
   },
-
   admins: async (args, req) => {
     // if (!req.isAuth) {
     //   throw new Error("Not authenticated.");
@@ -915,21 +910,22 @@ return      [
     // if (!req.isAuth) {
     //   throw new Error("Not authenticated.");
     // }
-    await Account.find().sort({ createdAt: -1 }).then((res)=>{
-      return res.map((acc) => {
-        return {
+   const acc= await Account.find().sort({ createdAt: -1 })
+      return acc.map(async(acc) => {
+                // const user = await singleUser.bind(this, acc?._doc.user)
+        const user = await User.findOne({_id:acc?._doc.user})
+        return {  
           ...acc?._doc,
           _id: acc?.id,
-          user: singleUser.bind(this, acc?._doc.user),
+          user: user,
           createdAt: new Date(acc?._doc?.createdAt).toISOString(),
           updatedAt: new Date(acc?._doc?.updatedAt).toISOString(),
-        };
+        }
       });
-    });
+  
 
    
   },
-
   historyBets: async (args, req) => {
     // if (!req.isAuth) {
     //     throw new Error("Not authenticated.");
@@ -950,7 +946,6 @@ return      [
       };
     });
   },
-
   bets: async (args, req) => {
     // if (!req.isAuth) {
     //     throw new Error("Not authenticated.");
@@ -971,12 +966,8 @@ return      [
     });
   },
   allBets: async (args, req) => {
-    // if (!req.isAuth) {
-    //   throw new Error("Not authenticated.");
-    // }
     const bets = await Bet.find().sort({ createdAt: -1 });
-
-
+    console.log(bets)
     return bets.map((bet) => {
       return {
         ...bet?._doc,
@@ -1032,7 +1023,6 @@ return      [
   //     };
   //   });
   // },
-
   transactions: async (args, req) => {
     if (!req.isAuth) {
       throw new Error("Not authenticated.");
@@ -1061,7 +1051,6 @@ return      [
       updatedAt: new Date(account?._doc?.updatedAt).toISOString(),
     };
   },
-
   login: async (args, req) => {
     const user = await User.findOne({ username: args.loginInput.username });
     if (!user) {
@@ -1114,8 +1103,9 @@ return      [
     };
   },
   adminLogin: async (args, req) => {
+    console.log(args); 
     const user = await Admin.findOne({
-      username: args.loginInput.username,
+      username: args.loginInput.username, 
     });
     if (!user) {
       throw new Error("Invalid credentials. Please try again!");
@@ -1465,7 +1455,7 @@ return      [
       })
       .catch((err) => console.log(err.message));
   },
-   editAdminUserPhone: async (args, req) => {
+  editAdminUserPhone: async (args, req) => {
      const user = await User.findOne({ username: args.username });
     if (!user) {
       throw new Error("User does'nt exist.");
@@ -1486,7 +1476,6 @@ return      [
       })
       .catch((err) => console.log(err.message));
   },
-
   editAdminUser: async (args, req) => {
     const user = await Admin.findOne({ username: args.username });
     if (!user) {
@@ -1509,7 +1498,6 @@ return      [
       })
       .catch((err) => console.log(err.message));
   },
-
   changeType: async (args, req) => {
     const user = await Admin.findOne({ username: args.username });
     if (!user) {
@@ -1607,7 +1595,7 @@ return      [
       });
   },
   createAdmin: (args, req) => {
-    return Admin.findOne({ username: args.userInput.username })
+    return Admin.findOne({ username: args.userInput.username }) 
       .then((user) => {
         if (user) {
           throw new Error("Username already exists!!!");
@@ -1622,7 +1610,7 @@ return      [
           phone: args.userInput.phone,
           online: true,
           password: hashedPass,
-        });
+        }); 
         return user.save();
       })
       .then(async (result) => {
