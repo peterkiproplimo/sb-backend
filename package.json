@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon index.js -P 3020"
+      "start": "node index.js -P 3020",
+        "dev": "nodemon index.js -P 3020"
   }, 
 
    "author": "",
