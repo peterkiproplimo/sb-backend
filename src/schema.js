@@ -197,6 +197,7 @@ phone: String!
 type:String!
 password: String!
 }
+
 input AdminUserInput {
 username:String!
 phone: String!
