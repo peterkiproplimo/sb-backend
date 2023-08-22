@@ -1,6 +1,6 @@
 const connectToDatabase = require('../../config/database');
 // const User = require('../models/Player');
-const User = require("./src/models/users");
+const User = require("../models/users");
 
 const userResolvers = {
 createUser: (args, req) => {
