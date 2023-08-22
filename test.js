@@ -1436,10 +1436,7 @@ const root= {
       };
     },
     createBet: async (args, req) => {
-      // const user = await User.findOne({dataToken: args.betInput.dataToken});
-      // if(!user){
-      //   throw new Error("Session expired!!!");
-      // }
+   
       const account = await Account.findOne({ user: args.betInput.user });
       if(+account.balance <0){
           throw new Error("Insufficient account account balance");
@@ -1448,9 +1445,7 @@ const root= {
         user: args.betInput.user,
         round: args.betInput.round,
       });
-      // if (dublicateBet) {
-      //   throw new Error("Already placed a bet!");
-      // }
+   
       const bet = new Bet({
         nonce: args.betInput.nonce,
         clientSeed: args.betInput.clientSeed,
@@ -1487,16 +1482,6 @@ const root= {
         balance:`${account.balance}`
       });
       await log.save();
-  
-      // let filter = { user: args.betInput.user };
-      // let update = {
-      //   balance:`${args.betInput.win
-      //     ? +account?.balance +
-      //       +args?.betInput?.amount +
-      //       +args?.betInput?.betAmount
-      //     : account?.balance}`,
-      // };
-      // await Account.findOneAndUpdate(filter, update);
   
       let userProfit = +args?.betInput?.amount + +args?.betInput?.tax;
       houseAccount.houseTotal = args.betInput.win
