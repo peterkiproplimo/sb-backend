@@ -16,6 +16,6 @@ const userSchema = new mongoose.Schema({
   updatedAt: Date,
 });
 
-const User = mongoose.model('User', userSchema);
+const User = mongoose.model('Player', userSchema);
 
 module.exports = User;
