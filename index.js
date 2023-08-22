@@ -12,25 +12,28 @@ const moment = require("moment");
 const otpGenerator = require("otp-generator");
 var request = require("request");
 const axios = require("axios");
-const formatDate = require("./utils/formatDate");
+const formatDate = require("./src/utils/formatDate");
 var mysql = require('mysql');
+
+
 //importing mongoose models
-const User = require("./models/users");
-const Account = require("./models/account");
-const Bet = require("./models/bet");
-const Transaction = require("./models/transactions");
-const Logs = require("./models/logs");
-const BetHistory = require("./models/bethistory");
-const Game = require("./models/gamedata");
-const OTP = require("./models/verifier");
-const Admin = require("./models/admins");
-const AdminLog=require("./models/adminlogs");
+const User = require("./src/models/users");
+const Account = require("./src/models/account");
+const Bet = require("./src/models/bet");
+const Transaction = require("./src/models/transactions");
+const Logs = require("./src/models/logs");
+const BetHistory = require("./src/models/bethistory");
+const Game = require("./src/models/gamedata");
+const OTP = require("./src/models/verifier");
+const Admin = require("./src/models/admins");
+const AdminLog=require("./src/models/adminlogs");
 
 //import the midleware to check for every incoming request if user is authenticated
-const isAuth = require("./middleware/is-auth");
-const house = require("./models/house");
+const isAuth = require("./src/middleware/is-auth");
+const house = require("./src/models/house");
 
-const Actives = require("./models/activeusers");
+
+const Actives = require("./src/models/activeusers");
 const cors=require("cors"); 
 
 const app = express(); 
@@ -198,7 +201,7 @@ const root= {
     return { amount: sum};
   },
   deposit: async (args, req) => {
-    // console.log(parseInt(args.number));
+  
     try {
       const consumer_key = "e9U18oviHqQdAzrIP6jupLtjPTI16OmJ";
       const consumer_secret = "n53UGl05vCeLGz1H";
@@ -572,14 +575,7 @@ const root= {
     return { round: bets[0].round, amount: sum };
   },
   winnersPerRound: async () => {
-    // const bets= await Bet.find();
-    // let thisMonth=bets.filter(item=>item.createdAt.getMonth()+1 === new Date().getMonth()+1 && item.win === false)
 
-    // let tt=0
-    //  thisMonth.map(item=>{
-    //   tt=tt+item.betAmount;
-    // })
-    // console.log(tt)
     const bets = await Bet.aggregate([
       { $match: { win: false } },
       { $group: {
@@ -881,30 +877,6 @@ return      [
   }
 ]
 
-
-//         {
-//   "data": {
-//     "getHouse": [
-//       {
-//         "houseTotal": 280,
-//         "_id": "6318a55d329e4eaf1f1bcd9a",
-//         "createdAt": "2022-09-07T14:06:21.337Z"
-//       }
-//     ]
-//   }
-// }
-
-    // const hous = await house.find();
-    // console.log(hous)
-    // return hous.map((acc) => {
-    //   return {
-    //     ...acc._doc,
-    //     _id: acc.id,
-    //     user: singleUser.bind(this, acc._doc.user),
-    //     createdAt: new Date(acc._doc.createdAt).toISOString(),
-    //     updatedAt: new Date(acc._doc.updatedAt).toISOString(),
-    //   };
-    // });
   },
   accounts: async (args, req) => {
     // if (!req.isAuth) {
@@ -1954,6 +1926,8 @@ return      [
     };
   },
 }
+
+
 const schema= buildSchema(`
 type User {
 _id: ID!
@@ -2305,7 +2279,7 @@ app.use(
   );
     
   const host = '0.0.0.0';
-  const MONGO_URI =  "mongodb+srv://Safaribust:safaribust@cluster0.yuiecha.mongodb.net/?retryWrites=true&w=majority";
+  const MONGO_URI =  "mongodb+srv://Safaribust:ffFnYOKKFVSEWis6@cluster0.yuiecha.mongodb.net/?retryWrites=true&w=majority";
   const PORT = process.env.PORT || 8000;
 //socket listening
 
