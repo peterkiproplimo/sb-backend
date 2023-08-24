@@ -3,6 +3,10 @@ const connectToDatabase = require('../../config/database');
 const User = require("../models/users");
 const Admin = require("../models/admins");
 
+const crypto = require("crypto")
+
+
+
 const userResolvers = {
 createUser: (args, req) => {
       
@@ -139,4 +143,4 @@ createAdmin: (args, req) => {
 
 }
 
-module.exports = userResolvers;
+module.exports = [userResolvers];

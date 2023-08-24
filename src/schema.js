@@ -81,6 +81,12 @@ changePassword(username:String, password:String, initiator:String!):User!
 accounts:[Account!]
 actives:[User!]!
 players:[User!]!
+gameResult: Float
+generateSHA512(inputString: String): String!
+veryfyGame(inputString: String): String!
+generateServerSeed: String
+generateClientSeed: String
+generateSaltedSHA256: String
 }
 
 

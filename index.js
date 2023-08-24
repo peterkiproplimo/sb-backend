@@ -66,7 +66,7 @@ let OTPs = [];
 let betsLive = [];
 
 app.get("/verify", async (req, res, next) => {
-  
+   return "null"
 });
 
 app.get("/remove", (req, res, next) => {
@@ -83,8 +83,7 @@ schedule.scheduleJob("0 0 * * *", async function () {
   await houseAccount.save();
 });
 
-
-
+;
 
 app.use(
   "/graphql",
@@ -95,12 +94,12 @@ app.use(
   })
   );
     
-const host = '0.0.0.0';
+// const userRoutes = require('./src/routes/userRoutes'); // Update the path if needed
+// app.use('/users', userRoutes);
 
 
 // Start the database connection and then start the server
 connectToDatabase()
-
 .then(() => {
   // Start the Express server
   const port = process.env.PORT || 8000;
