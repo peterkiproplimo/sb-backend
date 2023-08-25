@@ -46,7 +46,6 @@ const bustResolvers = {
       
       const hash = inputString; // You can adjust the length as needed
 
-      // const result =// gameVerifiedResult(hash);
 
       let bust = gameVerifier(hash);
       return {
