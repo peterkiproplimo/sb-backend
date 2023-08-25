@@ -41,11 +41,12 @@ const bustResolvers = {
     return hash;
   },
 
-  veryfyGame: async (_, {inputString="ee4eb0d4df05f0907dc16de69aa7b2a1d53bffcd1caae56c71"} ) => {
+  veryfyGame: async (_, {inputString="0eb5b78124c2fe6880106a5629313a7c22b13c01ab1e671ed7"} ) => {
     try {
       
       const hash = inputString; // You can adjust the length as needed
 
+      // const result =// gameVerifiedResult(hash);
 
       let bust = gameVerifier(hash);
       return {

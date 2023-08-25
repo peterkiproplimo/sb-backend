@@ -12,6 +12,9 @@ const otpGenerator = require("otp-generator");
 var request = require("request");
 const axios = require("axios");
 const formatDate = require("./src/utils/formatDate");
+const { WebSocketServer } = require('ws');
+const http = require('http');
+
 var mysql = require('mysql');
 
 
@@ -24,7 +27,7 @@ const Logs = require("./src/models/logs");
 const BetHistory = require("./src/models/bethistory");
 const Game = require("./src/models/gamedata");
 const OTP = require("./src/models/verifier");
-// const Admin = require("./src/models/admins");
+const Admin = require("./src/models/admins");
 const AdminLog=require("./src/models/adminlogs");
 // Import the resolvers and the schema
 
@@ -83,7 +86,7 @@ schedule.scheduleJob("0 0 * * *", async function () {
   await houseAccount.save();
 });
 
-;
+
 
 app.use(
   "/graphql",
@@ -112,3 +115,27 @@ connectToDatabase()
 });
 
 
+
+// Websocket server
+
+const server = http.createServer();
+const wsServer = new WebSocketServer({ server });
+const port = 7000;
+server.listen(port, () => {
+  console.log(`WebSocket server is running on port ${port}`);
+});
+
+
+
+const clients = {};
+
+// A new client connection request received
+wsServer.on('connection', function(connection) {
+  // Generate a unique code for every user
+  const userId = uuidv4();
+  console.log(`Recieved a new connection.`);
+
+  // Store the new connection and handle messages
+  clients[userId] = connection;
+  console.log(`${userId} connected.`);
+});
