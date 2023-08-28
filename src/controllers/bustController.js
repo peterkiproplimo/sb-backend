@@ -3,7 +3,9 @@ const connectToDatabase = require('../../config/database');
 const User = require("../models/users");
 const Admin = require("../models/admins");
 const crypto = require("crypto")
-const CryptoJS = require('crypto-js');
+const mongoXlsx = require('mongo-xlsx');
+const fs = require('fs');
+
 
 const axios = require('axios');
 
@@ -41,12 +43,11 @@ const bustResolvers = {
     return hash;
   },
 
-  veryfyGame: async (_, {inputString="0eb5b78124c2fe6880106a5629313a7c22b13c01ab1e671ed7"} ) => {
+  veryfyGame: async (_, {inputString="11faeb189a4fa6177cde227273b67cea9460d21be8e25e5d16"} ) => {
     try {
       
       const hash = inputString; // You can adjust the length as needed
 
-      // const result =// gameVerifiedResult(hash);
 
       let bust = gameVerifier(hash);
       return {
@@ -57,6 +58,7 @@ const bustResolvers = {
       throw new Error('Error generating salted SHA-256 hash.');
     }
   },
+
 
   generateSaltedSHA256: async () => {
     try {
@@ -74,11 +76,8 @@ const bustResolvers = {
       const result = gameResult(saltedHash);
 
       // return result;
-      return {
-         result,
-        hash: saltedHash,
-        blockHeight: blockHex
-      };
+      return result;
+
     } catch (error) {
       throw new Error('Error generating salted SHA-256 hash.');
     }
@@ -156,5 +155,66 @@ function gameVerifier(seed) {
   const result = Math.floor(X);
   return Math.max(1, result / 100);
 };
+
+
+
+async function generateAndSaveGameResults() {
+  try {
+    const { client, db } = await connectToDatabase();
+
+    const collectionName = 'mygameResults';
+    const collection = db.collection(collectionName);
+
+    const results = [];
+
+    for (let i = 0; i < 10000; i++) {
+      const inputString = crypto.randomBytes(32).toString('hex');
+      const saltedHash = gameResult(inputString);
+      
+      if (saltedHash.bustpoint <= 20) {
+        results.push(saltedHash);
+      }
+    }
+
+    if (results.length > 0) {
+      await collection.insertMany(results);
+      console.log("Game results saved to MongoDB");
+    } else {
+      console.log("No eligible results to save.");
+    }
+
+    client.close();
+    console.log("Connection to MongoDB closed");
+  } catch (error) {
+    console.error("Error:", error);
+  }
+}
+
+
+async function exportToExcel() {
+  
+  try {
+    const db = await connectToDatabase();
+    const collection = db.collection('mygameResults'); // Replace with your collection name
+
+    const data = await collection.find().toArray();
+
+    const model = mongoXlsx.buildDynamicModel(data);
+    const excelData = mongoXlsx.mongoData2Xlsx(data, model);
+
+    const filePath = 'bustpoints.xlsx';
+    fs.writeFileSync(filePath, excelData);
+
+  } catch (error) {
+    console.error('Error:', error);
+  }
+
+}
+
+// exportToExcel();
+
+// generateAndSaveGameResults();
+
+
 
 module.exports = bustResolvers;
