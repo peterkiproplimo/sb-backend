@@ -2,6 +2,7 @@ const connectToDatabase = require('../../config/database');
 // const User = require('../models/Player');
 const User = require("../models/users");
 const Admin = require("../models/admins");
+const bcrypt = require("bcryptjs");
 
 const crypto = require("crypto")
 
