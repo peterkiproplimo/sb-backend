@@ -1,13 +1,11 @@
 const Player = require('../models/Player');
 const Admin = require("../models/admins");
 const bcrypt = require("bcryptjs");
-
-
+const otpGenerator = require("otp-generator");
+const Logs = require("../models/logs");
 const crypto = require("crypto")
-
-function gameResult() {
-   return "null";
-}
+const AdminLog=require("../models/adminlogs");
+const jwt = require("jsonwebtoken");
 
 const authResolvers = {
 
@@ -55,12 +53,14 @@ const authResolvers = {
     return {
       userId: user.id,
       type: user.type,
+      username:user.username,
       phone:user.phone,
       token: token,
-      online: user.online,
       dataToken:user.dataToken,
       tokenExpiration: 15,
+      online:user.online
     };
+    // online: user.online,
   },
 
 

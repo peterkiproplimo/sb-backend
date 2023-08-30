@@ -1,5 +1,6 @@
 
 const User = require("../models/users");
+const Player = require("../models/Player");
 const Admin = require("../models/admins");
 const bcrypt = require("bcryptjs");
 
@@ -11,7 +12,7 @@ const jwt = require("jsonwebtoken");
 const userResolvers = {
 createUser: (args, req) => {
       
-  return User.findOne({ username: args.userInput.username })
+  return Player.findOne({ username: args.userInput.username })
     .then((user) => {
       if (user) {
         throw new Error("Username already exists!!!");
@@ -26,7 +27,7 @@ createUser: (args, req) => {
             specialChars: false,
           });
           
-      const user = new User({
+      const user = new Player({
         type: args.userInput.type,
         username: args.userInput.username,
         active: true,
@@ -77,6 +78,7 @@ createUser: (args, req) => {
         type: result.type,
         token: token,
         tokenExpiration: 15,
+        online:result.online
       };
     })
     .catch((err) => {
