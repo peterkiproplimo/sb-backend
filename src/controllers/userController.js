@@ -4,8 +4,8 @@ const Admin = require("../models/admins");
 const bcrypt = require("bcryptjs");
 
 const otpGenerator = require("otp-generator");
-const Account = require("./src/models/account");
-const AdminLog=require("./src/models/adminlogs");
+const Account = require("../models/account");
+const AdminLog=require("../models/adminlogs");
 const jwt = require("jsonwebtoken");
 
 const userResolvers = {
