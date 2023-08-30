@@ -211,10 +211,6 @@ async function exportToExcel() {
 
 }
 
-// exportToExcel();
-
-// generateAndSaveGameResults();
-
 
 
 module.exports = bustResolvers;

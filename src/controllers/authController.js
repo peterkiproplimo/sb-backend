@@ -3,12 +3,6 @@ const Admin = require("../models/admins");
 const bcrypt = require("bcryptjs");
 
 
-const crypto = require("crypto")
-
-function gameResult() {
-   return "null";
-}
-
 const authResolvers = {
 
   login: async (args, req) => {
@@ -129,4 +123,4 @@ const authResolvers = {
 //   }
 // };
 
-module.exports = [authResolvers,gameResult];
+module.exports = authResolvers;
