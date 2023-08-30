@@ -56,6 +56,7 @@ phone: String!
 type:String!
 password: String!
 }
+
 input AdminUserInput {
 username:String!
 phone: String!
@@ -68,8 +69,6 @@ input LoginInput {
 username: String!
 password: String!
 }
-
-
 
 type RootQuery{
 users: [User!]!
@@ -96,7 +95,6 @@ createUser(userInput:UserInput): AuthData!
 createAdmin(userInput:AdminUserInput): AuthData!
 
 }
-
 
 
 schema{
