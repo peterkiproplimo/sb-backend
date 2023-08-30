@@ -103,6 +103,21 @@ users: async (args, req) => {
     };
   });
 },
+
+players: async (args, req) => {
+  const users = await Player.find().sort({ createdAt: -1 });
+
+  const usrs = users.filter((item) => item.type === "User");
+
+  return usrs.map((user) => {
+    return {
+      ...user._doc,
+      _id: user.id,
+      createdAt: new Date(user._doc.createdAt).toISOString(),
+      updatedAt: new Date(user._doc.updatedAt).toISOString(),
+    };
+  });
+},
 createAdmin: (args, req) => {
   return Admin.findOne({ username: args.userInput.username }) 
     .then((user) => {
