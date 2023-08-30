@@ -129,4 +129,4 @@ const authResolvers = {
 //   }
 // };
 
-module.exports = [authResolvers,gameResult];
+module.exports = authResolvers;

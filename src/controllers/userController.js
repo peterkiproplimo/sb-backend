@@ -157,4 +157,4 @@ createAdmin: (args, req) => {
 
 }
 
-module.exports = [userResolvers];
+module.exports = userResolvers;
