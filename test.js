@@ -700,21 +700,7 @@ const root= {
         };
       });
     },
-    users: async (args, req) => {
-      // if (!req.isAuth) {
-      //   throw new Error("Not authenticated.");
-      // }
-      const users = await User.find().sort({ createdAt: -1 });
-      const usrs = users.filter((item) => item.type === "User");
-        return usrs.map((user) => {
-        return {
-          ...user._doc,
-          _id: user.id,
-          createdAt: new Date(user._doc.createdAt).toISOString(),
-          updatedAt: new Date(user._doc.updatedAt).toISOString(),
-        };
-      });
-    },
+
     admins: async (args, req) => {
       // if (!req.isAuth) {
       //   throw new Error("Not authenticated.");
