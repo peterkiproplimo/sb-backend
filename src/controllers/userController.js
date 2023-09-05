@@ -181,14 +181,31 @@ createAdmin: (args, req) => {
 
 
 //  Find one user detail
-aUser:async(args, req)=>{
-  const user = await User.findOne({username:args.username})
-  return  {
+aUser: async (args, req) => {
+  try {
+    const user = await Player.findOne({ username: args.username });
+    
+    if (!user) {
+      return {
+        code: 404,
+        message: "User does not exist",
+      };
+    }
+
+    return {
       ...user?._doc,
-      _id: user?.id,
+      _id:" user?.id",
       createdAt: new Date(user?._doc?.createdAt).toISOString(),
       updatedAt: new Date(user?._doc?.updatedAt).toISOString(),
     };
+  } catch (error) {
+    // Handle other potential errors here if needed
+    console.error("Error fetching user:", error);
+    return {
+      code: 500, // Internal Server Error
+      message: "An error occurred while fetching the user.",
+    };
+  }
 },
 
 //  Change player password - DONE

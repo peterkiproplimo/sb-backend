@@ -18,20 +18,19 @@ updatedAt:String!
 }
 
 type Player {
-    _id: ID!
-    phone:String!
-    type:String!
-    active:Boolean!
-    online:Boolean
-    password: String!
-    dataToken:String!
-    username:String!
-    label:String
-    firstDeposit:Float
-    createdAt:String!
-    updatedAt:String!
-    
-    }
+_id: ID!
+phone:String!
+type:String!
+active:Boolean!
+online:Boolean
+password: String!
+dataToken:String!
+username:String!
+label:String
+firstDeposit:Float
+createdAt:String!
+updatedAt:String!  
+}
 
 type Admin {
 _id: ID!
@@ -295,7 +294,7 @@ amount:Float
 
 type RootQuery{
 users: [User!]!
-aUser(username:String!):User!
+aUser(username:String!):Player!
 admins: [Admin!]!
 login(loginInput:LoginInput): AuthData!
 adminLogin(loginInput:LoginInput): AuthData!
@@ -312,13 +311,7 @@ adminrefundAccount(userId:String, amount:String, backend:Boolean, initiator:Stri
 admindeductAccountBalance(userId:String, amount:String, backend:Boolean, initiator:String!):Account!
 refundAccount(userId:String, amount:String, backend:Boolean):Account!
 history(userId:String):[BetHistory!]!
-changeAdminPassword(username:String, password:String,initiator:String!):User!
-editAdminUserPhone(username:String, phone:String, initiator:String!):User!
-editAdminUser(username:String, initiator:String!, phone:String, type:String!):Admin!
 accounts:[Account!]
-suspendPlayer(username:String,initiator:String!):User!
-activatePlayer(username:String,initiator:String!):User!
-changeType(username:String, type:String, initiator:String!):Admin!
 house:[House!]!
 updateHouse(amount:Float!, win:Boolean!, userId:String!):House!
 getHouse:[House!]!
@@ -337,16 +330,12 @@ logout(username:String!, initiator:String!):User!
 logoutUser(username:String!):User!
 countActives:ActivesCount
 actives:[User!]!
-players:[User!]!
+players:[Player!]!
 verifyOtp(otp:String!):OTP
 systemLogs:[AdminLogs!]!
 customerToTal:CustomerToTal
 taxToTal:CustomerToTal
 userTT(userId:String!):PlayerToTal
-suspendAccount(accountId:String!, initiator:String):Account
-activateAccount(accountId:String!, initiator:String):Account
-deposit(phone:String!, amount:Float!, userId:String!):Account
-depositManual(phone:String!, userId:String!):Account
 totalDeposits(userId:String!):TotalDeposits
 totalWidrawal(phone:String!):TotalDeposits
 withdraw(amount:Float, userId:String!, username:String!, phone:String!):Deposit
@@ -371,6 +360,17 @@ createActives(user:String!, round:String!, amount:String):ActiveUsers
 generateOtp(username:String, phone:String):OTP!
 generateAdminOtp(username:String, userId:String):OTP!
 transactionStatus(reference:String!):Transaction
+deposit(phone:String!, amount:Float!, userId:String!):Account
+suspendAccount(accountId:String!, initiator:String):Account
+activateAccount(accountId:String!, initiator:String):Account
+depositManual(phone:String!, userId:String!):Account
+suspendPlayer(username:String,initiator:String!):User!
+activatePlayer(username:String,initiator:String!):User!
+changeType(username:String, type:String, initiator:String!):Admin!
+changeAdminPassword(username:String, password:String,initiator:String!):User!
+editAdminUserPhone(username:String, phone:String, initiator:String!):User!
+editAdminUser(username:String, initiator:String!, phone:String, type:String!):Admin!
+
 }
 
 

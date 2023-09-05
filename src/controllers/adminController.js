@@ -183,7 +183,7 @@ const adminResolvers = {
     // Get a list of all the players
 
     players: async (args, req) => {
-        const users = await User.find().sort({ createdAt: -1 });
+        const users = await Player.find().sort({ createdAt: -1 });
     
         const usrs = users.filter((item) => item.type === "User");
     
