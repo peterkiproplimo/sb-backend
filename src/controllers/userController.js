@@ -191,13 +191,14 @@ aUser:async(args, req)=>{
     };
 },
 
-//  Change user password
+//  Change player password - DONE
 
 changePassword: async (args, req) => {
-  const user = await User.findOne({ username: args.username });
+  const user = await Player.findOne({ username: args.username });
   if (!user) {
     throw new Error("User does'nt exist.");
   }
+
   return bcrypt
     .hash(args.password, 12)
     .then((hashedPass) => {
@@ -213,7 +214,7 @@ changePassword: async (args, req) => {
       });
 
       await log.save();
-      return { ...usr._doc, _id: usr.id, password: null };
+      return { ...usr._doc, _id: usr.id, password: null, createdAt:"ada",updatedAt:"adad" };
     })
     .catch((err) => console.log(err.message));
 },
