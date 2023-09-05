@@ -12,7 +12,7 @@ const otpGenerator = require("otp-generator");
 var request = require("request");
 const axios = require("axios");
 const formatDate = require("./src/utils/formatDate");
-const { WebSocketServer } = require('ws');
+// const { WebSocketServer } = require('ws');
 const http = require('http');
 
 var mysql = require('mysql');

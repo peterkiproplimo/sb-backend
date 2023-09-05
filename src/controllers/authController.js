@@ -1,11 +1,13 @@
-const Player = require('../models/Player');
-const Admin = require("../models/admins");
 const bcrypt = require("bcryptjs");
 const otpGenerator = require("otp-generator");
-const Logs = require("../models/logs");
-const crypto = require("crypto")
-const AdminLog=require("../models/adminlogs");
 const jwt = require("jsonwebtoken");
+
+//importing mongoose models
+const Player = require('../models/Player');
+const Admin = require("../models/admins");
+const Logs = require("../models/logs");
+const AdminLog=require("../models/adminlogs");
+
 
 const authResolvers = {
 
@@ -113,20 +115,45 @@ const authResolvers = {
     };
   },
 
+  logout: async (args, req) => {
+    const user = await User.findOne({ username: args.username });
+    if(!user){
+      throw Error("User not found")
+    }
+    user.online = false;
+    await user.save();
+
+     const ipAddress = req.socket.remoteAddress;
+    const log = new AdminLog({
+      ip: ipAddress,
+      description: `${args.initiator} logged out ${user.username}`,
+      user: user._id,
+    });
+
+    await log.save();
+    return user;
+  },
+  logoutUser: async (args, req) => {
+    const user = await User.findOne({ username: args.username });
+    if(!user){
+      throw Error("User not found")
+    }
+    user.online = false;
+    await user.save();
+
+     const ipAddress = req.socket.remoteAddress;
+    const log = new Logs({
+      ip: ipAddress,
+      description: `${user.username} logged out `,
+      user: user._id,
+    });
+    await log.save();
+    return user;
+  },
+
   
 };
 
 
-// const singleUser = async (userID) => {
-//   try {
-//     const user = await User.findById(userID);
-//     return {
-//       ...user._doc,
-//       _id: user.id,
-//     };
-//   } catch (err) {
-//     throw err;
-//   }
-// };
 
 module.exports = authResolvers;

@@ -1,13 +1,17 @@
+require("dotenv").config();
+const bcrypt = require("bcryptjs");
+const otpGenerator = require("otp-generator");
+const jwt = require("jsonwebtoken");
+var request = require("request");
 
+//importing mongoose models
+const Logs = require("../models/logs");
+const Account = require("../models/account");
+const AdminLog=require("../models/adminlogs");
 const User = require("../models/users");
 const Player = require("../models/Player");
 const Admin = require("../models/admins");
-const bcrypt = require("bcryptjs");
 
-const otpGenerator = require("otp-generator");
-const Account = require("../models/account");
-const AdminLog=require("../models/adminlogs");
-const jwt = require("jsonwebtoken");
 
 const userResolvers = {
 createUser: (args, req) => {
@@ -107,7 +111,7 @@ users: async (args, req) => {
 players: async (args, req) => {
   const users = await Player.find().sort({ createdAt: -1 });
 
-  const usrs = users.filter((item) => item.type === "User");
+  const usrs = users.filter((item) => item.type === "regular");
 
   return usrs.map((user) => {
     return {
@@ -174,6 +178,46 @@ createAdmin: (args, req) => {
       throw err;
     });
 },
+
+
+//  Find one user detail
+aUser:async(args, req)=>{
+  const user = await User.findOne({username:args.username})
+  return  {
+      ...user?._doc,
+      _id: user?.id,
+      createdAt: new Date(user?._doc?.createdAt).toISOString(),
+      updatedAt: new Date(user?._doc?.updatedAt).toISOString(),
+    };
+},
+
+//  Change user password
+
+changePassword: async (args, req) => {
+  const user = await User.findOne({ username: args.username });
+  if (!user) {
+    throw new Error("User does'nt exist.");
+  }
+  return bcrypt
+    .hash(args.password, 12)
+    .then((hashedPass) => {
+      user.password = hashedPass;
+      return user.save();
+    })
+    .then(async (usr) => {
+      const ipAddress = req.socket.remoteAddress;
+      const log = new Logs({
+        ip: ipAddress,
+        description: `${args.initiator} changed password`,
+        user: usr.id,
+      });
+
+      await log.save();
+      return { ...usr._doc, _id: usr.id, password: null };
+    })
+    .catch((err) => console.log(err.message));
+},
+
 
 }
 
