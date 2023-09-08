@@ -216,14 +216,15 @@ const adminResolvers = {
     
         const users = await Admin.find().sort({ createdAt: -1 });
     
-        return users.map((user) => {
-          return {
-            ...user._doc,
-            _id: user.id,
-            createdAt: new Date(user._doc.createdAt).toISOString(),
-            updatedAt: new Date(user._doc.updatedAt).toISOString(),
-          };
-        });
+        return users;
+        // .map((user) => {
+        //   return {
+        //     ...user._doc,
+        //     _id: user.id,
+        //     createdAt: new Date(user._doc.createdAt).toISOString(),
+        //     updatedAt: new Date(user._doc.updatedAt).toISOString(),
+        //   };
+        // });
       },
 
 

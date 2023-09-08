@@ -23,14 +23,15 @@ phone:String!
 type:String!
 active:Boolean!
 online:Boolean
-password: String!
+password: String
 dataToken:String!
 username:String!
 label:String
 firstDeposit:Float
-createdAt:String!
-updatedAt:String!  
+createdAt:String
+updatedAt:String 
 }
+
 
 type Admin {
 _id: ID!
@@ -372,7 +373,6 @@ editAdminUserPhone(username:String, phone:String, initiator:String!):User!
 editAdminUser(username:String, initiator:String!, phone:String, type:String!):Admin!
 
 }
-
 
 
 

@@ -169,7 +169,10 @@ createAdmin: (args, req) => {
         userId: result.id,
         type: result.type,
         token: token,
+        username: result.username,
+        online: result.online,
         tokenExpiration: 15,
+        phone: result.phone,
       };
       // return { ...result._doc, _id: result.id, password: null };
     })
@@ -192,12 +195,7 @@ aUser: async (args, req) => {
       };
     }
 
-    return {
-      ...user?._doc,
-      _id:" user?.id",
-      createdAt: new Date(user?._doc?.createdAt).toISOString(),
-      updatedAt: new Date(user?._doc?.updatedAt).toISOString(),
-    };
+    return user;
   } catch (error) {
     // Handle other potential errors here if needed
     console.error("Error fetching user:", error);
