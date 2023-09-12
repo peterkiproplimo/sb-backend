@@ -16,7 +16,7 @@ const betSchema = new Schema(
     userId: {
       type: String,
       required: true,
-    },ada
+    },
     round: {
       type: String,
       required: true,
