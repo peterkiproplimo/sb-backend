@@ -248,6 +248,23 @@ type:String!
 amount:String!
 }
 
+type Playerbet {
+    _id: ID!
+    betAmount: Float!
+    point: String!
+    userId: Player!
+    round: String!
+    createdAt: String!
+    updatedAt: String!
+  }
+
+  input PlayerbetInput {
+    betAmount: Float!
+    point: String!
+    userId: ID!
+    round: String!
+  }
+  
 input LogsInput {
 ip:String!
 description:String!  
@@ -371,7 +388,7 @@ changeType(username:String, type:String, initiator:String!):Admin!
 changeAdminPassword(username:String, password:String,initiator:String!):User!
 editAdminUserPhone(username:String, phone:String, initiator:String!):User!
 editAdminUser(username:String, initiator:String!, phone:String, type:String!):Admin!
-
+createPlayerbet(playerbetInput: PlayerbetInput!): Playerbet
 }
 
 

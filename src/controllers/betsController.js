@@ -8,8 +8,52 @@ const Logs = require("../models/logs");
 const BetHistory = require("../models/bethistory");
 const Game = require("../models/gamedata");
 const house = require("../models/house");
-
+const Playerbet = require("../models/PlayerBet");
 const betsResolvers = {
+
+
+  createPlayerbet: async (args, req) => {
+   
+    // console.log(req);
+    const account = await Account.findOne({ user: args.playerbetInput.userId });
+    if(+account.balance <0){
+        throw new Error("Insufficient account account balance");
+    }
+
+ 
+    const bet = new Playerbet({
+      betAmount: args.playerbetInput.betAmount,
+      point: args.playerbetInput.point,
+      userId: args.playerbetInput.userId,
+      round: args.playerbetInput.round,
+    });
+
+    const results = await bet.save();
+    console.log(results)
+
+    // {
+    //   _id: 65002f01e2fb925a56a57aed,
+    //   betAmount: 100,
+    //   point: '2.5',
+    //   userId: '64ef000875f6b542d6437d46',
+    //   round: '1',
+    //   createdAt: 2023-09-12T09:27:30.060Z,
+    //   updatedAt: 2023-09-12T09:27:30.060Z,
+    //   __v: 0
+    // }
+    
+    
+    // Format and return the result
+    const createdBet = {
+      ...results._doc,
+      _id: results._id,
+      user: "a",
+      createdAt: new Date(results._doc.createdAt).toISOString(),
+      updatedAt: new Date(results._doc.updatedAt).toISOString(),
+    };
+
+    return createdBet;
+  },
 
 winnersBets: async () => {
     const bets = await Bet.find().sort({ createdAt: -1 });
@@ -55,7 +99,6 @@ winnersBets: async () => {
 
     return bts;
   },
-
 
   losersPerRound: async () => {
   

@@ -68,9 +68,6 @@ let OTPs = [];
 
 let betsLive = [];
 
-app.get("/verify", async (req, res, next) => {
-   return "null"
-});
 
 app.get("/remove", (req, res, next) => {
   betsLive = [];
