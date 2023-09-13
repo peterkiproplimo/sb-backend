@@ -10,7 +10,7 @@ const betSchema = new Schema(
       required: true,
     },
     point: {
-      type: String,
+      type: Number,
       required: true,
     },
     userId: {
@@ -18,8 +18,12 @@ const betSchema = new Schema(
       required: true,
     },
     round: {
-      type: String,
+      type: Number,
       required: true,
+    },
+    possibleWin: {
+      type: Number,
+      required: false,
     },
   },
   { timestamps: true }

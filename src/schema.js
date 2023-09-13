@@ -30,6 +30,7 @@ label:String
 firstDeposit:Float
 createdAt:String
 updatedAt:String 
+bets: [Playerbet]
 }
 
 
@@ -251,18 +252,20 @@ amount:String!
 type Playerbet {
     _id: ID!
     betAmount: Float!
-    point: String!
+    point: Float!
     userId: Player!
-    round: String!
+    round: Float!
+    possibleWin: Float
     createdAt: String!
     updatedAt: String!
+   
   }
 
   input PlayerbetInput {
     betAmount: Float!
-    point: String!
+    point: Float!
     userId: ID!
-    round: String!
+    round: Float!
   }
   
 input LogsInput {
@@ -361,6 +364,7 @@ userTransaction(phone:String!):Transaction
 accountBalanceUpdate(userId:String!, amount:String!):Account
 transactionDetails(trans_id:String!):Account
 calculateBalance:AccountBalance
+getAllPlayers: [Player]!
 }
 
 

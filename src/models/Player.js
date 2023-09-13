@@ -14,6 +14,7 @@ const userSchema = new mongoose.Schema({
   firstDeposit: Number,
   createdAt: Date,
   updatedAt: Date,
+  playerbets: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Playerbet' }],
 });
 
 const User = mongoose.model('Player', userSchema);
