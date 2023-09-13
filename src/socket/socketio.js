@@ -5,7 +5,7 @@ const User = require("../models/User");
 const socketIO = (server) =>
   new Server(server, {
     cors: {
-      origin: "http://localhost:3000",
+      origin: "https://sb-backend-test.onrender.com",
       //   methods: ["GET", "POST"],
       credentials: true,
     },
