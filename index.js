@@ -187,10 +187,10 @@ function waitCount() {
   // console.log('Waiting before moving to the next multiplier:', multiplier[targetValueIndex]);
   timerPaused = true;
   // Set the initial countdown value
-  let countdownValue = 5.0;
+  let countdownValue = 4.0;
 
   // Set the decrement interval and step
-  const decrementInterval = 100; // 100 milliseconds
+  const decrementInterval = 200; // 100 milliseconds
   const decrementStep = 0.1;
 
   const intervalId = setInterval(async () => {
