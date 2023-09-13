@@ -53,7 +53,7 @@ const corsOptions = {
   optionSuccessStatus: 200,
 };
 
-app.use(cors(corsOptions));
+// app.use(cors(corsOptions));
 app.use(express.json());
 app.use(isAuth);
 app.use((req, res, next) => {
@@ -102,6 +102,7 @@ const onConnection = (socket) => {
 
 io.on("connection", onConnection);
 io.use(socketAuth);
+app.use(cors());
 
 let _multipliers = [];
 let timerPaused = false; // Flag t
