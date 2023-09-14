@@ -72,7 +72,7 @@ app.use((req, res, next) => {
   }
   next();
 });
-
+let livePlayers = [];
 let betsLive = [];
 
 app.get("/remove", (req, res, next) => {
@@ -254,17 +254,8 @@ async function updatePlayedField(multiplier) {
   }
 }
 
-// Start the database connection and then start the server
-// connectToDatabase()
-//   .then(() => {
-// Start the Express server
-// const port = process.env.PORT || 8000;
-// app.listen(port, () => {
-//   console.log(`Server is running on port ${port}`);
-// });
-
 server.listen(3001, async () => {
-  // startGame();
+  startGame();
   // StartBust();
   console.log(`listening on 3001`);
 });
