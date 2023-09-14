@@ -170,7 +170,7 @@ async function updateSetPlayed() {
     // res.status(500).json({ error: "Internal Server Error" });
   }
 }
-// updateSetPlayed();
+updateSetPlayed();
 async function exportToExcel() {
   try {
     const db = await connectToDatabase();

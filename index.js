@@ -118,6 +118,36 @@ const incrementStep = 0.01; // Step to achieve 1 decimal place
 let targetValueIndex = 0;
 let gameround = 1;
 
+const BET_CHECK_INTERVAL = 1000;
+let BET_MULTIPLIERVALUE = 0;
+
+async function checkBetsForWinsAndLosses() {
+  try {
+    const db = await connectToDatabase();
+
+    // Fetch all player bets from the "Playerbets" collection
+    const bets = await db.collection("playerbets").find().toArray();
+
+    return bets;
+    // return bets;
+  } catch (error) {
+    console.error("Error checking bets:", error);
+    throw error; // Rethrow the error to handle it at a higher level if needed
+  }
+}
+
+setInterval(async () => {
+  try {
+    const playerBets = await checkBetsForWinsAndLosses();
+    io.emit("livedata", playerBets);
+    console.log("Player bets:", playerBets);
+    // Perform actions with player bets here
+  } catch (error) {
+    // Handle the error here
+    console.error("An error occurred while checking bets:", error);
+  }
+}, 1000);
+
 async function fetchMultipliersBatch() {
   try {
     const db = await connectToDatabase();
@@ -141,29 +171,14 @@ async function fetchMultipliersBatch() {
   }
 }
 
-function getNextMultiplier() {
-  gameround++;
-
-  io.emit("nextround", gameround);
-
-  if (batchIndex < currentMultiplierBatch.length) {
-    const nextMultiplier = currentMultiplierBatch[batchIndex];
-    batchIndex++;
-    return nextMultiplier;
-  } else {
-    // If the batch is exhausted, fetch a new batch
-    fetchMultipliersBatch();
-    return getNextMultiplier();
-  }
-}
-
 fetchMultipliersBatch();
 
 function updateTimerWithMultipliers(multiplier) {
   if (value < multiplier.bustpoint && !timerPaused) {
     // Increment the value by incrementStep
-    value += incrementStep;
+    setMultiplierValue((value += incrementStep));
 
+    console.log(value);
     io.emit("updateTimer", value.toFixed(2)); // Emit the updated value to all connected clients
   } else {
     if (value >= multiplier.bustpoint) {
@@ -192,6 +207,7 @@ function updateTimerWithMultipliers(multiplier) {
 }
 
 function waitCount() {
+  console.log("currnet game round", gameround);
   // console.log('Waiting before moving to the next multiplier:', multiplier[targetValueIndex]);
   timerPaused = true;
   // Set the initial countdown value
@@ -245,16 +261,62 @@ async function updatePlayedField(multiplier) {
       { _id: multiplier._id },
       { $set: { played: 1 } }
     );
-
-    console.log(
-      `Updated "played" field for multiplier with _id ${multiplier._id}`
-    );
   } catch (error) {
     console.error("Error updating played field:", error);
   }
 }
 
 server.listen(3001, async () => {
-  startGame();
+  await startGame();
+  getMultiplierValue();
+
+  // setTimeout(() => {
+  //   // const nextMultiplier = getNextMultiplier();
+  //   getMultiplierValue();
+  // }, 100);
+
+  // setInterval(checkBetsForWinsAndLosses(), 100);
+
   console.log(`listening on 3001`);
 });
+// Helper functions
+
+function getNextMultiplier() {
+  gameround++;
+
+  io.emit("nextround", gameround);
+  console.log("next game round", gameround);
+  if (batchIndex < currentMultiplierBatch.length) {
+    const nextMultiplier = currentMultiplierBatch[batchIndex];
+    batchIndex++;
+    updateRound(nextMultiplier, gameround);
+    return nextMultiplier;
+  } else {
+    // If the batch is exhausted, fetch a new batch
+    fetchMultipliersBatch();
+
+    return getNextMultiplier();
+  }
+}
+async function updateRound(multiplier, gameround) {
+  try {
+    const db = await connectToDatabase();
+    const collection = db.collection("gameResults");
+
+    // Update the "played" field to 1 for the current multiplier
+    await collection.updateOne(
+      { _id: multiplier._id },
+      { $set: { round: gameround } }
+    );
+  } catch (error) {
+    console.error("Error updating played field:", error);
+  }
+}
+
+function setMultiplierValue(value) {
+  BET_MULTIPLIERVALUE = value;
+  return getMultiplierValue();
+}
+function getMultiplierValue() {
+  return BET_MULTIPLIERVALUE;
+}
