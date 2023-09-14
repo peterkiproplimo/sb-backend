@@ -25,6 +25,10 @@ const betSchema = new Schema(
       type: Number,
       required: false,
     },
+    win: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );

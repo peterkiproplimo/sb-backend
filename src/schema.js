@@ -1,6 +1,6 @@
 const { buildSchema } = require("graphql");
 
-const schema= buildSchema(`
+const schema = buildSchema(`
 type User {
 _id: ID!
 phone:String!
@@ -91,7 +91,7 @@ type Account{
 _id:ID!
 balance:String!
 active:Boolean!
-user:User
+user:Player
 phone:String
 createdAt:String!
 updatedAt:String!
@@ -250,23 +250,24 @@ amount:String!
 }
 
 type Playerbet {
-    _id: ID!
-    betAmount: Float!
-    point: Float!
-    userId: Player!
-    round: Float!
-    possibleWin: Float
-    createdAt: String!
-    updatedAt: String!
-   
-  }
+_id: ID!
+betAmount: Float!
+point: Float!
+userId: Player!
+round: Float!
+possibleWin: Float
+win:Boolean
+createdAt: String!
+updatedAt: String!
+}
 
-  input PlayerbetInput {
-    betAmount: Float!
-    point: Float!
-    userId: ID!
-    round: Float!
-  }
+input PlayerbetInput {
+  betAmount: Float!
+  point: Float!
+  userId: ID!
+  round: Float!
+  win: Boolean!
+}
   
 input LogsInput {
 ip:String!
@@ -402,6 +403,6 @@ query:RootQuery
 mutation:RootMutation
 }
 
-`)
+`);
 
 module.exports = schema;

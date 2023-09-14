@@ -26,31 +26,50 @@ const betsResolvers = {
       userId: args.playerbetInput.userId,
       round: args.playerbetInput.round,
       possibleWin: possibleWin,
+      win: false,
     });
 
-    const results = await bet.save();
+    const user = await Player.findById(args.playerbetInput.userId);
 
-    // {
-    //   _id: 65002f01e2fb925a56a57aed,
-    //   betAmount: 100,
-    //   point: '2.5',
-    //   userId: '64ef000875f6b542d6437d46',
-    //   round: '1',
-    //   createdAt: 2023-09-12T09:27:30.060Z,
-    //   updatedAt: 2023-09-12T09:27:30.060Z,
-    //   __v: 0
-    // }
+    const results = await bet.save();
 
     // Format and return the result
     const createdBet = {
       ...results._doc,
-      _id: results._id,
-      user: "a",
+      _id: results._id.toString(),
+      userId: user,
       createdAt: new Date(results._doc.createdAt).toISOString(),
       updatedAt: new Date(results._doc.updatedAt).toISOString(),
+      Player: {
+        _id: user._id.toString(), // Include the _id of the associated Player
+      },
     };
 
     return createdBet;
+  },
+
+  markUserBetAsWin: async (_, { userId, round }) => {
+    try {
+      // Find the first Playerbet for the given user ID, specific round, and where 'win' is set to false
+      const userBetToUpdate = await Playerbet.findOne({
+        userId,
+        round,
+        win: false,
+      });
+
+      if (!userBetToUpdate) {
+        throw new Error("No eligible bets found to mark as a win");
+      }
+
+      // Update 'win' to true for the found bet
+      userBetToUpdate.win = true;
+      await userBetToUpdate.save(); // Save the updated bet
+
+      return true; // Return true to indicate success
+    } catch (error) {
+      console.error("Error marking a bet as a win:", error);
+      throw new Error("Failed to mark a bet as a win");
+    }
   },
 
   getAllPlayers: async () => {

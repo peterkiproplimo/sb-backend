@@ -260,7 +260,7 @@ async function updatePlayedField(multiplier) {
 // });
 
 server.listen(3001, async () => {
-  startGame();
+  // startGame();
   // StartBust();
   console.log(`listening on 3001`);
 });
