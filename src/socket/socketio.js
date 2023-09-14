@@ -7,7 +7,7 @@ const socketIO = (server) =>
     cors: {
       origin: "https://safaribust.techsavanna.technology",
       //   methods: ["GET", "POST"],
-      credentials: false,
+      credentials: true,
     },
   });
 
