@@ -122,7 +122,7 @@ async function fetchMultipliersBatch() {
     // Fetch a batch of 100 multipliers and store them in currentMultiplierBatch
     currentMultiplierBatch = await collection
       .find({ played: 0 })
-      .limit(1000)
+      .limit(100)
       .toArray();
 
     if (currentMultiplierBatch.length === 0) {
@@ -194,7 +194,7 @@ function waitCount() {
   let countdownValue = 4.0;
 
   // Set the decrement interval and step
-  const decrementInterval = 200; // 100 milliseconds
+  const decrementInterval = 100; // 100 milliseconds
   const decrementStep = 0.1;
 
   const intervalId = setInterval(async () => {
