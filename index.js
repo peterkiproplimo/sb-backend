@@ -136,18 +136,6 @@ async function checkBetsForWinsAndLosses() {
   }
 }
 
-setInterval(async () => {
-  try {
-    const playerBets = await checkBetsForWinsAndLosses();
-    io.emit("livedata", playerBets);
-    console.log("Player bets:", playerBets);
-    // Perform actions with player bets here
-  } catch (error) {
-    // Handle the error here
-    console.error("An error occurred while checking bets:", error);
-  }
-}, 1000);
-
 async function fetchMultipliersBatch() {
   try {
     const db = await connectToDatabase();
@@ -320,3 +308,19 @@ function setMultiplierValue(value) {
 function getMultiplierValue() {
   return BET_MULTIPLIERVALUE;
 }
+
+// Function to emit the live data
+
+setInterval(async () => {
+  try {
+    const playerBets = await checkBetsForWinsAndLosses();
+    io.emit("livedata", playerBets);
+    console.log("Player bets:", playerBets);
+    // Perform actions with player bets here
+  } catch (error) {
+    // Handle the error here
+    console.error("An error occurred while checking bets:", error);
+  }
+}, 1000);
+
+//  Get t
