@@ -256,11 +256,5 @@ async function updatePlayedField(multiplier) {
 
 server.listen(3001, async () => {
   startGame();
-  // StartBust();
   console.log(`listening on 3001`);
 });
-
-// })
-// .catch((error) => {
-//   console.error("Error connecting to the database:", error);
-// });

@@ -126,7 +126,7 @@ async function generateAndSaveGameResults() {
   try {
     const { client, db } = await connectToDatabase();
 
-    const collectionName = "mygameResults";
+    const collectionName = "gameResults";
     const collection = db.collection(collectionName);
 
     const results = [];
@@ -154,6 +154,23 @@ async function generateAndSaveGameResults() {
   }
 }
 
+async function updateSetPlayed() {
+  try {
+    const db = await connectToDatabase();
+    const collection = db.collection("gameResults");
+
+    // Update 'played' field to 0 for all game results
+    await collection.updateMany({}, { $set: { played: 0 } });
+
+    // res
+    //   .status(200)
+    //   .json({ message: "Updated played field for all game results" });
+  } catch (error) {
+    console.error("Error:", error);
+    // res.status(500).json({ error: "Internal Server Error" });
+  }
+}
+// updateSetPlayed();
 async function exportToExcel() {
   try {
     const db = await connectToDatabase();
