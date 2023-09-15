@@ -186,7 +186,6 @@ function updateTimerWithMultipliers(multiplier) {
   // Continue updating the timer if it's not paused
   if (!timerPaused) {
     setTimeout(() => {
-      // const nextMultiplier = getNextMultiplier();
       updateTimerWithMultipliers(multiplier);
     }, incrementInterval);
   }
@@ -227,7 +226,6 @@ function waitCount() {
         // Handle the case when there are no more multipliers
         console.log("No more multipliers available.");
       }
-      // getMultipliersFromDatabase(); // Continue with the next multiplier
     }
   }, decrementInterval);
 }
@@ -252,16 +250,11 @@ async function updatePlayedField(multiplier) {
   }
 }
 
+//  Start server and Game
+
 server.listen(3001, async () => {
   await startGame();
   getMultiplierValue();
-
-  // setTimeout(() => {
-  //   // const nextMultiplier = getNextMultiplier();
-  //   getMultiplierValue();
-  // }, 100);
-
-  // setInterval(checkBetsForWinsAndLosses(), 100);
 
   console.log(`listening on 3001`);
 });
@@ -319,7 +312,7 @@ setInterval(async () => {
     // Handle the error here
     console.error("An error occurred while checking bets:", error);
   }
-}, 100);
+}, 300);
 
 //  Get the next game round id
 
