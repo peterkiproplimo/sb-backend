@@ -46,6 +46,7 @@ const cors = require("cors");
 // Get Socket io manenos
 const { socketIO, socketCON } = require("./src/socket/socketio");
 const { connection } = require("./src/socket/gameHandler");
+const { getnextRound, setNextRound } = require("./src/utils/gameroundUtils"); // Adjust the path as needed
 
 const corsOptions = {
   origin: "*",
@@ -110,10 +111,10 @@ let timerPaused = false; // Flag t
 let currentMultiplierBatch = []; // Array to store the current batch of multipliers
 let batchIndex = 0;
 let value = 1.0;
-const incrementInterval = 60; // milliseconds
+const incrementInterval = 40; // milliseconds
 const incrementStep = 0.01; // Step to achieve 1 decimal place
 let targetValueIndex = 0;
-let gameround = 1;
+let nextGameroundID = generateRandomID(32);
 
 const BET_CHECK_INTERVAL = 1000;
 let BET_MULTIPLIERVALUE = 0;
@@ -192,7 +193,7 @@ function updateTimerWithMultipliers(multiplier) {
 }
 
 function waitCount() {
-  console.log("currnet game round", gameround);
+  console.log("currnet game round", getnextRound());
   // console.log('Waiting before moving to the next multiplier:', multiplier[targetValueIndex]);
   timerPaused = true;
   // Set the initial countdown value
@@ -267,14 +268,14 @@ server.listen(3001, async () => {
 // Helper functions
 
 function getNextMultiplier() {
-  gameround++;
-
-  io.emit("nextround", gameround);
-  console.log("next game round", gameround);
+  const nextGameroundID = generateRandomID(32);
+  setNextRound(nextGameroundID);
+  io.emit("nextround", nextGameroundID);
+  console.log("next game round", getnextRound());
   if (batchIndex < currentMultiplierBatch.length) {
     const nextMultiplier = currentMultiplierBatch[batchIndex];
     batchIndex++;
-    updateRound(nextMultiplier, gameround);
+    updateRound(nextMultiplier, nextGameroundID);
     return nextMultiplier;
   } else {
     // If the batch is exhausted, fetch a new batch
@@ -318,6 +319,17 @@ setInterval(async () => {
     // Handle the error here
     console.error("An error occurred while checking bets:", error);
   }
-}, 1000);
+}, 100);
 
-//  Get t
+//  Get the next game round id
+
+function generateRandomID(length) {
+  const characters =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  let randomID = "";
+  for (let i = 0; i < length; i++) {
+    const randomIndex = Math.floor(Math.random() * characters.length);
+    randomID += characters.charAt(randomIndex);
+  }
+  return randomID;
+}
