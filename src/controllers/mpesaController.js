@@ -120,6 +120,34 @@ const mpesaResolvers = {
     }
   },
 
+  depositTest: async (args, req) => {
+    try {
+      const trans = new Transaction({
+        type: "Deposit",
+        trans_id: " row.trans_id",
+        bill_ref_number: "row.bill_ref_number",
+        trans_time: "row.trans_time",
+        amount: args.amount,
+        user: args.userId,
+      });
+      await trans.save();
+      const account = await Account.findOne({
+        user: args.userId,
+      });
+      account.balance = parseFloat(account?.balance) + parseFloat(args.amount);
+      await account.save();
+      // const ipAddress = req.socket.remoteAddress;
+      const log = new Logs({
+        ip: "deposits",
+        description: `${account?.user?.username} deposited ${args.amount}- Account Name:${account?.user?.username}`,
+        user: args.userId,
+      });
+      await log.save();
+    } catch (err) {
+      console.log(err);
+    }
+  },
+
   depositManual: (args, req) => {
     var con = mysql.createConnection({
       host: "173.214.168.54",

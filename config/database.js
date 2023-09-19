@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
-const MONGO_URI = "mongodb+srv://Safaribust:ffFnYOKKFVSEWis6@cluster0.yuiecha.mongodb.net/?retryWrites=true&w=majority";
+const MONGO_URI =
+  "mongodb+srv://Safaribust:ffFnYOKKFVSEWis6@cluster0.yuiecha.mongodb.net/?retryWrites=true&w=majority";
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 
@@ -12,12 +13,12 @@ async function connectToDatabase() {
       serverSelectionTimeoutMS: 5000, // Timeout for server selection
     });
 
-    console.log('Connected to MongoDB');
+    // console.log('Connected to MongoDB');
 
     // Return the Mongoose connection
     return mongoose.connection;
   } catch (error) {
-    console.error('Error connecting to MongoDB:', error.message);
+    console.error("Error connecting to MongoDB:", error.message);
     throw error;
   }
 }

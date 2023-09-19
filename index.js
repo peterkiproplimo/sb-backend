@@ -167,7 +167,7 @@ function updateTimerWithMultipliers(multiplier) {
     // Increment the value by incrementStep
     setMultiplierValue((value += incrementStep));
 
-    console.log(value);
+    // console.log(value);
     io.emit("updateTimer", value.toFixed(2)); // Emit the updated value to all connected clients
   } else {
     if (value >= multiplier.bustpoint) {
@@ -309,7 +309,7 @@ setInterval(async () => {
   try {
     const playerBets = await checkBetsForWinsAndLosses();
     io.emit("livedata", playerBets);
-    console.log("Player bets:", playerBets);
+    // console.log("Player bets:", playerBets);
     // Perform actions with player bets here
   } catch (error) {
     // Handle the error here

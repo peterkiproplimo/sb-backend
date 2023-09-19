@@ -402,7 +402,7 @@ createActives(user:String!, round:String!, amount:String):ActiveUsers
 generateOtp(username:String, phone:String):OTP!
 generateAdminOtp(username:String, userId:String):OTP!
 transactionStatus(reference:String!):Transaction
-deposit(phone:String!, amount:Float!, userId:String!):Account
+depositTest(phone:String!, amount:Float!, userId:String!):Account
 suspendAccount(accountId:String!, initiator:String):Account
 activateAccount(accountId:String!, initiator:String):Account
 depositManual(phone:String!, userId:String!):Account
