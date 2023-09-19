@@ -1,0 +1,36 @@
+{
+    "users": {
+      "create": "Create Users",
+      "read": "Read Users",
+      "update": "Update Users",
+      "suspend": "Suspend Users",
+      "hold": "Hold Users",
+      "activate": "Activate Users",
+      "changepassword": "Change User Password"
+    },
+    "roles": {
+      "create": "Create Roles",
+      "read": "Read Roles",
+      "update": "Update Roles",
+      "delete": "Delete Roles"
+    },
+    "products": {
+      "create": "Create Products",
+      "read": "Read Products",
+      "update": "Update Products",
+      "delete": "Delete Products"
+    },
+    "dashboard": {
+        "create": "Create Products",
+        "read": "Read Products",
+        "update": "Update Products",
+        "delete": "Delete Products"
+    },
+    "players": {
+        "create": "Create Products",
+        "read": "Read Products",
+        "update": "Update Products",
+        "delete": "Delete Products"
+    }
+  }
+  

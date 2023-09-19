@@ -279,6 +279,12 @@ at:Float
 crush:Float
 }
 
+input PermissionInput {
+  entity_name: String!
+  action_name: String!
+  description: String!
+}
+
 type HouseAmount{
 amount:Float!
 }
@@ -311,6 +317,19 @@ lost:Float
 
 type AccountBalance{
 amount:Float
+}
+
+type Role {
+  _id: ID!
+  name: String!
+  permissions: [Permission!]!
+}
+
+type Permission {
+  _id: ID!
+  entity_name: String!
+  action_name: String!
+  description: String!
 }
 
 
@@ -394,6 +413,8 @@ changeAdminPassword(username:String, password:String,initiator:String!):User!
 editAdminUserPhone(username:String, phone:String, initiator:String!):User!
 editAdminUser(username:String, initiator:String!, phone:String, type:String!):Admin!
 createPlayerbet(playerbetInput: PlayerbetInput!): Playerbet
+createRole(name: String!, selectedPermissionIds: [ID!]!): Role
+
 }
 
 

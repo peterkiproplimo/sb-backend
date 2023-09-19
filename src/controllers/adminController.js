@@ -11,6 +11,11 @@ const Admin = require("../models/admins");
 const AdminLog = require("../models/adminlogs");
 const house = require("../models/house");
 const Actives = require("../models/activeusers");
+const Role = require("../models/roleModel");
+const Permission = require("../models/permissionModel");
+const permissions = require("../../permissions.json");
+
+const connectToDatabase = require("../../config/database");
 
 const adminResolvers = {
   // Get the number of winners  in a particular month
@@ -209,14 +214,6 @@ const adminResolvers = {
     const users = await Admin.find().sort({ createdAt: -1 });
 
     return users;
-    // .map((user) => {
-    //   return {
-    //     ...user._doc,
-    //     _id: user.id,
-    //     createdAt: new Date(user._doc.createdAt).toISOString(),
-    //     updatedAt: new Date(user._doc.updatedAt).toISOString(),
-    //   };
-    // });
   },
 
   //  Get a list of all the accounts
@@ -669,6 +666,63 @@ const adminResolvers = {
       updatedAt: new Date(results._doc.updatedAt).toISOString(),
     };
   },
+
+  createRole: async (parent, args, context) => {
+    const { name, selectedPermissionIds } = args;
+
+    try {
+      // Fetch the selected permissions by their IDs
+      const selectedPermissions = await Permission.find({
+        _id: { $in: selectedPermissionIds },
+      });
+
+      const role = new Role({
+        name: name,
+        permissions: selectedPermissions,
+      });
+
+      await role.save();
+      console.log(
+        `Role "${name}" created with permissions:`,
+        selectedPermissions
+      );
+
+      return role;
+    } catch (error) {
+      console.error("Error creating role:", error);
+      throw new Error("Failed to create role");
+    }
+  },
 };
+async function savePermissionsToMongo() {
+  try {
+    const db = await connectToDatabase(); // Replace with your database name
+    const permissionsCollection = db.collection("permissions");
+
+    // Clear existing permissions and insert new ones
+    await permissionsCollection.deleteMany({});
+    const permissionArray = [];
+
+    for (const entity in permissions) {
+      for (const action in permissions[entity]) {
+        permissionArray.push({
+          entity_name: entity,
+          action_name: action,
+          description: permissions[entity][action],
+        });
+      }
+    }
+
+    const result = await permissionsCollection.insertMany(permissionArray);
+    console.log(`${result.insertedCount} permissions inserted into MongoDB`);
+  } catch (error) {
+    console.error("Error saving permissions to MongoDB:", error);
+  } finally {
+    await client.close();
+    console.log("Disconnected from MongoDB");
+  }
+}
+
+// savePermissionsToMongo();
 
 module.exports = adminResolvers;
