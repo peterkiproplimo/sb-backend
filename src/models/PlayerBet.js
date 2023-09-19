@@ -18,7 +18,7 @@ const betSchema = new Schema(
       required: true,
     },
     round: {
-      type: Number,
+      type: String,
       required: true,
     },
     possibleWin: {

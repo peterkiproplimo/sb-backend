@@ -272,6 +272,30 @@ const mpesaResolvers = {
     }
   },
 
+  withdrawTest: async (args, req) => {
+    const account = await Account.findOne({ user: args.userId });
+
+    if (parseFloat(args.amount) > parseFloat(account.balance)) {
+      throw new Error("Insufficient balance in your wallet");
+    }
+
+    try {
+      let filter = { user: args.userId };
+      let update = {
+        balance: parseFloat(account?.balance) - parseFloat(args.amount),
+      };
+      await Account.findOneAndUpdate(filter, update);
+      const log = new Logs({
+        ip: ipAddress,
+        description: `Withdrawn ${args.amount} - Account Name:${args.phone}`,
+        user: args.userId,
+      });
+      await og.save();
+    } catch (err) {
+      console.log(err);
+    }
+  },
+
   transactionStatus: async (args, req) => {
     try {
       const consumer_key = "FH9hAhMJLPK4bmgfwRA4X5rmDw6bAcFS";

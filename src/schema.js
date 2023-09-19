@@ -254,7 +254,7 @@ _id: ID!
 betAmount: Float!
 point: Float!
 userId: Player!
-round: Float!
+round: String!
 possibleWin: Float
 win:Boolean
 createdAt: String!
@@ -265,7 +265,7 @@ input PlayerbetInput {
   betAmount: Float!
   point: Float!
   userId: ID!
-  round: Float!
+  round: String!
   win: Boolean!
 }
   
@@ -414,7 +414,7 @@ editAdminUserPhone(username:String, phone:String, initiator:String!):User!
 editAdminUser(username:String, initiator:String!, phone:String, type:String!):Admin!
 createPlayerbet(playerbetInput: PlayerbetInput!): Playerbet
 createRole(name: String!, selectedPermissionIds: [ID!]!): Role
-
+withdrawTest(userId: String!, amount: Float!, phone: String!): Account
 }
 
 
