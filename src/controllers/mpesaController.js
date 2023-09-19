@@ -9,6 +9,7 @@ var mysql = require("mysql");
 const Account = require("../models/Account");
 const Transaction = require("../models/transactions");
 const Logs = require("../models/logs");
+const Player = require("../models/Player");
 
 const mpesaResolvers = {
   deposit: async (args, req) => {
@@ -143,6 +144,16 @@ const mpesaResolvers = {
         user: args.userId,
       });
       await log.save();
+
+      const user = await Player.findById(args.userId);
+      return {
+        _id: account?.id,
+        balance: account?.balance,
+        user: user,
+        createdAt: new Date(account?._doc?.createdAt).toISOString(),
+        updatedAt: new Date(account?._doc?.updatedAt).toISOString(),
+        active: account?.active,
+      };
     } catch (err) {
       console.log(err);
     }
@@ -286,11 +297,22 @@ const mpesaResolvers = {
       };
       await Account.findOneAndUpdate(filter, update);
       const log = new Logs({
-        ip: ipAddress,
+        ip: "ipAddress",
         description: `Withdrawn ${args.amount} - Account Name:${args.phone}`,
         user: args.userId,
       });
-      await og.save();
+
+      await log.save();
+
+      const user = await Player.findById(args.userId);
+      return {
+        _id: account?.id,
+        balance: account?.balance,
+        user: user,
+        createdAt: new Date(account?._doc?.createdAt).toISOString(),
+        updatedAt: new Date(account?._doc?.updatedAt).toISOString(),
+        active: account?.active,
+      };
     } catch (err) {
       console.log(err);
     }
