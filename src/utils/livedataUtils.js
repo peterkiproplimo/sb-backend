@@ -31,6 +31,34 @@ async function getWinnersofRound(bustboint, roundId) {
     throw error; // Rethrow the error to handle it at a higher level if needed
   }
 }
+
+async function setWinners(bustboint, roundId) {
+  try {
+    const db = await connectToDatabase();
+
+    // Fetch all player bets from the "Playerbets" collection
+    const bets = await db.collection("playerbets").find({ roundId }).toArray();
+
+    const winners = bets.filter((bet) => {
+      if (bet.bustpoint > bustboint) {
+        // Set the "win" property to true for the winners
+        db.collection("playerbets").updateOne(
+          { _id: bet._id },
+          { $set: { win: true } }
+        );
+        return true;
+      }
+      return false;
+    });
+
+    livePlayers.push(...winners);
+    return winners;
+    // return bets;
+  } catch (error) {
+    console.error("Error checking bets:", error);
+    throw error; // Rethrow the error to handle it at a higher level if needed
+  }
+}
 /*/  Set the next round betting players livedata
    Be checking for the players who have bet the next round and update next round livedata array
 */

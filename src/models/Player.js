@@ -1,6 +1,4 @@
-// src/models/User.js
-
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema({
   type: String,
@@ -14,9 +12,9 @@ const userSchema = new mongoose.Schema({
   firstDeposit: Number,
   createdAt: Date,
   updatedAt: Date,
-  playerbets: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Playerbet' }],
+  playerbets: [{ type: mongoose.Schema.Types.ObjectId, ref: "Playerbet" }],
 });
 
-const User = mongoose.model('Player', userSchema);
+const User = mongoose.model("Player", userSchema);
 
 module.exports = User;
