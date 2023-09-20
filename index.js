@@ -341,11 +341,12 @@ setInterval(async () => {
     } else if (getemitOngoingRound()) {
       const multvalue = getMultiplierValue();
       const roundId = getnextRound();
+      await setWinners(multvalue);
       const playerBets = await checkBetsForWinsAndLosses();
       io.emit("livedata", playerBets);
       console.log("Ongoing round" + multvalue + "Round id" + roundId);
       let data = [];
-      io.emit("livedata", data);
+      // io.emit("livedata", data);
     } else if (getemitEndRound()) {
       console.log("Ok2");
       let data1 = [];
@@ -377,12 +378,12 @@ function generateRandomID(length) {
   return randomID;
 }
 
-async function setWinners(bustboint, roundId) {
+async function setWinners(bustboint) {
   try {
     const db = await connectToDatabase();
 
     // Fetch all player bets from the "Playerbets" collection
-    const bets = await db.collection("playerbets").find({ roundId }).toArray();
+    const bets = await db.collection("playerbets").find().toArray();
 
     console.log(bets);
     const winners = bets.filter((bet) => {
