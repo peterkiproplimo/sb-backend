@@ -341,12 +341,16 @@ setInterval(async () => {
     } else if (getemitOngoingRound()) {
       const multvalue = getMultiplierValue();
       const roundId = getnextRound();
+      const playerBets = await checkBetsForWinsAndLosses();
+      io.emit("livedata", playerBets);
       console.log("Ongoing round" + multvalue + "Round id" + roundId);
       let data = [];
       io.emit("livedata", data);
     } else if (getemitEndRound()) {
       console.log("Ok2");
       let data1 = [];
+      const playerBets = await checkBetsForWinsAndLosses();
+      io.emit("livedata", playerBets);
       io.emit("livedata", data1);
     } else {
       console.log("Ok3");
