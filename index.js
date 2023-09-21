@@ -301,7 +301,7 @@ setInterval(async () => {
     model: Player, // Reference the User model
   });
   // Reverse the order to have the latest messages at the end of the array
-  const latestChatsReversed = chatsWithDetails.reverse();
+  // const latestChatsReversed = chatsWithDetails.reverse();
   io.emit("livechat", latestChatsReversed);
 }, 300);
 
