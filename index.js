@@ -302,7 +302,7 @@ setInterval(async () => {
   });
   // Reverse the order to have the latest messages at the end of the array
   // const latestChatsReversed = chatsWithDetails.reverse();
-  io.emit("livechat", latestChatsReversed);
+  io.emit("livechat", chatsWithDetails);
 }, 300);
 
 // Update the players win/lose as the counter continue's with the counting
