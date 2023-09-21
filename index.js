@@ -12,10 +12,10 @@ const resolvers = require("./src/resolvers");
 //import the midleware to check for every incoming request if user is authenticated
 const isAuth = require("./src/middleware/is-auth");
 const house = require("./src/models/house");
-
+const Chat = require("./src/models/Chat");
 const connectToDatabase = require("./config/database"); // Update the path if needed
 const cors = require("cors");
-
+const Player = require("./src/models/Player");
 // Get Socket io manenos
 const { socketIO } = require("./src/socket/socketio");
 const { connection } = require("./src/socket/gameHandler");
@@ -96,7 +96,6 @@ io.on("connection", onConnection);
 io.use(socketAuth);
 app.use(cors());
 
-let _multipliers = [];
 let timerPaused = false; // Flag t
 let currentMultiplierBatch = []; // Array to store the current batch of multipliers
 let batchIndex = 0;
@@ -106,7 +105,6 @@ const incrementStep = 0.01; // Step to achieve 1 decimal place
 let targetValueIndex = 0;
 let nextGameroundID = generateRandomID(32);
 
-const BET_CHECK_INTERVAL = 1000;
 let BET_MULTIPLIERVALUE = 0;
 
 setemitNextRound(false);
@@ -148,7 +146,6 @@ async function updateTimerWithMultipliers(multiplier) {
     // Increment the value by incrementStep
     setMultiplierValue((value += incrementStep));
 
-    // console.log(value);
     io.emit("updateTimer", value.toFixed(2)); // Emit the updated value to all connected clients
   } else {
     if (value >= multiplier.bustpoint) {
@@ -185,8 +182,7 @@ async function waitCount() {
   setemitEndRound(false);
   const currentRound = await getRoundFromDatabase();
   await saveCurrentRound(currentRound);
-  // console.log("currnet game round", getnextRound());
-  // console.log('Waiting before moving to the next multiplier:', multiplier[targetValueIndex]);
+
   timerPaused = true;
   // Set the initial countdown value
   let countdownValue = 10.0;
@@ -206,7 +202,6 @@ async function waitCount() {
       // After the countdown, resume the timer and continue to the next multiplier
       timerPaused = false;
       io.emit("countDown", "");
-      // io.emit('successMessage', ''); // Clear the "Busted" message
       targetValueIndex++;
 
       const nextMultiplier = await getNextMultiplier();
@@ -302,6 +297,18 @@ setInterval(async () => {
     // Handle the error here
     console.error("An error occurred while checking bets:", error);
   }
+
+  const latestChats = await Chat.find({})
+    .sort({ createdAt: -1 }) // Sort by createdAt in descending order (most recent first)
+    .limit(20);
+  // Limit the result to 20 messages
+  const chatsWithDetails = await Chat.populate(latestChats, {
+    path: "user", // Match this with the field name in Playerbet model that references User model
+    model: Player, // Reference the User model
+  });
+  // Reverse the order to have the latest messages at the end of the array
+  const latestChatsReversed = chatsWithDetails.reverse();
+  io.emit("livechat", latestChatsReversed);
 }, 300);
 
 // Update the players win/lose as the counter continue's with the counting
@@ -319,3 +326,5 @@ async function generateRandomID(length) {
 
   return randomID;
 }
+
+module.exports = { io };

@@ -261,6 +261,19 @@ createdAt: String!
 updatedAt: String!
 }
 
+type Chat {
+  _id: ID!
+  message: String!
+  userId: Player!
+  createdAt: String!
+  updatedAt: String!
+}
+
+input ChatInput {
+  message: String!
+  userId: ID!
+}
+
 input PlayerbetInput {
   betAmount: Float!
   point: Float!
@@ -415,6 +428,8 @@ editAdminUser(username:String, initiator:String!, phone:String, type:String!):Ad
 createPlayerbet(playerbetInput: PlayerbetInput!): Playerbet
 createRole(name: String!, selectedPermissionIds: [ID!]!): Role
 withdrawTest(userId: String!, amount: Float!, phone: String!): Account
+createChat(chatInput: ChatInput!): Chat!
+
 }
 
 

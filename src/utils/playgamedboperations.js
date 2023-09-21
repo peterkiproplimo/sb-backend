@@ -2,7 +2,7 @@
 const connectToDatabase = require("../../config/database"); // Update the path if needed
 const Player = require("../models/Player");
 const Playerbet = require("../models/PlayerBet");
-const { MongoClient, ObjectId } = require("mongodb");
+const { ObjectId } = require("mongodb");
 
 async function checkBetsForWinsAndLosses(roundId) {
   try {
