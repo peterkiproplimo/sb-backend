@@ -1,36 +1,12 @@
 "use strict";
 const express = require("express");
-const mongoose = require("mongoose");
 require("dotenv").config();
 const { graphqlHTTP } = require("express-graphql");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-
 var schedule = require("node-schedule");
-const moment = require("moment");
-const otpGenerator = require("otp-generator");
-var request = require("request");
-const axios = require("axios");
-const formatDate = require("./src/utils/formatDate");
-// const { WebSocketServer } = require('ws');
 const http = require("http");
 const app = express();
 const server = http.createServer(app);
-var mysql = require("mysql");
 const socketAuth = require("./src/middleware/socketAuth");
-//importing mongoose models
-
-const Account = require("./src/models/Account");
-const Bet = require("./src/models/Bet");
-const Transaction = require("./src/models/transactions");
-const Logs = require("./src/models/logs");
-const BetHistory = require("./src/models/bethistory");
-// const Game = require("./src/models/gamedata");
-const OTP = require("./src/models/verifier");
-const Admin = require("./src/models/admins");
-const AdminLog = require("./src/models/adminlogs");
-// Import the resolvers and the schema
-
 const schema = require("./src/schema");
 const resolvers = require("./src/resolvers");
 //import the midleware to check for every incoming request if user is authenticated
@@ -38,17 +14,31 @@ const isAuth = require("./src/middleware/is-auth");
 const house = require("./src/models/house");
 
 const connectToDatabase = require("./config/database"); // Update the path if needed
-
-const Actives = require("./src/models/activeusers");
-const Player = require("./src/models/Player");
-const Playerbet = require("./src/models/PlayerBet");
 const cors = require("cors");
 
 // Get Socket io manenos
-const { socketIO, socketCON } = require("./src/socket/socketio");
+const { socketIO } = require("./src/socket/socketio");
 const { connection } = require("./src/socket/gameHandler");
-const { getnextRound, setNextRound } = require("./src/utils/gameroundUtils"); // Adjust the path as needed
-// const { setWinners } = require("./src/utils/livedataUtils"); // Adjust the path as needed
+const {
+  getnextRound,
+  setNextRound,
+  setemitNextRound,
+  setemitOngoingRound,
+  setemitEndRound,
+  getemitNextRound,
+  getemitOngoingRound,
+  getemitEndRound,
+} = require("./src/utils/gameroundUtils");
+const {
+  checkBetsForWinsAndLosses,
+  updatePlayedField,
+  getRoundFromDatabase,
+  getCurrentRoundFromDatabase,
+  saveRoundIndB,
+  saveCurrentRound,
+  updateRound,
+  setWinners,
+} = require("./src/utils/playgamedboperations");
 
 const corsOptions = {
   origin: "*",
@@ -72,8 +62,6 @@ app.use((req, res, next) => {
   }
   next();
 });
-let livePlayers = [];
-let betsLive = [];
 
 app.get("/remove", (req, res, next) => {
   betsLive = [];
@@ -120,34 +108,12 @@ let nextGameroundID = generateRandomID(32);
 
 const BET_CHECK_INTERVAL = 1000;
 let BET_MULTIPLIERVALUE = 0;
-let emitNextRound = false;
-let emitOngoingRound = false;
-let emitEndRound = false;
+
 setemitNextRound(false);
 setemitOngoingRound(false);
 setemitEndRound(false);
 
-async function checkBetsForWinsAndLosses() {
-  try {
-    const db = await connectToDatabase();
-
-    // Fetch all player bets from the "Playerbets" collection
-    // const bets = await db.collection("playerbets").find().toArray();
-    const bets = await Playerbet.find();
-
-    // Use populate to include player details for each bet
-    const betsWithDetails = await Playerbet.populate(bets, {
-      path: "userId", // Match this with the field name in Playerbet model that references User model
-      model: Player, // Reference the User model
-    });
-
-    return betsWithDetails;
-    // return bets;
-  } catch (error) {
-    console.error("Error checking bets:", error);
-    throw error; // Rethrow the error to handle it at a higher level if needed
-  }
-}
+let currentRound = null;
 
 async function fetchMultipliersBatch() {
   try {
@@ -174,7 +140,7 @@ async function fetchMultipliersBatch() {
 
 fetchMultipliersBatch();
 
-function updateTimerWithMultipliers(multiplier) {
+async function updateTimerWithMultipliers(multiplier) {
   setemitOngoingRound(true);
   setemitEndRound(false);
   setemitNextRound(false);
@@ -196,9 +162,9 @@ function updateTimerWithMultipliers(multiplier) {
       io.emit("updateTimer", "");
       io.emit("loadwinners", "");
 
-      setTimeout(() => {
+      setTimeout(async () => {
         io.emit("successMessage", ""); // Clear the "Busted" message
-        waitCount();
+        await waitCount();
       }, 2000);
 
       value = 1.0;
@@ -213,15 +179,17 @@ function updateTimerWithMultipliers(multiplier) {
   }
 }
 
-function waitCount() {
+async function waitCount() {
   setemitNextRound(true);
   setemitOngoingRound(false);
   setemitEndRound(false);
+  const currentRound = await getRoundFromDatabase();
+  await saveCurrentRound(currentRound);
   // console.log("currnet game round", getnextRound());
   // console.log('Waiting before moving to the next multiplier:', multiplier[targetValueIndex]);
   timerPaused = true;
   // Set the initial countdown value
-  let countdownValue = 4.0;
+  let countdownValue = 10.0;
 
   // Set the decrement interval and step
   const decrementInterval = 100; // 100 milliseconds
@@ -241,12 +209,12 @@ function waitCount() {
       // io.emit('successMessage', ''); // Clear the "Busted" message
       targetValueIndex++;
 
-      const nextMultiplier = getNextMultiplier();
+      const nextMultiplier = await getNextMultiplier();
 
       if (nextMultiplier) {
         // Start the timer with the next multiplier
 
-        updateTimerWithMultipliers(nextMultiplier);
+        await updateTimerWithMultipliers(nextMultiplier);
       } else {
         // Handle the case when there are no more multipliers
         console.log("No more multipliers available.");
@@ -256,23 +224,7 @@ function waitCount() {
 }
 
 async function startGame() {
-  // Start the game by waiting for the initial countdown
   await waitCount();
-}
-
-async function updatePlayedField(multiplier) {
-  try {
-    const db = await connectToDatabase();
-    const collection = db.collection("gameResults");
-
-    // Update the "played" field to 1 for the current multiplier
-    await collection.updateOne(
-      { _id: multiplier._id },
-      { $set: { played: 1 } }
-    );
-  } catch (error) {
-    console.error("Error updating played field:", error);
-  }
 }
 
 //  Start server and Game
@@ -286,11 +238,15 @@ server.listen(3002, async () => {
 
 // Helper functions
 
-function getNextMultiplier() {
-  const nextGameroundID = generateRandomID(32);
+async function getNextMultiplier() {
+  const nextGameroundID = await generateRandomID(32);
   setNextRound(nextGameroundID);
   setemitOngoingRound(true);
+
+  currentRound = getnextRound();
+
   io.emit("nextround", nextGameroundID);
+  await saveRoundIndB(nextGameroundID);
   console.log("next game round", getnextRound());
   if (batchIndex < currentMultiplierBatch.length) {
     const nextMultiplier = currentMultiplierBatch[batchIndex];
@@ -302,20 +258,6 @@ function getNextMultiplier() {
     fetchMultipliersBatch();
 
     return getNextMultiplier();
-  }
-}
-async function updateRound(multiplier, gameround) {
-  try {
-    const db = await connectToDatabase();
-    const collection = db.collection("gameResults");
-
-    // Update the "played" field to 1 for the current multiplier
-    await collection.updateOne(
-      { _id: multiplier._id },
-      { $set: { round: gameround } }
-    );
-  } catch (error) {
-    console.error("Error updating played field:", error);
   }
 }
 
@@ -332,27 +274,26 @@ function getMultiplierValue() {
 setInterval(async () => {
   try {
     if (getemitNextRound()) {
-      // const bets = await getplayersbettingnextRound(getnextRound());
-      // console.log(bets);
-      const playerBets = await checkBetsForWinsAndLosses();
+      const currentroundId = await getCurrentRoundFromDatabase();
+
+      const playerBets = await checkBetsForWinsAndLosses(currentroundId);
       io.emit("livedata", playerBets);
-      console.log("waiting for the next round");
-      // console.log("Player bets:", playerBets);
     } else if (getemitOngoingRound()) {
       const multvalue = getMultiplierValue();
-      const roundId = getnextRound();
-      await setWinners(multvalue);
-      const playerBets = await checkBetsForWinsAndLosses();
+      const currentroundId = await getCurrentRoundFromDatabase();
+      await setWinners(multvalue, currentroundId);
+      console.log(currentroundId);
+      const playerBets = await checkBetsForWinsAndLosses(currentroundId);
       io.emit("livedata", playerBets);
-      console.log("Ongoing round" + multvalue + "Round id" + roundId);
+      // console.log("Ongoing round" + multvalue + "Round id" + roundId);
       let data = [];
       // io.emit("livedata", data);
     } else if (getemitEndRound()) {
       console.log("Ok2");
       let data1 = [];
-      const playerBets = await checkBetsForWinsAndLosses();
-      io.emit("livedata", playerBets);
-      io.emit("livedata", data1);
+      // const playerBets = await checkBetsForWinsAndLosses();
+      // io.emit("livedata", playerBets);
+      // io.emit("livedata", playerBets);
     } else {
       console.log("Ok3");
     }
@@ -367,7 +308,7 @@ setInterval(async () => {
 
 //  Get the next game round id
 
-function generateRandomID(length) {
+async function generateRandomID(length) {
   const characters =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   let randomID = "";
@@ -375,79 +316,6 @@ function generateRandomID(length) {
     const randomIndex = Math.floor(Math.random() * characters.length);
     randomID += characters.charAt(randomIndex);
   }
+
   return randomID;
-}
-
-async function setWinners(bustboint) {
-  try {
-    const db = await connectToDatabase();
-
-    // Fetch all player bets from the "Playerbets" collection
-    const bets = await db.collection("playerbets").find().toArray();
-
-    console.log(bets);
-    const winners = bets.filter((bet) => {
-      if (bet.bustpoint > bustboint) {
-        // Set the "win" property to true for the winners
-        db.collection("playerbets").updateOne(
-          { _id: bet._id },
-          { $set: { win: true } }
-        );
-        return true;
-      }
-      return false;
-    });
-
-    livePlayers.push(...winners);
-    return winners;
-    // return bets;
-  } catch (error) {
-    console.error("Error checking bets:", error);
-    throw error; // Rethrow the error to handle it at a higher level if needed
-  }
-}
-
-async function getplayersbettingnextRound(roundId) {
-  try {
-    const db = await connectToDatabase();
-
-    // Fetch all player bets from the "Playerbets" collection
-
-    const bets = await Playerbet.find({ round: roundId });
-
-    // Use populate to include player details for each bet
-    const betsWithDetails = await Playerbet.populate(bets, {
-      path: "userId", // Match this with the field name in Playerbet model that references User model
-      model: Player, // Reference the User model
-    });
-
-    return betsWithDetails;
-    // return bets;
-  } catch (error) {
-    console.error("Error checking bets:", error);
-    throw error;
-  }
-}
-
-function setemitNextRound(next) {
-  emitNextRound = next;
-}
-
-function setemitOngoingRound(ongoing) {
-  emitOngoingRound = ongoing;
-}
-function setemitEndRound(endround) {
-  emitEndRound = endround;
-}
-
-function getemitNextRound() {
-  return emitNextRound;
-}
-
-function getemitOngoingRound() {
-  return emitOngoingRound;
-}
-
-function getemitEndRound() {
-  return emitEndRound;
 }
