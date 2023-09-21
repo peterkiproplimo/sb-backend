@@ -119,7 +119,7 @@ async function fetchMultipliersBatch() {
     // Fetch a batch of 100 multipliers and store them in currentMultiplierBatch
     currentMultiplierBatch = await collection
       .find({ played: 0 })
-      .limit(2000)
+      .limit(500)
       .toArray();
 
     if (currentMultiplierBatch.length === 0) {
