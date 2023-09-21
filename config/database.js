@@ -10,7 +10,7 @@ async function connectToDatabase() {
     await mongoose.connect(MONGO_URI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
-      serverSelectionTimeoutMS: 5000, // Timeout for server selection
+      serverSelectionTimeoutMS: 20000, // Timeout for server selection
     });
 
     // console.log('Connected to MongoDB');

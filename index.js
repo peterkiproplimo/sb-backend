@@ -46,7 +46,6 @@ const corsOptions = {
   optionSuccessStatus: 200,
 };
 
-// app.use(cors(corsOptions));
 app.use(express.json());
 app.use(isAuth);
 app.use((req, res, next) => {
@@ -103,7 +102,6 @@ let value = 1.0;
 const incrementInterval = 40; // milliseconds
 const incrementStep = 0.01; // Step to achieve 1 decimal place
 let targetValueIndex = 0;
-let nextGameroundID = generateRandomID(32);
 
 let BET_MULTIPLIERVALUE = 0;
 
@@ -121,7 +119,7 @@ async function fetchMultipliersBatch() {
     // Fetch a batch of 100 multipliers and store them in currentMultiplierBatch
     currentMultiplierBatch = await collection
       .find({ played: 0 })
-      .limit(100)
+      .limit(2000)
       .toArray();
 
     if (currentMultiplierBatch.length === 0) {
@@ -280,15 +278,11 @@ setInterval(async () => {
       console.log(currentroundId);
       const playerBets = await checkBetsForWinsAndLosses(currentroundId);
       io.emit("livedata", playerBets);
-      // console.log("Ongoing round" + multvalue + "Round id" + roundId);
-      let data = [];
-      // io.emit("livedata", data);
     } else if (getemitEndRound()) {
       console.log("Ok2");
-      let data1 = [];
-      // const playerBets = await checkBetsForWinsAndLosses();
-      // io.emit("livedata", playerBets);
-      // io.emit("livedata", playerBets);
+      const currentroundId = await getCurrentRoundFromDatabase();
+      const playerBets = await checkBetsForWinsAndLosses(currentroundId);
+      io.emit("livedata", playerBets);
     } else {
       console.log("Ok3");
     }
