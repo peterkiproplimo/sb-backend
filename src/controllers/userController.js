@@ -272,9 +272,9 @@ const generateOtp = async (user, phone, username, type, req) => {
     formData: {
       userid: "safaribust",
       password: "qghckqHE",
-      mobile: `${user ? user.phone : phone}`,
+      mobile: "0741734820",
       senderid: "SAFARIBUST",
-      msg: `OTP: ${otp}`,
+      msg: "This is my message",
       sendMethod: "quick",
       msgType: "text",
       output: "json",
