@@ -429,7 +429,7 @@ createPlayerbet(playerbetInput: PlayerbetInput!): Playerbet
 createRole(name: String!, selectedPermissionIds: [ID!]!): Role
 withdrawTest(userId: String!, amount: Float!, phone: String!): Account
 createChat(chatInput: ChatInput!): Chat!
-
+logoutPlayer(username:String!):Player!
 }
 
 

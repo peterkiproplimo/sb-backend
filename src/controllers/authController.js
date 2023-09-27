@@ -3,14 +3,12 @@ const otpGenerator = require("otp-generator");
 const jwt = require("jsonwebtoken");
 
 //importing mongoose models
-const Player = require('../models/Player');
+const Player = require("../models/Player");
 const Admin = require("../models/admins");
 const Logs = require("../models/logs");
-const AdminLog=require("../models/adminlogs");
-
+const AdminLog = require("../models/adminlogs");
 
 const authResolvers = {
-
   login: async (args, req) => {
     const user = await Player.findOne({ username: args.loginInput.username });
     if (!user) {
@@ -27,12 +25,12 @@ const authResolvers = {
       throw new Error("Invalid credentials. Please try again!");
     }
     const otp = otpGenerator.generate(12, {
-              upperCaseAlphabets: true,
-              lowerCaseAlphabets: false,
-              digits: true,
-              specialChars: false,
-            });
-    user.dataToken=otp
+      upperCaseAlphabets: true,
+      lowerCaseAlphabets: false,
+      digits: true,
+      specialChars: false,
+    });
+    user.dataToken = otp;
     user.online = true;
     await user.save();
 
@@ -55,21 +53,20 @@ const authResolvers = {
     return {
       userId: user.id,
       type: user.type,
-      username:user.username,
-      phone:user.phone,
+      username: user.username,
+      phone: user.phone,
       token: token,
-      dataToken:user.dataToken,
+      dataToken: user.dataToken,
       tokenExpiration: 15,
-      online:user.online
+      online: user.online,
     };
     // online: user.online,
   },
 
-
   adminLogin: async (args, req) => {
-    console.log(args); 
+    console.log(args);
     const user = await Admin.findOne({
-      username: args.loginInput.username, 
+      username: args.loginInput.username,
     });
     if (!user) {
       throw new Error("Invalid credentials. Please try again!");
@@ -117,13 +114,13 @@ const authResolvers = {
 
   logout: async (args, req) => {
     const user = await User.findOne({ username: args.username });
-    if(!user){
-      throw Error("User not found")
+    if (!user) {
+      throw Error("User not found");
     }
     user.online = false;
     await user.save();
 
-     const ipAddress = req.socket.remoteAddress;
+    const ipAddress = req.socket.remoteAddress;
     const log = new AdminLog({
       ip: ipAddress,
       description: `${args.initiator} logged out ${user.username}`,
@@ -135,13 +132,13 @@ const authResolvers = {
   },
   logoutUser: async (args, req) => {
     const user = await User.findOne({ username: args.username });
-    if(!user){
-      throw Error("User not found")
+    if (!user) {
+      throw Error("User not found");
     }
     user.online = false;
     await user.save();
 
-     const ipAddress = req.socket.remoteAddress;
+    const ipAddress = req.socket.remoteAddress;
     const log = new Logs({
       ip: ipAddress,
       description: `${user.username} logged out `,
@@ -151,9 +148,23 @@ const authResolvers = {
     return user;
   },
 
-  
+  logoutPlayer: async (args, req) => {
+    const user = await Player.findOne({ username: args.username });
+    if (!user) {
+      throw Error("User not found");
+    }
+    user.online = false;
+    await user.save();
+
+    const ipAddress = req.socket.remoteAddress;
+    const log = new Logs({
+      ip: ipAddress,
+      description: `${user.username} logged out `,
+      user: user._id,
+    });
+    await log.save();
+    return user;
+  },
 };
-
-
 
 module.exports = authResolvers;
