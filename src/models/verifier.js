@@ -12,6 +12,10 @@ const otpSchema = new Schema(
       type: Boolean,
       required: true,
     },
+    type: {
+      type: String,
+      required: false,
+    },
     user: {
       type: Schema.Types.ObjectId,
       ref: "User",

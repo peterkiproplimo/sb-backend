@@ -11,7 +11,7 @@ const AdminLog = require("../models/adminlogs");
 const User = require("../models/User");
 const Player = require("../models/Player");
 const Admin = require("../models/admins");
-
+const OTP = require("../models/verifier");
 const userResolvers = {
   createUser: (args, req) => {
     return Player.findOne({ username: args.userInput.username })
@@ -51,7 +51,7 @@ const userResolvers = {
             user: result.id,
           });
           await account.save();
-          //TODO: send a verification email
+
           const ipAddress = req.socket.remoteAddress;
           const log = new AdminLog({
             ip: ipAddress,
@@ -62,26 +62,37 @@ const userResolvers = {
           await log.save();
           console.log(log);
         }
-        const token = await jwt.sign(
-          {
+      })
+      .then(async (result) => {
+        const myuser = Player.findOne({ username: args.userInput.username });
+        const mresult = await generateOtp(
+          myuser,
+          myuser.phone,
+          "register",
+          myuser.username
+        );
+        if (mresult) {
+          const token = await jwt.sign(
+            {
+              userId: result.id,
+              username: result.username,
+              online: result.online,
+              phone: result.phone,
+            },
+            "thisissupposedtobemysecret",
+            {
+              expiresIn: 60 * 15,
+            }
+          );
+          return {
             userId: result.id,
             username: result.username,
+            type: result.type,
+            token: token,
+            tokenExpiration: 15,
             online: result.online,
-            phone: result.phone,
-          },
-          "thisissupposedtobemysecret",
-          {
-            expiresIn: 60 * 15,
-          }
-        );
-        return {
-          userId: result.id,
-          username: result.username,
-          type: result.type,
-          token: token,
-          tokenExpiration: 15,
-          online: result.online,
-        };
+          };
+        }
       })
       .catch((err) => {
         console.log(err);
@@ -235,6 +246,62 @@ const userResolvers = {
       })
       .catch((err) => console.log(err.message));
   },
+};
+
+const generateOtp = async (user, phone, username, type, req) => {
+  const otp = otpGenerator.generate(5, {
+    upperCaseAlphabets: true,
+    lowerCaseAlphabets: false,
+    digits: true,
+    specialChars: false,
+  });
+
+  const otpCreator = new OTP({
+    otp: otp,
+    verified: false,
+    user: user ? user.id : null,
+  });
+  const generator = await otpCreator.save();
+
+  var options = {
+    method: "POST",
+    url: "https://sms.securifier.co.ke/SMSApi/send",
+    headers: {
+      Headers: "Content-Type:application/json",
+    },
+    formData: {
+      userid: "safaribust",
+      password: "qghckqHE",
+      mobile: `${user ? user.phone : phone}`,
+      senderid: "SAFARIBUST",
+      msg: `OTP: ${otp}`,
+      sendMethod: "quick",
+      msgType: "text",
+      output: "json",
+      duplicatecheck: "true",
+    },
+  };
+  request(options, function (error, response) {
+    if (error) throw new Error(error);
+    // console.log(response.body);
+  });
+
+  const ipAddress = "ada";
+  const log = new Logs({
+    ip: ipAddress,
+    description: ` OTP sent to User`,
+    user: user ? user._id : null,
+  });
+
+  await log.save();
+
+  return {
+    ...generator._doc,
+    _id: generator._id,
+    user: user,
+    createdAt: new Date(generator._doc.createdAt).toISOString(),
+    updatedAt: new Date(generator._doc.updatedAt).toISOString(),
+  };
 };
 
 module.exports = userResolvers;
