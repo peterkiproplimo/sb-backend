@@ -59,12 +59,13 @@ const userResolvers = {
             user: result.id,
           });
 
-          await log.save();
-          console.log(log);
+          return log.save();
+          // console.log(log);
         }
       })
       .then(async (result) => {
         const myuser = Player.findOne({ username: args.userInput.username });
+        console.log(myuser);
         const mresult = await generateOtp(
           myuser,
           myuser.phone,
@@ -259,7 +260,7 @@ const generateOtp = async (user, phone, username, type, req) => {
   const otpCreator = new OTP({
     otp: otp,
     verified: false,
-    user: user ? user.id : null,
+    user: user ? user._id : null,
   });
   const generator = await otpCreator.save();
 

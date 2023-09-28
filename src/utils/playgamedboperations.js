@@ -4,6 +4,11 @@ const Player = require("../models/Player");
 const Playerbet = require("../models/PlayerBet");
 const { ObjectId } = require("mongodb");
 
+const {
+  generateFakePlayers,
+  generateFakePlayersAndBets,
+} = require("../utils/fakePlayerUtils");
+
 async function checkBetsForWinsAndLosses(roundId) {
   try {
     const db = await connectToDatabase();
@@ -25,6 +30,47 @@ async function checkBetsForWinsAndLosses(roundId) {
     throw error; // Rethrow the error to handle it at a higher level if needed
   }
 }
+
+async function getEndResults(roundId, endValue) {
+  try {
+    const db = await connectToDatabase();
+
+    // Fetch all player bets from the "Playerbets" collection
+    const bets = await Playerbet.find({ round: roundId });
+
+    // Iterate through the bets and update the "win" field based on the condition
+    for (const bet of bets) {
+      if (bet.point <= endValue) {
+        // If the condition is met, set win to true
+        await Playerbet.updateOne(
+          { _id: bet._id },
+          { $set: { busted: false, win: true } }
+        );
+      } else {
+        // If the condition is not met, set win to false
+        await Playerbet.updateOne(
+          { _id: bet._id },
+          { $set: { busted: true, win: false } }
+        );
+      }
+    }
+    const fakeplayers = generateFakePlayersAndBets(20);
+    // Fetch and return the updated bets from the database
+    const updatedBets = await Playerbet.find({ round: roundId });
+    const betsWithDetails = await Playerbet.populate(updatedBets, {
+      path: "userId", // Match this with the field name in Playerbet model that references User model
+      model: Player, // Reference the User model
+    });
+
+    const finalResponse = [...betsWithDetails, ...fakeplayers];
+
+    return finalResponse;
+  } catch (error) {
+    console.error("Error checking bets:", error);
+    throw error; // Rethrow the error to handle it at a higher level if needed
+  }
+}
+
 async function updatePlayedField(multiplier) {
   try {
     const db = await connectToDatabase();
@@ -154,7 +200,7 @@ async function setWinners(bustboint) {
       console.log(winners);
       return winners;
     } else {
-      console.log("No winners found.");
+      // console.log("No winners found.");
       return [];
     }
   } catch (error) {
@@ -162,6 +208,7 @@ async function setWinners(bustboint) {
     throw error; // Rethrow the error to handle it at a higher level if needed
   }
 }
+
 module.exports = {
   checkBetsForWinsAndLosses,
   updatePlayedField,
@@ -171,4 +218,5 @@ module.exports = {
   saveCurrentRound,
   updateRound,
   setWinners,
+  getEndResults,
 };

@@ -10,6 +10,11 @@ const Game = require("../models/Game");
 const house = require("../models/house");
 const Playerbet = require("../models/PlayerBet");
 const Player = require("../models/Player");
+const {
+  getRoundFromDatabase,
+  getCurrentRoundFromDatabase,
+} = require("../utils/playgamedboperations");
+
 const betsResolvers = {
   createPlayerbet: async (args, req) => {
     // console.log(req);
@@ -19,12 +24,12 @@ const betsResolvers = {
     }
 
     let possibleWin = args.playerbetInput.betAmount * args.playerbetInput.point;
-
+    const nextRound = await getRoundFromDatabase();
     const bet = new Playerbet({
       betAmount: args.playerbetInput.betAmount,
       point: args.playerbetInput.point,
       userId: args.playerbetInput.userId,
-      round: args.playerbetInput.round,
+      round: nextRound,
       possibleWin: possibleWin,
       win: false,
     });

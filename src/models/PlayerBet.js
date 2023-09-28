@@ -28,6 +28,12 @@ const betSchema = new Schema(
     win: {
       type: Boolean,
       default: false,
+      required: false,
+    },
+    busted: {
+      type: Boolean,
+      default: true,
+      required: false,
     },
   },
   { timestamps: true }
