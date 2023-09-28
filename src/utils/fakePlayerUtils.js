@@ -12,7 +12,7 @@ function generateFakePlayers(numPlayers) {
   for (let i = 0; i < numPlayers; i++) {
     const fakePlayer = {
       type: "regular", // Adjust the player type as needed
-      username: faker.internet.userName(),
+      username: faker.internet.userName(6),
       active: true,
       phone: generatePhoneNumber(),
       online: true,
@@ -35,7 +35,7 @@ function generateFakePlayersAndBets(numPlayers) {
   for (let i = 0; i < numPlayers; i++) {
     const fakePlayer = {
       type: "regular",
-      username: faker.internet.userName(),
+      username: faker.internet.userName(6),
       active: true,
       phone: generatePhoneNumber(),
       online: false,

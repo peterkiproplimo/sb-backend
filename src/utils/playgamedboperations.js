@@ -23,7 +23,7 @@ async function checkBetsForWinsAndLosses(roundId) {
       model: Player, // Reference the User model
     });
 
-    const fakeplayers = generateFakePlayersAndBets(10);
+    const fakeplayers = generateFakePlayersAndBets(15);
 
     const finalResponse = [...betsWithDetails, ...fakeplayers];
 
@@ -58,7 +58,7 @@ async function getEndResults(roundId, endValue) {
         );
       }
     }
-    const fakeplayers = generateFakePlayersAndBets(20);
+    const fakeplayers = generateFakePlayersAndBets(15);
     // Fetch and return the updated bets from the database
     const updatedBets = await Playerbet.find({ round: roundId });
     const betsWithDetails = await Playerbet.populate(updatedBets, {
