@@ -23,7 +23,11 @@ async function checkBetsForWinsAndLosses(roundId) {
       model: Player, // Reference the User model
     });
 
-    return betsWithDetails;
+    const fakeplayers = generateFakePlayersAndBets(10);
+
+    const finalResponse = [...betsWithDetails, ...fakeplayers];
+
+    return finalResponse;
     // return bets;
   } catch (error) {
     console.error("Error checking bets:", error);
