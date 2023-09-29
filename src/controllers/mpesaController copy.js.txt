@@ -11,7 +11,6 @@ const Transaction = require("../models/transactions");
 const Logs = require("../models/logs");
 const Player = require("../models/Player");
 const Mpesa = require("mpesa-node");
-let unirest = require("unirest");
 
 const mpesaApi = new Mpesa({
   consumerKey: "ROqiKlEFF9Gb4BmYtTbhPlxk0NYfATg8",
@@ -21,19 +20,19 @@ const mpesaApi = new Mpesa({
 const mpesaResolvers = {
   deposit: async (args, req) => {
     try {
-      const consumer_key = "ROqiKlEFF9Gb4BmYtTbhPlxk0NYfATg8";
+      const consumer_key = "R8Kd6wFX6ot3L7Th";
       const consumer_secret = "R8Kd6wFX6ot3L7Th";
       const url =
-        "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials";
+        "https://api.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials";
       const auth = btoa(`${consumer_key}:${consumer_secret}`);
       const { data } = await axios.get(url, {
         headers: { Authorization: "Basic" + " " + auth },
       });
       if (data.access_token) {
         const timestamp = formatDate();
-        const shortcode = 174379;
+        const shortcode = 4097295;
         const passkey =
-          "MTc0Mzc5YmZiMjc5ZjlhYTliZGJjZjE1OGU5N2RkNzFhNDY3Y2QyZTBjODkzMDU5YjEwZjc4ZTZiNzJhZGExZWQyYzkxOTIwMTYwMjE2MTY1NjI3";
+          "1bbf1ad26591bc48bca5faf176845a5feb3c929d96097ae77d3f45a84e2c339e";
         const password = Buffer.from(shortcode + passkey + timestamp).toString(
           "base64"
         );
@@ -41,7 +40,7 @@ const mpesaResolvers = {
         let unirest = require("unirest");
         let req = unirest(
           "POST",
-          "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest"
+          "https://api.safaricom.co.ke/mpesa/stkpush/v1/processrequest"
         )
           .headers({
             "Content-Type": "application/json",
@@ -59,7 +58,7 @@ const mpesaResolvers = {
               PartyB: shortcode,
               PhoneNumber: parseInt(args.phone),
               CallBackURL:
-                "https://sb-backend-test.onrender.com/mpesa-callback",
+                "https://www.safaribust.co.ke/pesaxpress/STK/callback.php",
               AccountReference: parseInt(args.phone),
               TransactionDesc: "Deposit to SAFARIBUST Account",
             })
@@ -130,85 +129,53 @@ const mpesaResolvers = {
 
   depositTest: async (args, req) => {
     try {
-      const consumer_key = "ROqiKlEFF9Gb4BmYtTbhPlxk0NYfATg8";
-      const consumer_secret = "R8Kd6wFX6ot3L7Th";
-      const url =
-        "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials";
-      const auth = btoa(`${consumer_key}:${consumer_secret}`);
-      const { data } = await axios.get(url, {
-        headers: { Authorization: "Basic" + " " + auth },
+      const testMSISDN = 254741734820;
+      const amount = 1;
+      const accountRef = 174379;
+      await mpesaApi.lipaNaMpesaOnline(
+        testMSISDN,
+        amount,
+        "https://sb-backend-test.onrender.com/mpesa-callback",
+        accountRef,
+        "Lipa na mpesa online",
+        "CustomerPayBillOnline",
+        174379,
+        "MTc0Mzc5YmZiMjc5ZjlhYTliZGJjZjE1OGU5N2RkNzFhNDY3Y2QyZTBjODkzMDU5YjEwZjc4ZTZiNzJhZGExZWQyYzkxOTIwMTYwMjE2MTY1NjI3"
+      );
+
+      const trans = new Transaction({
+        type: "Deposit",
+        trans_id: " row.trans_id",
+        bill_ref_number: "row.bill_ref_number",
+        trans_time: "row.trans_time",
+        amount: args.amount,
+        user: args.userId,
       });
-      if (data.access_token) {
-        const timestamp = formatDate();
-        const shortcode = 174379;
-        const passkey =
-          "MTc0Mzc5YmZiMjc5ZjlhYTliZGJjZjE1OGU5N2RkNzFhNDY3Y2QyZTBjODkzMDU5YjEwZjc4ZTZiNzJhZGExZWQyYzkxOTIwMTYwMjE2MTY1NjI3";
-        const password = Buffer.from(shortcode + passkey + timestamp).toString(
-          "base64"
-        );
+      await trans.save();
 
-        let req = unirest(
-          "POST",
-          "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest"
-        )
-          .headers({
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${data.access_token}`,
-            Host: "api.safaricom.co.ke",
-          })
-          .send(
-            JSON.stringify({
-              BusinessShortCode: shortcode,
-              Password: password,
-              Timestamp: timestamp,
-              TransactionType: "CustomerPayBillOnline",
-              Amount: parseInt(args.amount),
-              PartyA: parseInt(args.phone),
-              PartyB: shortcode,
-              PhoneNumber: parseInt(args.phone),
-              CallBackURL:
-                "https://sb-backend-test.onrender.com/mpesa-callback",
-              AccountReference: parseInt(args.phone),
-              TransactionDesc: "Deposit to SAFARIBUST Account",
-            })
-          )
-          .end(async (res) => {
-            const trans = new Transaction({
-              type: "Deposit",
-              trans_id: " row.trans_id",
-              bill_ref_number: "row.bill_ref_number",
-              trans_time: "row.trans_time",
-              amount: args.amount,
-              user: args.userId,
-            });
-            await trans.save();
+      const account = await Account.findOne({
+        user: args.userId,
+      });
 
-            const account = await Account.findOne({
-              user: args.userId,
-            });
+      account.balance = parseFloat(account?.balance) + parseFloat(args.amount);
+      await account.save();
+      // const ipAddress = req.socket.remoteAddress;
+      const log = new Logs({
+        ip: "deposits",
+        description: `${account?.user?.username} deposited ${args.amount}- Account Name:${account?.user?.username}`,
+        user: args.userId,
+      });
+      await log.save();
 
-            account.balance =
-              parseFloat(account?.balance) + parseFloat(args.amount);
-            await account.save();
-            // const ipAddress = req.socket.remoteAddress;
-            const log = new Logs({
-              ip: "deposits",
-              description: `${account?.user?.username} deposited ${args.amount}- Account Name:${account?.user?.username}`,
-              user: args.userId,
-            });
-            await log.save();
-
-            const user = await Player.findById(args.userId);
-            return {
-              _id: account?.id,
-              balance: account?.balance,
-              user: user,
-              createdAt: new Date(account?._doc?.createdAt).toISOString(),
-              updatedAt: new Date(account?._doc?.updatedAt).toISOString(),
-              active: account?.active,
-            };
-          });
-      }
+      const user = await Player.findById(args.userId);
+      return {
+        _id: account?.id,
+        balance: account?.balance,
+        user: user,
+        createdAt: new Date(account?._doc?.createdAt).toISOString(),
+        updatedAt: new Date(account?._doc?.updatedAt).toISOString(),
+        active: account?.active,
+      };
     } catch (err) {
       console.log(err);
     }
