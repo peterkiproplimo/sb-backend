@@ -110,9 +110,7 @@ const utilsResolvers = {
     const ipAddress = req.socket.remoteAddress;
     const log = new Logs({
       ip: ipAddress,
-      description: ` OTP sent an to ${
-        user ? user.phone.substr(1, 13) : args.phone
-      } - Username: ${args.username}`,
+      description: ` OTP sent an to `,
       user: user ? user._id : null,
     });
 
@@ -121,7 +119,7 @@ const utilsResolvers = {
     return {
       ...generator._doc,
       _id: generator.id,
-      user: singleUser.bind(this, generator._doc.user),
+      user: generator._doc.user,
       createdAt: new Date(generator._doc.createdAt).toISOString(),
       updatedAt: new Date(generator._doc.updatedAt).toISOString(),
     };
