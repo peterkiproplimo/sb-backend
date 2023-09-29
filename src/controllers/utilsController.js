@@ -69,7 +69,9 @@ const utilsResolvers = {
   },
 
   generateOtp: async (args, req) => {
-    const user = await User.findOne({ username: args.username });
+    const user = await Player.findOne({ username: args.username });
+
+    console.log("This is my phone number", args.phone);
     const otp = otpGenerator.generate(5, {
       upperCaseAlphabets: true,
       lowerCaseAlphabets: false,
@@ -80,9 +82,10 @@ const utilsResolvers = {
     const otpCreator = new OTP({
       otp: otp,
       verified: false,
-      user: user ? user.id : null,
+      user: user ? user._id : null,
     });
     const generator = await otpCreator.save();
+    const phone = formatKenyanPhoneNumber(args.phone);
 
     var options = {
       method: "POST",
@@ -93,7 +96,7 @@ const utilsResolvers = {
       formData: {
         userid: "safaribust",
         password: "qghckqHE",
-        mobile: `${user ? user.phone : args.phone}`,
+        mobile: `${phone}`,
         senderid: "SAFARIBUST",
         msg: `OTP: ${otp}`,
         sendMethod: "quick",
@@ -102,15 +105,16 @@ const utilsResolvers = {
         duplicatecheck: "true",
       },
     };
+
     request(options, function (error, response) {
       if (error) throw new Error(error);
       // console.log(response.body);
     });
 
-    const ipAddress = req.socket.remoteAddress;
+    const ipAddress = "ada";
     const log = new Logs({
       ip: ipAddress,
-      description: ` OTP sent an to `,
+      description: ` OTP sent to User`,
       user: user ? user._id : null,
     });
 
@@ -118,8 +122,8 @@ const utilsResolvers = {
 
     return {
       ...generator._doc,
-      _id: generator.id,
-      user: generator._doc.user,
+      _id: generator._id,
+      user: user,
       createdAt: new Date(generator._doc.createdAt).toISOString(),
       updatedAt: new Date(generator._doc.updatedAt).toISOString(),
     };
@@ -217,5 +221,21 @@ const utilsResolvers = {
     return createdChat;
   },
 };
+
+function formatKenyanPhoneNumber(phoneNumber) {
+  // Remove any spaces and non-numeric characters
+  phoneNumber = phoneNumber.replace(/\D/g, "");
+
+  // Check if the phone number starts with "254" and has 12 digits (including the country code)
+  if (/^254\d{9}$/.test(phoneNumber)) {
+    return phoneNumber; // Phone number is already in the correct format
+  } else if (/^0\d{9}$/.test(phoneNumber)) {
+    // Add "254" in front of the phone number
+    return "254" + phoneNumber.slice(1);
+  } else {
+    // Handle invalid phone numbers
+    return "Invalid phone number";
+  }
+}
 
 module.exports = utilsResolvers;
