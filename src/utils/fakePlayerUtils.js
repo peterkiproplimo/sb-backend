@@ -1,8 +1,9 @@
 const { faker } = require("@faker-js/faker");
+
 function generatePhoneNumber() {
   // Generates a random 10-digit phone number
   const phoneNumber = faker.number.int({ min: 1000000000, max: 9999999999 });
-  return `+1${phoneNumber}`;
+  return `+254${phoneNumber}`;
 }
 
 // Function to generate fake players

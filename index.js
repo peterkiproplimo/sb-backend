@@ -34,10 +34,7 @@ const {
 } = require("./src/utils/gameroundUtils");
 
 const { getLiveChat } = require("./src/utils/livechatUtils");
-const {
-  generateFakePlayers,
-  generateFakePlayersAndBets,
-} = require("./src/utils/fakePlayerUtils");
+const { generateFakePlayersAndBets } = require("./src/utils/fakePlayerUtils");
 const {
   checkBetsForWinsAndLosses,
   updatePlayedField,
@@ -104,6 +101,18 @@ const onConnection = (socket) => {
 io.on("connection", onConnection);
 io.use(socketAuth);
 app.use(cors());
+
+app.post("/mpesa-callback", (req, res) => {
+  // Handle the incoming M-Pesa callback data here
+  const mpesaCallbackData = req.body;
+  console.log("Received M-Pesa callback:", mpesaCallbackData);
+
+  // Perform any necessary processing based on the callback data
+  // ...
+
+  // Respond to the M-Pesa API with an appropriate response (e.g., a success message)
+  res.json({ result: "Callback received and processed successfully" });
+});
 
 let timerPaused = false; // Flag t
 let currentMultiplierBatch = []; // Array to store the current batch of multipliers
@@ -279,11 +288,11 @@ setInterval(async () => {
     if (getemitNextRound()) {
       const currentroundId = await getCurrentRoundFromDatabase();
       const playerBets = await checkBetsForWinsAndLosses(currentroundId);
-      console.log("Time to be for next round");
+      // console.log("Time to be for next round");
       io.emit("livedata", playerBets);
     } else if (getemitOngoingRound()) {
       const multvalue = getMultiplierValue();
-      console.log("Ongoing round data" + multvalue);
+      // console.log("Ongoing round data" + multvalue);
       const currentroundId = await getCurrentRoundFromDatabase();
       await setWinners(multvalue, currentroundId);
       const playerBets = await checkBetsForWinsAndLosses(currentroundId);
@@ -292,7 +301,7 @@ setInterval(async () => {
       const endvalue = getendValue();
       const currentroundId = await getCurrentRoundFromDatabase();
       const playerBets = await getEndResults(currentroundId, endvalue);
-      console.log("endresults for round", playerBets);
+      // console.log("endresults for round", playerBets);
       io.emit("livedata", playerBets);
     } else {
       console.log("Ok3");
@@ -313,6 +322,6 @@ const numPlayersToGenerate = 10;
 const fakePlayers = generateFakePlayersAndBets(numPlayersToGenerate);
 
 // Print the generated fake players
-console.log(fakePlayers);
+// console.log(fakePlayers);
 
 module.exports = { io };

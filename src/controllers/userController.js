@@ -29,11 +29,12 @@ const userResolvers = {
           specialChars: false,
         });
 
+        const phoneNumber = formatKenyanPhoneNumber(args.userInput.phone);
         const user = new Player({
           type: args.userInput.type,
           username: args.userInput.username,
           active: true,
-          phone: args.userInput.phone,
+          phone: phoneNumber,
           online: false,
           password: hashedPass,
           dataToken: otp,
@@ -44,9 +45,10 @@ const userResolvers = {
       })
       .then(async (result) => {
         if (result) {
+          const phoneNumber2 = formatKenyanPhoneNumber(args.userInput.phone);
           const account = new Account({
             balance: "0.00",
-            phone: args.userInput.phone,
+            phone: phoneNumber2,
             active: true,
             user: result.id,
           });
@@ -59,19 +61,16 @@ const userResolvers = {
             user: result.id,
           });
 
-          return log.save();
+          await log.save();
+          return account;
           // console.log(log);
         }
       })
       .then(async (result) => {
-        const myuser = Player.findOne({ username: args.userInput.username });
-        console.log(myuser);
-        const mresult = await generateOtp(
-          myuser,
-          myuser.phone,
-          "register",
-          myuser.username
-        );
+        // console.log(result);
+        const myuser = await Player.findOne({ phone: result.phone });
+
+        const mresult = await generateOtp(myuser, result.phone, "register");
         if (mresult) {
           const token = await jwt.sign(
             {
@@ -87,11 +86,11 @@ const userResolvers = {
           );
           return {
             userId: result.id,
-            username: result.username,
-            type: result.type,
+            username: myuser.username,
+            type: myuser.type,
             token: token,
             tokenExpiration: 15,
-            online: result.online,
+            online: myuser.online,
           };
         }
       })
@@ -249,7 +248,8 @@ const userResolvers = {
   },
 };
 
-const generateOtp = async (user, phone, username, type, req) => {
+const generateOtp = async (user, phone, type) => {
+  console.log("This is my phone number", user.phone);
   const otp = otpGenerator.generate(5, {
     upperCaseAlphabets: true,
     lowerCaseAlphabets: false,
@@ -273,15 +273,16 @@ const generateOtp = async (user, phone, username, type, req) => {
     formData: {
       userid: "safaribust",
       password: "qghckqHE",
-      mobile: "0741734820",
+      mobile: `${phone}`,
       senderid: "SAFARIBUST",
-      msg: "This is my message",
+      msg: `OTP: ${otp}`,
       sendMethod: "quick",
       msgType: "text",
       output: "json",
       duplicatecheck: "true",
     },
   };
+
   request(options, function (error, response) {
     if (error) throw new Error(error);
     // console.log(response.body);
@@ -304,5 +305,21 @@ const generateOtp = async (user, phone, username, type, req) => {
     updatedAt: new Date(generator._doc.updatedAt).toISOString(),
   };
 };
+
+function formatKenyanPhoneNumber(phoneNumber) {
+  // Remove any spaces and non-numeric characters
+  phoneNumber = phoneNumber.replace(/\D/g, "");
+
+  // Check if the phone number starts with "254" and has 12 digits (including the country code)
+  if (/^254\d{9}$/.test(phoneNumber)) {
+    return phoneNumber; // Phone number is already in the correct format
+  } else if (/^0\d{9}$/.test(phoneNumber)) {
+    // Add "254" in front of the phone number
+    return "254" + phoneNumber.slice(1);
+  } else {
+    // Handle invalid phone numbers
+    return "Invalid phone number";
+  }
+}
 
 module.exports = userResolvers;

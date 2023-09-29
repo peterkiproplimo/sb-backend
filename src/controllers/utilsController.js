@@ -11,6 +11,7 @@ const Admin = require("../models/admins");
 const AdminLog = require("../models/adminlogs");
 const Chat = require("../models/Chat");
 const Player = require("../models/Player");
+const User = require("../models/User");
 // Some of the below to delete
 require("dotenv").config();
 const express = require("express");
@@ -33,10 +34,10 @@ io.use(socketAuth);
 
 const utilsResolvers = {
   verifyOtp: async (args, req) => {
-    if (OTPs.includes(args.otp)) {
-      // console.log("first")
-      throw new Error("Invalid OTP!!!");
-    }
+    // if (OTPs.includes(args.otp)) {
+    //   // console.log("first")
+    //   throw new Error("Invalid OTP!!!");
+    // }
     const otp = await OTP.findOne({ otp: args.otp }).sort({
       createdAt: -1,
     });
@@ -54,14 +55,14 @@ const utilsResolvers = {
     }
     otp.verified = true;
 
-    OTPs.push(args.otp);
+    // OTPs.push(args.otp);
 
     const verified = await otp.save();
-
+    const user = await User.findById(verified.user);
     return {
       ...verified._doc,
       _id: verified.id,
-      user: singleUser.bind(this, verified._doc.user),
+      user: user,
       createdAt: new Date(verified._doc.createdAt).toISOString(),
       updatedAt: new Date(verified._doc.updatedAt).toISOString(),
     };
