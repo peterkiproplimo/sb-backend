@@ -44,7 +44,7 @@ function generateFakePlayersAndBets(numPlayers) {
       dataToken: faker.string.uuid(24),
       label: faker.number.int({ min: 1, max: 10 }).toString(),
       firstDeposit: parseFloat(faker.finance.amount(0, 1000, 2)),
-      createdAt: faker.date.past(1),
+      createdAt: faker.date.past({ years: 1 }),
       updatedAt: faker.date.recent(),
     };
 
@@ -72,7 +72,7 @@ function generateFakePlayersAndBets(numPlayers) {
       },
       round: faker.string.uuid(24),
       possibleWin: parseFloat(faker.finance.amount(1, 10000, 2)),
-      createdAt: faker.date.past(1),
+      createdAt: faker.date.past({ years: 1 }),
       updatedAt: faker.date.recent(),
       __v: 0,
     };

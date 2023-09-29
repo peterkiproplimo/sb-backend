@@ -3,6 +3,7 @@ const connectToDatabase = require("../../config/database"); // Update the path i
 const Player = require("../models/Player");
 const Playerbet = require("../models/PlayerBet");
 const { ObjectId } = require("mongodb");
+const Account = require("../models/Account");
 
 const {
   generateFakePlayers,
@@ -25,9 +26,9 @@ async function checkBetsForWinsAndLosses(roundId) {
 
     const fakeplayers = generateFakePlayersAndBets(15);
 
-    const finalResponse = [...betsWithDetails, ...fakeplayers];
+    // const finalResponse = [...betsWithDetails, ...fakeplayers];
 
-    return finalResponse;
+    return betsWithDetails;
     // return bets;
   } catch (error) {
     console.error("Error checking bets:", error);
@@ -41,23 +42,44 @@ async function getEndResults(roundId, endValue) {
 
     // Fetch all player bets from the "Playerbets" collection
     const bets = await Playerbet.find({ round: roundId });
-
+    let winAmount = 0;
+    let loseAmount = 0;
     // Iterate through the bets and update the "win" field based on the condition
     for (const bet of bets) {
       if (bet.point <= endValue) {
+        winAmount += bet.betAmount;
         // If the condition is met, set win to true
         await Playerbet.updateOne(
           { _id: bet._id },
           { $set: { busted: false, win: true } }
         );
+
+        const account = await Account.findOne({
+          user: bet.userId,
+        });
+        account.balance =
+          parseFloat(account?.balance) + parseFloat(bet.betAmount);
+        await account.save();
       } else {
+        loseAmount += bet.betAmount;
         // If the condition is not met, set win to false
         await Playerbet.updateOne(
           { _id: bet._id },
           { $set: { busted: true, win: false } }
         );
+
+        const account = await Account.findOne({
+          user: bet.userId,
+        });
+        account.balance =
+          parseFloat(account?.balance) - parseFloat(bet.betAmount);
+        await account.save();
       }
     }
+
+    // console.log("win amount", winAmount);
+    // console.log("lose amount", loseAmount);
+
     const fakeplayers = generateFakePlayersAndBets(15);
     // Fetch and return the updated bets from the database
     const updatedBets = await Playerbet.find({ round: roundId });
@@ -66,9 +88,9 @@ async function getEndResults(roundId, endValue) {
       model: Player, // Reference the User model
     });
 
-    const finalResponse = [...betsWithDetails, ...fakeplayers];
+    // const finalResponse = [...betsWithDetails, ...fakeplayers];
 
-    return finalResponse;
+    return betsWithDetails;
   } catch (error) {
     console.error("Error checking bets:", error);
     throw error; // Rethrow the error to handle it at a higher level if needed
