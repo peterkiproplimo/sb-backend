@@ -29,6 +29,7 @@
     "mongo-xlsx": "^1.0.12",
     "mongoose": "^5.12.2",
     "mongoose-unique-validator": "^3.1.0",
+    "mpesa-node": "^0.1.3",
     "mysql": "^2.18.1",
     "node-schedule": "^2.1.0",
     "nodemon": "^2.0.7",

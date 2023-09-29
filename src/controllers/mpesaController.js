@@ -10,12 +10,18 @@ const Account = require("../models/Account");
 const Transaction = require("../models/transactions");
 const Logs = require("../models/logs");
 const Player = require("../models/Player");
+const Mpesa = require("mpesa-node");
+
+const mpesaApi = new Mpesa({
+  consumerKey: "ROqiKlEFF9Gb4BmYtTbhPlxk0NYfATg8",
+  consumerSecret: "R8Kd6wFX6ot3L7Th",
+});
 
 const mpesaResolvers = {
   deposit: async (args, req) => {
     try {
-      const consumer_key = "e9U18oviHqQdAzrIP6jupLtjPTI16OmJ";
-      const consumer_secret = "n53UGl05vCeLGz1H";
+      const consumer_key = "R8Kd6wFX6ot3L7Th";
+      const consumer_secret = "R8Kd6wFX6ot3L7Th";
       const url =
         "https://api.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials";
       const auth = btoa(`${consumer_key}:${consumer_secret}`);
@@ -123,6 +129,16 @@ const mpesaResolvers = {
 
   depositTest: async (args, req) => {
     try {
+      const testMSISDN = args.phone;
+      const amount = args.amount;
+      const accountRef = Math.random().toString(35).substr(2, 7);
+      await mpesaApi.lipaNaMpesaOnline(
+        testMSISDN,
+        amount,
+        "https://sb-backend-test.onrender.com/mpesa-callback",
+        accountRef
+      );
+
       const trans = new Transaction({
         type: "Deposit",
         trans_id: " row.trans_id",
@@ -132,9 +148,11 @@ const mpesaResolvers = {
         user: args.userId,
       });
       await trans.save();
+
       const account = await Account.findOne({
         user: args.userId,
       });
+
       account.balance = parseFloat(account?.balance) + parseFloat(args.amount);
       await account.save();
       // const ipAddress = req.socket.remoteAddress;

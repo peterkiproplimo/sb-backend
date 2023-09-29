@@ -12,6 +12,7 @@ const resolvers = require("./src/resolvers");
 //import the midleware to check for every incoming request if user is authenticated
 const isAuth = require("./src/middleware/is-auth");
 const house = require("./src/models/house");
+const Account = require("./src/models/Account");
 // Update the path if needed
 const cors = require("cors");
 
@@ -317,6 +318,24 @@ setInterval(async () => {
 
   io.emit("livechat", livechat);
 }, 300);
+
+setInterval(async () => {
+  try {
+    // Fetch all accounts with their user references populated
+    const accounts = await Account.find().populate("User");
+
+    // Iterate through the accounts and emit user's account balance
+    accounts.forEach((account) => {
+      if (account.user) {
+        console.log(account.balance);
+        io.emit(account.user.username, account.balance);
+      }
+    });
+  } catch (error) {
+    // Handle the error here
+    console.error("An error occurred while checking bets:", error);
+  }
+}, 100);
 
 const numPlayersToGenerate = 10;
 const fakePlayers = generateFakePlayersAndBets(numPlayersToGenerate);
