@@ -289,11 +289,11 @@ setInterval(async () => {
     if (getemitNextRound()) {
       const currentroundId = await getCurrentRoundFromDatabase();
       const playerBets = await checkBetsForWinsAndLosses(currentroundId);
-      console.log("bet next round");
+      // console.log("bet next round");
       io.emit("livedata", playerBets);
     } else if (getemitOngoingRound()) {
       const multvalue = getMultiplierValue();
-      console.log("Ongoing round data" + multvalue);
+      // console.log("Ongoing round data" + multvalue);
       const currentroundId = await getCurrentRoundFromDatabase();
       await setWinners(multvalue, currentroundId);
       const playerBets = await checkBetsForWinsAndLosses(currentroundId);
@@ -302,7 +302,7 @@ setInterval(async () => {
       const endvalue = getendValue();
       const currentroundId = await getCurrentRoundFromDatabase();
       const playerBets = await getEndResults(currentroundId, endvalue);
-      console.log("endresults for round", playerBets);
+      // console.log("endresults for round", playerBets);
       io.emit("livedata", playerBets);
     } else {
       console.log("Ok3");
@@ -327,7 +327,7 @@ setInterval(async () => {
     // Iterate through the accounts and emit user's account balance
     accounts.forEach((account) => {
       if (account.user) {
-        console.log(account.balance);
+        // console.log(account.balance);
         io.emit(account.user.username, account.balance);
       }
     });
