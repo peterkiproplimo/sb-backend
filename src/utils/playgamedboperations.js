@@ -26,9 +26,9 @@ async function checkBetsForWinsAndLosses(roundId) {
 
     const fakeplayers = generateFakePlayersAndBets(15);
 
-    // const finalResponse = [...betsWithDetails, ...fakeplayers];
+    const finalResponse = [...betsWithDetails, ...fakeplayers];
 
-    return betsWithDetails;
+    return finalResponse;
     // return bets;
   } catch (error) {
     console.error("Error checking bets:", error);
@@ -88,9 +88,9 @@ async function getEndResults(roundId, endValue) {
       model: Player, // Reference the User model
     });
 
-    // const finalResponse = [...betsWithDetails, ...fakeplayers];
+    const finalResponse = [...betsWithDetails, ...fakeplayers];
 
-    return betsWithDetails;
+    return finalResponse;
   } catch (error) {
     console.error("Error checking bets:", error);
     throw error; // Rethrow the error to handle it at a higher level if needed
