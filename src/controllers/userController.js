@@ -14,10 +14,13 @@ const Admin = require("../models/admins");
 const OTP = require("../models/verifier");
 const userResolvers = {
   createUser: (args, req) => {
-    return Player.findOne({ username: args.userInput.username })
+    const phoneNumber2 = formatKenyanPhoneNumber(args.userInput.phone);
+    return Player.findOne({
+      $or: [{ username: args.userInput.username }, { phone: phoneNumber2 }],
+    })
       .then((user) => {
         if (user) {
-          throw new Error("Username already exists!!!");
+          throw new Error("User already exists!!!");
         }
         return bcrypt.hash(args.userInput.password, 12);
       })
