@@ -15,9 +15,9 @@ const OTP = require("../models/verifier");
 const userResolvers = {
   createUser: (args, req) => {
     const phoneNumber2 = formatKenyanPhoneNumber(args.userInput.phone);
-    return Player.findOne({
-      $or: [{ username: args.userInput.username }, { phone: phoneNumber2 }],
-    })
+    // $or: [{ username: args.userInput.username }, { phone: phoneNumber2 }],
+
+    return Player.findOne({ username: args.userInput.username })
       .then((user) => {
         if (user) {
           throw new Error("User already exists!!!");
@@ -29,6 +29,7 @@ const userResolvers = {
         const otp = await OTP.findOne({
           otp: args.userInput.otp,
           phone: phoneNumber,
+          verified: false,
         }).sort({
           createdAt: -1,
         });
