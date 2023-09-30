@@ -69,7 +69,9 @@ const utilsResolvers = {
   },
 
   generateOtp: async (args, req) => {
-    const user = await Player.findOne({ username: args.username });
+    // const user = await Player.findOne({ username: args.username });
+
+    const phone = formatKenyanPhoneNumber(args.phone);
 
     console.log("This is my phone number", args.phone);
     const otp = otpGenerator.generate(5, {
@@ -82,10 +84,10 @@ const utilsResolvers = {
     const otpCreator = new OTP({
       otp: otp,
       verified: false,
-      user: user ? user._id : null,
+      phone: phone,
+      username: args.username,
     });
     const generator = await otpCreator.save();
-    const phone = formatKenyanPhoneNumber(args.phone);
 
     var options = {
       method: "POST",
@@ -112,18 +114,18 @@ const utilsResolvers = {
     });
 
     const ipAddress = "ada";
-    const log = new Logs({
-      ip: ipAddress,
-      description: ` OTP sent to User`,
-      user: user ? user._id : null,
-    });
+    // const log = new Logs({
+    //   ip: ipAddress,
+    //   description: ` OTP sent to User`,
+    //   user: args.username,
+    // });
 
-    await log.save();
+    // await log.save();
 
     return {
       ...generator._doc,
       _id: generator._id,
-      user: user,
+      user: args.username,
       createdAt: new Date(generator._doc.createdAt).toISOString(),
       updatedAt: new Date(generator._doc.updatedAt).toISOString(),
     };

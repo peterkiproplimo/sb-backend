@@ -314,7 +314,8 @@ total:Float!
 type OTP{
 otp:String!
 verified:Boolean!
-user:User
+phone:String!
+username:String!
 createdAt:String!
 updatedAt:String!
 
