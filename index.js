@@ -57,10 +57,7 @@ const corsOptions = {
 app.use(express.json());
 app.use(isAuth);
 app.use((req, res, next) => {
-  res.setHeader(
-    "Access-Control-Allow-Origin",
-    "https://safaribust.techsavanna.technology"
-  );
+  res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader(
     "Access-Control-Allow-Methods",
     "GET, POST, PUT, DELETE, UPDATE"
@@ -322,23 +319,23 @@ setInterval(async () => {
   io.emit("livechat", livechat);
 }, 300);
 
-setInterval(async () => {
-  try {
-    // Fetch all accounts with their user references populated
-    const accounts = await Account.find().populate("User");
+// setInterval(async () => {
+//   try {
+//     // Fetch all accounts with their user references populated
+//     const accounts = await Account.find().populate("User");
 
-    // Iterate through the accounts and emit user's account balance
-    accounts.forEach((account) => {
-      if (account.user) {
-        // console.log(account.balance);
-        io.emit(account.user.username, account.balance);
-      }
-    });
-  } catch (error) {
-    // Handle the error here
-    console.error("An error occurred while checking bets:", error);
-  }
-}, 100);
+//     // Iterate through the accounts and emit user's account balance
+//     accounts.forEach((account) => {
+//       if (account.user) {
+//         // console.log(account.balance);
+//         io.emit(account.user.username, account.balance);
+//       }
+//     });
+//   } catch (error) {
+//     // Handle the error here
+//     console.error("An error occurred while checking bets:", error);
+//   }
+// }, 100);
 
 const numPlayersToGenerate = 10;
 const fakePlayers = generateFakePlayersAndBets(numPlayersToGenerate);
