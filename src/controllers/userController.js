@@ -21,13 +21,26 @@ const userResolvers = {
         }
         return bcrypt.hash(args.userInput.password, 12);
       })
-      .then((hashedPass) => {
-        const otp = otpGenerator.generate(12, {
-          upperCaseAlphabets: true,
-          lowerCaseAlphabets: false,
-          digits: true,
-          specialChars: false,
+      .then(async (hashedPass) => {
+        const otp = await OTP.findOne({
+          otp: args.userInput.otp,
+          phone: args.userInput.phone,
+        }).sort({
+          createdAt: -1,
         });
+
+        if (
+          !otp ||
+          parseInt(new Date().toISOString().split("T")[1].substr(3, 2)) -
+            parseInt(otp.createdAt.toISOString().split("T")[1].substr(3, 2)) >
+            10
+        ) {
+          throw new Error("Invalid OTP!!!");
+        }
+
+        otp.verified = true;
+
+        const verified = await otp.save();
 
         const phoneNumber = formatKenyanPhoneNumber(args.userInput.phone);
         const user = new Player({

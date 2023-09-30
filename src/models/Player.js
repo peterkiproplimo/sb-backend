@@ -9,6 +9,7 @@ const userSchema = new mongoose.Schema(
     online: Boolean,
     password: String,
     dataToken: String,
+    otp: String,
     label: String,
     firstDeposit: Number,
     createdAt: Date,

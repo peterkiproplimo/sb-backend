@@ -34,14 +34,9 @@ io.use(socketAuth);
 
 const utilsResolvers = {
   verifyOtp: async (args, req) => {
-    // if (OTPs.includes(args.otp)) {
-    //   // console.log("first")
-    //   throw new Error("Invalid OTP!!!");
-    // }
     const otp = await OTP.findOne({ otp: args.otp }).sort({
       createdAt: -1,
     });
-    // console.log(otp);
 
     if (
       !otp ||
@@ -49,13 +44,9 @@ const utilsResolvers = {
         parseInt(otp.createdAt.toISOString().split("T")[1].substr(3, 2)) >
         10
     ) {
-      // console.log("second")
-
       throw new Error("Invalid OTP!!!");
     }
     otp.verified = true;
-
-    // OTPs.push(args.otp);
 
     const verified = await otp.save();
     const user = await User.findById(verified.user);

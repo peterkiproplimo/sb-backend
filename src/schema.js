@@ -167,6 +167,7 @@ online:Boolean!
 phone:String
 dataToken:String
 tokenExpiration: Int!
+otp:String
 }
 
 type ActiveUsers{
@@ -214,6 +215,7 @@ username:String!
 phone: String!
 type:String!
 password: String!
+otp:String
 }
 
 input AdminUserInput {
