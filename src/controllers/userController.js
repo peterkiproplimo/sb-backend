@@ -22,9 +22,10 @@ const userResolvers = {
         return bcrypt.hash(args.userInput.password, 12);
       })
       .then(async (hashedPass) => {
+        const phoneNumber = formatKenyanPhoneNumber(args.userInput.phone);
         const otp = await OTP.findOne({
           otp: args.userInput.otp,
-          phone: args.userInput.phone,
+          phone: phoneNumber,
         }).sort({
           createdAt: -1,
         });
@@ -42,7 +43,6 @@ const userResolvers = {
 
         const verified = await otp.save();
 
-        const phoneNumber = formatKenyanPhoneNumber(args.userInput.phone);
         const user = new Player({
           type: args.userInput.type,
           username: args.userInput.username,
@@ -83,29 +83,26 @@ const userResolvers = {
         // console.log(result);
         const myuser = await Player.findOne({ phone: result.phone });
 
-        const mresult = await generateOtp(myuser, result.phone, "register");
-        if (mresult) {
-          const token = await jwt.sign(
-            {
-              userId: result.id,
-              username: result.username,
-              online: result.online,
-              phone: result.phone,
-            },
-            "thisissupposedtobemysecret",
-            {
-              expiresIn: 60 * 15,
-            }
-          );
-          return {
+        const token = await jwt.sign(
+          {
             userId: result.id,
-            username: myuser.username,
-            type: myuser.type,
-            token: token,
-            tokenExpiration: 15,
-            online: myuser.online,
-          };
-        }
+            username: result.username,
+            online: result.online,
+            phone: result.phone,
+          },
+          "thisissupposedtobemysecret",
+          {
+            expiresIn: 60 * 15,
+          }
+        );
+        return {
+          userId: result.id,
+          username: myuser.username,
+          type: myuser.type,
+          token: token,
+          tokenExpiration: 15,
+          online: myuser.online,
+        };
       })
       .catch((err) => {
         console.log(err);
