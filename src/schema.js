@@ -26,6 +26,7 @@ online:Boolean
 password: String
 dataToken:String!
 username:String!
+otp:String
 label:String
 firstDeposit:Float
 createdAt:String
@@ -406,7 +407,7 @@ getAllPlayers: [Player]!
 
 
 type RootMutation{
-changePassword(username:String, password:String, initiator:String!):Player!
+changePassword(username:String, password:String, initiator:String!, otp:String!):Player!
 createUser(userInput:UserInput): AuthData!
 createAdmin(userInput:AdminUserInput): AuthData!
 createBet(betInput:BetInput):Bet!

@@ -235,30 +235,51 @@ const userResolvers = {
       throw new Error("User does'nt exist.");
     }
 
-    return bcrypt
-      .hash(args.password, 12)
-      .then((hashedPass) => {
-        user.password = hashedPass;
-        return user.save();
-      })
-      .then(async (usr) => {
-        const ipAddress = req.socket.remoteAddress;
-        const log = new Logs({
-          ip: ipAddress,
-          description: `${args.initiator} changed password`,
-          user: usr.id,
-        });
+    const otp = await OTP.findOne({
+      otp: args.otp,
+      username: args.username,
+      verified: false,
+    }).sort({
+      createdAt: -1,
+    });
 
-        await log.save();
-        return {
-          ...usr._doc,
-          _id: usr.id,
-          password: null,
-          createdAt: "ada",
-          updatedAt: "adad",
-        };
-      })
-      .catch((err) => console.log(err.message));
+    if (
+      !otp ||
+      parseInt(new Date().toISOString().split("T")[1].substr(3, 2)) -
+        parseInt(otp.createdAt.toISOString().split("T")[1].substr(3, 2)) >
+        10
+    ) {
+      throw new Error("Invalid OTP!!!");
+    } else {
+      otp.verified = true;
+
+      await otp.save();
+
+      return bcrypt
+        .hash(args.password, 12)
+        .then((hashedPass) => {
+          user.password = hashedPass;
+          return user.save();
+        })
+        .then(async (usr) => {
+          const ipAddress = req.socket.remoteAddress;
+          const log = new Logs({
+            ip: ipAddress,
+            description: `${args.initiator} changed password`,
+            user: usr.id,
+          });
+
+          await log.save();
+          return {
+            ...usr._doc,
+            _id: usr.id,
+            password: null,
+            createdAt: "ada",
+            updatedAt: "adad",
+          };
+        })
+        .catch((err) => console.log(err.message));
+    }
   },
 };
 
