@@ -32,6 +32,8 @@ const {
   getemitEndRound,
   generateRandomID,
   getendValue,
+  getCurrentRound,
+  setCurrentRound,
 } = require("./src/utils/gameroundUtils");
 
 const { getLiveChat } = require("./src/utils/livechatUtils");
@@ -169,6 +171,9 @@ async function updateTimerWithMultipliers(multiplier) {
   } else {
     if (value >= multiplier.bustpoint) {
       timerPaused = true;
+      io.emit("updateTimer", "");
+      io.emit("loadwinners", "");
+
       io.emit("successMessage", "Busted @" + multiplier.bustpoint);
 
       setemitEndRound(true, multiplier.bustpoint);
@@ -176,8 +181,6 @@ async function updateTimerWithMultipliers(multiplier) {
       setemitNextRound(false);
       // console.log("Ok");
       updatePlayedField(multiplier);
-      io.emit("updateTimer", "");
-      io.emit("loadwinners", "");
 
       setTimeout(async () => {
         io.emit("successMessage", ""); // Clear the "Busted" message
@@ -296,16 +299,19 @@ setInterval(async () => {
       io.emit("livedata", playerBets);
     } else if (getemitOngoingRound()) {
       const multvalue = getMultiplierValue();
-      // console.log("Ongoing round data" + multvalue);
+
       const currentroundId = await getCurrentRoundFromDatabase();
+      setCurrentRound(currentroundId);
+      console.log("Ongoing round if" + currentroundId);
       await setWinners(multvalue, currentroundId);
       const playerBets = await checkBetsForWinsAndLosses(currentroundId);
       io.emit("livedata", playerBets);
     } else if (getemitEndRound()) {
       const endvalue = getendValue();
-      const currentroundId = await getCurrentRoundFromDatabase();
+      const currentroundId = getCurrentRound();
+      console.log("endresults for round", currentroundId);
       const playerBets = await getEndResults(currentroundId, endvalue);
-      // console.log("endresults for round", playerBets);
+
       io.emit("livedata", playerBets);
     } else {
       console.log("Ok3");

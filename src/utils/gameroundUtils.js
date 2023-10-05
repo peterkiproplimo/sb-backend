@@ -3,6 +3,7 @@ let emitNextRound = false;
 let emitOngoingRound = false;
 let emitEndRound = false;
 let bustpoint = 0;
+let currentround = "";
 
 function getnextRound() {
   return nextGameroundID;
@@ -10,6 +11,14 @@ function getnextRound() {
 
 function setNextRound(GameroundID) {
   nextGameroundID = GameroundID;
+}
+
+function getCurrentRound() {
+  return currentround;
+}
+
+function setCurrentRound(currentround) {
+  currentround = currentround;
 }
 
 function setemitNextRound(next) {
@@ -63,4 +72,6 @@ module.exports = {
   getemitEndRound,
   generateRandomID,
   getendValue,
+  getCurrentRound,
+  setCurrentRound,
 };
