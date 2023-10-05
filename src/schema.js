@@ -402,6 +402,7 @@ countActives:ActivesCount
 actives:[User!]!
 players:[Player!]!
 permissions:[Permission!]!
+roles:[Role!]!
 verifyOtp(otp:String!):OTP
 systemLogs:[AdminLogs!]!
 customerToTal:CustomerToTal

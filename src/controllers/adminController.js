@@ -14,6 +14,7 @@ const Actives = require("../models/activeusers");
 const Role = require("../models/roleModel");
 const Permission = require("../models/permissionModel");
 const permissions = require("../../permissions.json");
+const Player = require("../models/Player");
 
 const connectToDatabase = require("../../config/database");
 const { AggregationCursor } = require("mongoose");
@@ -183,7 +184,7 @@ const adminResolvers = {
   players: async (args, req) => {
     const users = await Player.find().sort({ createdAt: -1 });
 
-    const usrs = users.filter((item) => item.type === "User");
+    const usrs = users.filter((item) => item.type === "regular");
 
     return usrs.map((user) => {
       return {
@@ -237,12 +238,15 @@ const adminResolvers = {
   //  Get all the system logs for the admin
 
   systemLogs: async (args, req) => {
-    const logs = await AdminLog.find().sort({ createdAt: -1 }).limit(200);
+    const logs = await AdminLog.find()
+      .populate("user")
+      .sort({ createdAt: -1 })
+      .limit(200);
     return logs.map((it) => {
       return {
         ...it._doc,
         _id: it.id,
-        user: singleUser.bind(this, it._doc.user),
+        user: it._doc.user,
         createdAt: new Date(it._doc.createdAt).toISOString(),
         updatedAt: new Date(it._doc.updatedAt).toISOString(),
       };
@@ -252,12 +256,15 @@ const adminResolvers = {
   // Get all the logs from the database
 
   logs: async (args, req) => {
-    const logs = await Logs.find().sort({ createdAt: -1 }).limit(200);
+    const logs = await Logs.find()
+      .populate("user")
+      .sort({ createdAt: -1 })
+      .limit(200);
     return logs.map((log) => {
       return {
         ...log._doc,
         _id: log?.id,
-        user: singleUser.bind(this, log._doc.user),
+        user: log._doc.user,
         createdAt: new Date(log?._doc?.createdAt).toISOString(),
         updatedAt: new Date(log?._doc?.updatedAt).toISOString(),
       };
@@ -702,6 +709,27 @@ const adminResolvers = {
         return {
           ...permission._doc,
           _id: permission.id,
+          createdAt: "time",
+          updatedAt: "time",
+        };
+      });
+    } catch (error) {
+      console.error("Error fetching permissions:", error);
+      throw new Error("Failed to fetch permissions");
+    }
+  },
+
+  roles: async (args, req) => {
+    try {
+      // Fetch the selected permissions by their IDs
+      const roles = await Role.find()
+        .populate("permissions")
+        .sort({ createdAt: -1 });
+
+      return roles.map((role) => {
+        return {
+          ...role._doc,
+          _id: role.id,
           createdAt: "time",
           updatedAt: "time",
         };
