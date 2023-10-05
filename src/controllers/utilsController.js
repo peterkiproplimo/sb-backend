@@ -104,15 +104,6 @@ const utilsResolvers = {
       // console.log(response.body);
     });
 
-    const ipAddress = "ada";
-    // const log = new Logs({
-    //   ip: ipAddress,
-    //   description: ` OTP sent to User`,
-    //   user: args.username,
-    // });
-
-    // await log.save();
-
     return {
       ...generator._doc,
       _id: generator._id,

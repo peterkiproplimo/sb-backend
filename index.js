@@ -122,7 +122,7 @@ let timerPaused = false; // Flag t
 let currentMultiplierBatch = []; // Array to store the current batch of multipliers
 let batchIndex = 0;
 let value = 1.0;
-const incrementInterval = 40; // milliseconds
+const incrementInterval = 200; // milliseconds
 const incrementStep = 0.01; // Step to achieve 1 decimal place
 let targetValueIndex = 0;
 

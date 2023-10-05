@@ -115,9 +115,6 @@ const userResolvers = {
   },
 
   users: async (args, req) => {
-    // if (!req.isAuth) {
-    //   throw new Error("Not authenticated.");
-    // }
     const users = await User.find().sort({ createdAt: -1 });
     const usrs = users.filter((item) => item.type === "User");
     return usrs.map((user) => {
@@ -145,7 +142,7 @@ const userResolvers = {
     });
   },
   createAdmin: (args, req) => {
-    return Admin.findOne({ username: args.userInput.username })
+    return User.findOne({ username: args.userInput.username })
       .then((user) => {
         if (user) {
           throw new Error("Username already exists!!!");
@@ -153,7 +150,7 @@ const userResolvers = {
         return bcrypt.hash(args.userInput.password, 12);
       })
       .then((hashedPass) => {
-        const user = new Admin({
+        const user = new User({
           type: args.userInput.type,
           username: args.userInput.username,
           active: true,

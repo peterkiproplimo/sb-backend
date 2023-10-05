@@ -222,9 +222,8 @@ otp:String
 input AdminUserInput {
 username:String!
 phone: String!
-type:String!
 password: String!
-initiator:String!
+roleId:String!
 }
 
 input LoginInput {
@@ -299,6 +298,13 @@ input PermissionInput {
   entity_name: String!
   action_name: String!
   description: String!
+}
+
+input CreateUserInput {
+  username: String!
+  phoneNumber: String!
+  password: String!
+  roleId: ID!
 }
 
 type HouseAmount{

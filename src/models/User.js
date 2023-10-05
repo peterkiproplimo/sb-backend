@@ -12,25 +12,14 @@ const UserSchema = new Schema(
       type: String,
       required: true,
     },
-    role: {
-      //bot, admin, player
-      type: String,
-      required: true,
-    },
     password: {
       type: String,
       required: true,
     },
-    account: {
+    role: {
       type: Schema.Types.ObjectId,
-      ref: "Account",
+      ref: "Role",
     },
-    bets: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Bet",
-      },
-    ],
   },
   {
     timestamps: true,
