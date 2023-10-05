@@ -307,6 +307,12 @@ input CreateUserInput {
   roleId: ID!
 }
 
+input CreateRoleInput {
+  name: String!
+  permissions: [ID!]
+}
+
+
 type HouseAmount{
 amount:Float!
 }
@@ -395,6 +401,7 @@ logoutUser(username:String!):User!
 countActives:ActivesCount
 actives:[User!]!
 players:[Player!]!
+permissions:[Permission!]!
 verifyOtp(otp:String!):OTP
 systemLogs:[AdminLogs!]!
 customerToTal:CustomerToTal
@@ -436,7 +443,7 @@ changeAdminPassword(username:String, password:String,initiator:String!):User!
 editAdminUserPhone(username:String, phone:String, initiator:String!):User!
 editAdminUser(username:String, initiator:String!, phone:String, type:String!):Admin!
 createPlayerbet(playerbetInput: PlayerbetInput!): Playerbet
-createRole(name: String!, selectedPermissionIds: [ID!]!): Role
+createRole(roleInput : CreateRoleInput): Role
 withdrawTest(userId: String!, amount: Float!, phone: String!): Account
 createChat(chatInput: ChatInput!): Chat!
 logoutPlayer(username:String!):Player!

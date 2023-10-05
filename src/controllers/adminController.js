@@ -16,6 +16,7 @@ const Permission = require("../models/permissionModel");
 const permissions = require("../../permissions.json");
 
 const connectToDatabase = require("../../config/database");
+const { AggregationCursor } = require("mongoose");
 
 const adminResolvers = {
   // Get the number of winners  in a particular month
@@ -667,23 +668,22 @@ const adminResolvers = {
     };
   },
 
-  createRole: async (parent, args, context) => {
-    const { name, selectedPermissionIds } = args;
-
+  createRole: async (args, req) => {
+    console.log(args.roleInput);
     try {
       // Fetch the selected permissions by their IDs
       const selectedPermissions = await Permission.find({
-        _id: { $in: selectedPermissionIds },
+        _id: { $in: args.roleInput.permissions },
       });
 
       const role = new Role({
-        name: name,
+        name: args.roleInput.name,
         permissions: selectedPermissions,
       });
 
       await role.save();
       console.log(
-        `Role "${name}" created with permissions:`,
+        `Role "${args.roleInput.name}" created with permissions:`,
         selectedPermissions
       );
 
@@ -691,6 +691,24 @@ const adminResolvers = {
     } catch (error) {
       console.error("Error creating role:", error);
       throw new Error("Failed to create role");
+    }
+  },
+  permissions: async (args, req) => {
+    try {
+      // Fetch the selected permissions by their IDs
+      const permissions = await Permission.find().sort({ createdAt: -1 });
+
+      return permissions.map((permission) => {
+        return {
+          ...permission._doc,
+          _id: permission.id,
+          createdAt: "time",
+          updatedAt: "time",
+        };
+      });
+    } catch (error) {
+      console.error("Error fetching permissions:", error);
+      throw new Error("Failed to fetch permissions");
     }
   },
 };

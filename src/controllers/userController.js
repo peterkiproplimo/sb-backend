@@ -156,6 +156,7 @@ const userResolvers = {
           active: true,
           phone: args.userInput.phone,
           online: true,
+          role: args.userInput.roleId,
           password: hashedPass,
         });
         return user.save();
@@ -186,10 +187,10 @@ const userResolvers = {
         // console.log({ userId: user.id, type:user.type, token: token, tokenExpiration: 1 })
         return {
           userId: result.id,
-          type: result.type,
+          type: "test",
           token: token,
           username: result.username,
-          online: result.online,
+          online: true,
           tokenExpiration: 15,
           phone: result.phone,
         };
