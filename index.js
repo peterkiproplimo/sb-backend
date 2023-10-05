@@ -181,10 +181,10 @@ async function updateTimerWithMultipliers(multiplier) {
 
       // Update win/ lose in database
       const currentroundId = await getCurrentRoundFromDatabase();
-      console.log(
-        "Update winners/ losers then show the results for round: " +
-          currentroundId
-      );
+      // console.log(
+      //   "Update winners/ losers then show the results for round: " +
+      //     currentroundId
+      // );
       const playerBets = await getEndResults(
         currentroundId,
         multiplier.bustpoint
@@ -304,23 +304,23 @@ setInterval(async () => {
     if (getemitNextRound()) {
       const currentroundId = await getCurrentRoundFromDatabase();
       const playerBets = await checkBetsForWinsAndLosses(currentroundId);
-      console.log("bet next round");
+      // console.log("bet next round");
       io.emit("livedata", playerBets);
     } else if (getemitOngoingRound()) {
       const multvalue = getMultiplierValue();
 
       const currentroundId = await getCurrentRoundFromDatabase();
       setCurrentRound(currentroundId);
-      console.log(
-        "Ongoing round:  " + currentroundId + " " + "Value: " + multvalue
-      );
+      // console.log(
+      //   "Ongoing round:  " + currentroundId + " " + "Value: " + multvalue
+      // );
       await setWinners(multvalue, currentroundId);
       const playerBets = await checkBetsForWinsAndLosses(currentroundId);
       io.emit("livedata", playerBets);
     } else if (getemitEndRound()) {
       const endvalue = getendValue();
       const currentroundId = getCurrentRound();
-      console.log("endresults for round", currentroundId);
+      // console.log("endresults for round", currentroundId);
     } else {
       console.log("Ok3");
     }
