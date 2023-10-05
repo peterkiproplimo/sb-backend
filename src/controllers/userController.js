@@ -14,9 +14,6 @@ const Admin = require("../models/admins");
 const OTP = require("../models/verifier");
 const userResolvers = {
   createUser: (args, req) => {
-    const phoneNumber2 = formatKenyanPhoneNumber(args.userInput.phone);
-    // $or: [{ username: args.userInput.username }, { phone: phoneNumber2 }],
-
     return Player.findOne({ username: args.userInput.username })
       .then((user) => {
         if (user) {
