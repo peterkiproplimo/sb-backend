@@ -34,6 +34,8 @@ const betsResolvers = {
       win: false,
     });
 
+    // Deduct amount from the player account, add to the house total
+
     const user = await Player.findById(args.playerbetInput.userId);
 
     const results = await bet.save();

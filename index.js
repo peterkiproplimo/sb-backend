@@ -59,10 +59,7 @@ const corsOptions = {
 app.use(express.json());
 app.use(isAuth);
 app.use((req, res, next) => {
-  res.setHeader(
-    "Access-Control-Allow-Origin",
-    "https://safaribust.techsavanna.technology"
-  );
+  res.setHeader("Access-Control-Allow-Origin", "http://localhost:3001");
   res.setHeader(
     "Access-Control-Allow-Methods",
     "GET, POST, PUT, DELETE, UPDATE"
@@ -124,7 +121,7 @@ let timerPaused = false; // Flag t
 let currentMultiplierBatch = []; // Array to store the current batch of multipliers
 let batchIndex = 0;
 let value = 1.0;
-const incrementInterval = 200; // milliseconds
+const incrementInterval = 40; // milliseconds
 const incrementStep = 0.01; // Step to achieve 1 decimal place
 let targetValueIndex = 0;
 
@@ -179,9 +176,21 @@ async function updateTimerWithMultipliers(multiplier) {
       setemitEndRound(true, multiplier.bustpoint);
       setemitOngoingRound(false);
       setemitNextRound(false);
-      // console.log("Ok");
+
       updatePlayedField(multiplier);
 
+      // Update win/ lose in database
+      const currentroundId = await getCurrentRoundFromDatabase();
+      console.log(
+        "Update winners/ losers then show the results for round: " +
+          currentroundId
+      );
+      const playerBets = await getEndResults(
+        currentroundId,
+        multiplier.bustpoint
+      );
+
+      io.emit("livedata", playerBets);
       setTimeout(async () => {
         io.emit("successMessage", ""); // Clear the "Busted" message
         await waitCount();
@@ -295,14 +304,16 @@ setInterval(async () => {
     if (getemitNextRound()) {
       const currentroundId = await getCurrentRoundFromDatabase();
       const playerBets = await checkBetsForWinsAndLosses(currentroundId);
-      // console.log("bet next round");
+      console.log("bet next round");
       io.emit("livedata", playerBets);
     } else if (getemitOngoingRound()) {
       const multvalue = getMultiplierValue();
 
       const currentroundId = await getCurrentRoundFromDatabase();
       setCurrentRound(currentroundId);
-      console.log("Ongoing round if" + currentroundId);
+      console.log(
+        "Ongoing round:  " + currentroundId + " " + "Value: " + multvalue
+      );
       await setWinners(multvalue, currentroundId);
       const playerBets = await checkBetsForWinsAndLosses(currentroundId);
       io.emit("livedata", playerBets);
@@ -310,9 +321,6 @@ setInterval(async () => {
       const endvalue = getendValue();
       const currentroundId = getCurrentRound();
       console.log("endresults for round", currentroundId);
-      const playerBets = await getEndResults(currentroundId, endvalue);
-
-      io.emit("livedata", playerBets);
     } else {
       console.log("Ok3");
     }

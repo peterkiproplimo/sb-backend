@@ -26,9 +26,9 @@ async function checkBetsForWinsAndLosses(roundId) {
 
     const fakeplayers = generateFakePlayersAndBets(15);
 
-    const finalResponse = [...betsWithDetails, ...fakeplayers];
+    // const finalResponse = [...betsWithDetails, ...fakeplayers];
 
-    return finalResponse;
+    return betsWithDetails;
     // return bets;
   } catch (error) {
     console.error("Error checking bets:", error);
@@ -57,9 +57,11 @@ async function getEndResults(roundId, endValue) {
         const account = await Account.findOne({
           user: bet.userId,
         });
-        account.balance =
-          parseFloat(account?.balance) + parseFloat(bet.betAmount);
-        await account.save();
+        if (account.user == bet.userId) {
+          account.balance =
+            parseFloat(account?.balance) + parseFloat(bet.betAmount);
+          await account.save();
+        }
       } else {
         loseAmount += bet.betAmount;
         // If the condition is not met, set win to false
@@ -71,9 +73,11 @@ async function getEndResults(roundId, endValue) {
         const account = await Account.findOne({
           user: bet.userId,
         });
-        account.balance =
-          parseFloat(account?.balance) - parseFloat(bet.betAmount);
-        await account.save();
+        if (account.user == bet.userId) {
+          account.balance =
+            parseFloat(account?.balance) - parseFloat(bet.betAmount);
+          await account.save();
+        }
       }
     }
 
@@ -88,9 +92,9 @@ async function getEndResults(roundId, endValue) {
       model: Player, // Reference the User model
     });
 
-    const finalResponse = [...betsWithDetails, ...fakeplayers];
+    // const finalResponse = [...betsWithDetails, ...fakeplayers];
 
-    return finalResponse;
+    return betsWithDetails;
   } catch (error) {
     console.error("Error checking bets:", error);
     throw error; // Rethrow the error to handle it at a higher level if needed
