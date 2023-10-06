@@ -81,9 +81,6 @@ async function getEndResults(roundId, endValue) {
       }
     }
 
-    // console.log("win amount", winAmount);
-    // console.log("lose amount", loseAmount);
-
     const fakeplayers = generateFakePlayersAndBets(15);
     // Fetch and return the updated bets from the database
     const updatedBets = await Playerbet.find({ round: roundId });

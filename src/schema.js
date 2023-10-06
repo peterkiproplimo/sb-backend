@@ -431,6 +431,7 @@ createBetHistory(point:String!, user:String!):BetHistory!
 createGameData(round:String!, level:String!):GameData
 createActives(user:String!, round:String!, amount:String):ActiveUsers
 generateOtp(username:String, phone:String):OTP!
+generateForgetpasswordOtp(username:String):OTP!
 generateAdminOtp(username:String, userId:String):OTP!
 transactionStatus(reference:String!):Transaction
 depositTest(phone:String!, amount:Float!, userId:String!):Account

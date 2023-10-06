@@ -59,10 +59,7 @@ const corsOptions = {
 app.use(express.json());
 app.use(isAuth);
 app.use((req, res, next) => {
-  res.setHeader(
-    "Access-Control-Allow-Origin",
-    "https://safaribust.techsavanna.technology"
-  );
+  res.setHeader("Access-Control-Allow-Origin", "http://localhost:3001");
   res.setHeader(
     "Access-Control-Allow-Methods",
     "GET, POST, PUT, DELETE, UPDATE"
@@ -284,7 +281,7 @@ async function startGame() {
 //  Start server and Game
 
 server.listen(3002, async () => {
-  await startGame();
+  // await startGame();
   getMultiplierValue();
 
   console.log(`listening on 3002`);

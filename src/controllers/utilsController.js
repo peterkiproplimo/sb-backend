@@ -113,6 +113,60 @@ const utilsResolvers = {
     };
   },
 
+  generateForgetpasswordOtp: async (args, req) => {
+    const user = await Player.findOne({ username: args.username });
+
+    const phone = formatKenyanPhoneNumber(user.phone);
+
+    console.log("This is my phone number", user.phone);
+    const otp = otpGenerator.generate(5, {
+      upperCaseAlphabets: true,
+      lowerCaseAlphabets: false,
+      digits: true,
+      specialChars: false,
+    });
+
+    const otpCreator = new OTP({
+      otp: otp,
+      verified: false,
+      phone: phone,
+      username: args.username,
+    });
+    const generator = await otpCreator.save();
+
+    var options = {
+      method: "POST",
+      url: "https://sms.securifier.co.ke/SMSApi/send",
+      headers: {
+        Headers: "Content-Type:application/json",
+      },
+      formData: {
+        userid: "safaribust",
+        password: "qghckqHE",
+        mobile: `${phone}`,
+        senderid: "SAFARIBUST",
+        msg: `OTP: ${otp}`,
+        sendMethod: "quick",
+        msgType: "text",
+        output: "json",
+        duplicatecheck: "true",
+      },
+    };
+
+    request(options, function (error, response) {
+      if (error) throw new Error(error);
+      // console.log(response.body);
+    });
+
+    return {
+      ...generator._doc,
+      _id: generator._id,
+      user: args.username,
+      createdAt: new Date(generator._doc.createdAt).toISOString(),
+      updatedAt: new Date(generator._doc.updatedAt).toISOString(),
+    };
+  },
+
   generateAdminOtp: async (args, req) => {
     const user = await Admin.findOne({ username: args.username });
     if (!user) {
