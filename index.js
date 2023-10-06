@@ -37,7 +37,11 @@ const {
 } = require("./src/utils/gameroundUtils");
 
 const { getLiveChat } = require("./src/utils/livechatUtils");
-const { generateFakePlayersAndBets } = require("./src/utils/fakePlayerUtils");
+const {
+  generateFakePlayersAndBets,
+  setFakePlayers,
+  getFakePlayers,
+} = require("./src/utils/fakePlayerUtils");
 const {
   checkBetsForWinsAndLosses,
   updatePlayedField,
@@ -181,16 +185,20 @@ async function updateTimerWithMultipliers(multiplier) {
 
       // Update win/ lose in database
       const currentroundId = await getCurrentRoundFromDatabase();
-      // console.log(
-      //   "Update winners/ losers then show the results for round: " +
-      //     currentroundId
-      // );
+
       const playerBets = await getEndResults(
         currentroundId,
         multiplier.bustpoint
       );
 
       io.emit("livedata", playerBets);
+
+      // Generate fake players for the next round here
+
+      const numPlayersToGenerate = 20;
+      const fakePlayers = generateFakePlayersAndBets(numPlayersToGenerate);
+      setFakePlayers(fakePlayers);
+
       setTimeout(async () => {
         io.emit("successMessage", ""); // Clear the "Busted" message
         await waitCount();
@@ -281,7 +289,7 @@ async function startGame() {
 //  Start server and Game
 
 server.listen(3002, async () => {
-  // await startGame();
+  await startGame();
   getMultiplierValue();
 
   console.log(`listening on 3002`);
@@ -303,24 +311,34 @@ setInterval(async () => {
   try {
     if (getemitNextRound()) {
       const currentroundId = await getCurrentRoundFromDatabase();
-      const playerBets = await checkBetsForWinsAndLosses(currentroundId);
+      const playerBets = await checkBetsForWinsAndLosses(
+        currentroundId,
+        "waitingnext"
+      );
+
+      console.log(playerBets);
       // console.log("bet next round");
+      // const fakePlayers = getFakePlayers();
+      // console.log(fakePlayers);
       io.emit("livedata", playerBets);
     } else if (getemitOngoingRound()) {
       const multvalue = getMultiplierValue();
 
       const currentroundId = await getCurrentRoundFromDatabase();
       setCurrentRound(currentroundId);
-      // console.log(
-      //   "Ongoing round:  " + currentroundId + " " + "Value: " + multvalue
-      // );
+
       await setWinners(multvalue, currentroundId);
-      const playerBets = await checkBetsForWinsAndLosses(currentroundId);
+      const playerBets = await checkBetsForWinsAndLosses(
+        currentroundId,
+        "ongoing"
+      );
+      console.log(playerBets);
       io.emit("livedata", playerBets);
     } else if (getemitEndRound()) {
+      // Generate fake players for the next round
+
       const endvalue = getendValue();
       const currentroundId = getCurrentRound();
-      // console.log("endresults for round", currentroundId);
     } else {
       console.log("Ok3");
     }
@@ -335,9 +353,6 @@ setInterval(async () => {
 
   io.emit("livechat", livechat);
 }, 300);
-
-const numPlayersToGenerate = 10;
-const fakePlayers = generateFakePlayersAndBets(numPlayersToGenerate);
 
 // Print the generated fake players
 // console.log(fakePlayers);

@@ -4,13 +4,15 @@ const Player = require("../models/Player");
 const Playerbet = require("../models/PlayerBet");
 const { ObjectId } = require("mongodb");
 const Account = require("../models/Account");
+const BetTransaction = require("../models/BetTransactions");
 
 const {
   generateFakePlayers,
   generateFakePlayersAndBets,
+  getFakePlayers,
 } = require("../utils/fakePlayerUtils");
 
-async function checkBetsForWinsAndLosses(roundId) {
+async function checkBetsForWinsAndLosses(roundId, gamestatus) {
   try {
     const db = await connectToDatabase();
 
@@ -24,11 +26,23 @@ async function checkBetsForWinsAndLosses(roundId) {
       model: Player, // Reference the User model
     });
 
-    const fakeplayers = generateFakePlayersAndBets(15);
+    const fakeplayers = getFakePlayers();
 
-    // const finalResponse = [...betsWithDetails, ...fakeplayers];
+    const betsFinalResponse = betsWithDetails.map((bet) => ({
+      ...bet.toObject(), // Convert the Mongoose document to a plain JavaScript object
+      gamestatus: gamestatus, // Add the gamestatus property
+    }));
 
-    return betsWithDetails;
+    // Iterate through each object in fakeplayers and add the gamestatus property
+    const fakeplayersFinalResponse = fakeplayers.map((fakeplayer) => ({
+      ...fakeplayer,
+      gamestatus: gamestatus,
+    }));
+
+    // Combine both arrays into a single finalResponse array
+    const finalResponse = [...betsFinalResponse, ...fakeplayersFinalResponse];
+
+    return finalResponse;
     // return bets;
   } catch (error) {
     console.error("Error checking bets:", error);
@@ -44,6 +58,7 @@ async function getEndResults(roundId, endValue) {
     const bets = await Playerbet.find({ round: roundId });
     let winAmount = 0;
     let loseAmount = 0;
+    const houseAccount = await Account.findById("6516eff5218a1ba827bb2a5e");
     // Iterate through the bets and update the "win" field based on the condition
     for (const bet of bets) {
       if (bet.point <= endValue) {
@@ -59,29 +74,51 @@ async function getEndResults(roundId, endValue) {
         });
         if (account.user == bet.userId) {
           account.balance =
-            parseFloat(account?.balance) + parseFloat(bet.betAmount);
+            parseFloat(account?.balance) + parseFloat(bet.possibleWin);
+
           await account.save();
+
+          const betrans = new BetTransaction({
+            type: "win",
+            usertype: "player",
+            amount: bet.possibleWin,
+            account: account,
+          });
+
+          await betrans.save();
+
+          houseAccount.balance =
+            parseFloat(houseAccount?.balance) - parseFloat(bet.possibleWin);
+          await houseAccount.save();
+
+          const betrans2 = new BetTransaction({
+            type: "lose",
+            usertype: "house",
+            amount: bet.possibleWin,
+            account: houseAccount,
+          });
+
+          await betrans2.save();
         }
       } else {
-        loseAmount += bet.betAmount;
+        // loseAmount += bet.betAmount;
         // If the condition is not met, set win to false
-        await Playerbet.updateOne(
-          { _id: bet._id },
-          { $set: { busted: true, win: false } }
-        );
-
-        const account = await Account.findOne({
-          user: bet.userId,
-        });
-        if (account.user == bet.userId) {
-          account.balance =
-            parseFloat(account?.balance) - parseFloat(bet.betAmount);
-          await account.save();
-        }
+        // await Playerbet.updateOne(
+        //   { _id: bet._id },
+        //   { $set: { busted: true, win: false } }
+        // );
+        // const account = await Account.findOne({
+        //   user: bet.userId,
+        // });
+        // if (account.user == bet.userId) {
+        //   account.balance =
+        //     parseFloat(account?.balance) - parseFloat(bet.betAmount);
+        //   await account.save();
+        // }
       }
     }
 
-    const fakeplayers = generateFakePlayersAndBets(15);
+    const fakeplayers = getFakePlayers();
     // Fetch and return the updated bets from the database
     const updatedBets = await Playerbet.find({ round: roundId });
     const betsWithDetails = await Playerbet.populate(updatedBets, {
@@ -89,9 +126,9 @@ async function getEndResults(roundId, endValue) {
       model: Player, // Reference the User model
     });
 
-    // const finalResponse = [...betsWithDetails, ...fakeplayers];
+    const finalResponse = [...betsWithDetails, ...fakeplayers];
 
-    return betsWithDetails;
+    return finalResponse;
   } catch (error) {
     console.error("Error checking bets:", error);
     throw error; // Rethrow the error to handle it at a higher level if needed
@@ -206,8 +243,9 @@ async function updateRound(multiplier, gameround) {
     console.error("Error updating played field:", error);
   }
 }
+
 //  Update winners as the multiplier continues
-async function setWinners(bustboint) {
+async function setWinners(bustboint, currentroundId) {
   try {
     const db = await connectToDatabase();
 

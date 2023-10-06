@@ -1,5 +1,6 @@
 const { faker } = require("@faker-js/faker");
 
+let fakePlayers = [];
 function generatePhoneNumber() {
   // Generates a random 10-digit phone number
   const phoneNumber = faker.number.int({ min: 1000000000, max: 9999999999 });
@@ -49,8 +50,8 @@ function generateFakePlayersAndBets(numPlayers) {
     };
 
     const fakeBet = {
-      win: true,
-      busted: false,
+      win: false,
+      busted: true,
       _id: faker.string.uuid(24),
       betAmount: parseFloat(faker.finance.amount(1, 1000, 2)),
       point: parseFloat(faker.finance.amount(0, 20, 2)),
@@ -83,7 +84,16 @@ function generateFakePlayersAndBets(numPlayers) {
   return fakePlayersAndBets;
 }
 
+function setFakePlayers(fakeplayers) {
+  fakePlayers = fakeplayers;
+}
+
+function getFakePlayers() {
+  return fakePlayers;
+}
 module.exports = {
   generateFakePlayers,
   generateFakePlayersAndBets,
+  getFakePlayers,
+  setFakePlayers,
 };

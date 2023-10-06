@@ -10,6 +10,8 @@ const Game = require("../models/Game");
 const house = require("../models/house");
 const Playerbet = require("../models/PlayerBet");
 const Player = require("../models/Player");
+const BetTransaction = require("../models/BetTransactions");
+
 const {
   getRoundFromDatabase,
   getCurrentRoundFromDatabase,
@@ -17,14 +19,29 @@ const {
 
 const betsResolvers = {
   createPlayerbet: async (args, req) => {
-    // console.log(req);
+    // Check player AC balance
     const account = await Account.findOne({ user: args.playerbetInput.userId });
-    if (+account.balance < 0) {
+    if (
+      +account.balance < 0 ||
+      account.balance < parseFloat(args.playerbetInput.betAmount)
+    ) {
       throw new Error("Insufficient account account balance");
     }
+    // Subtract the player account balance
+    account.balance =
+      parseFloat(account?.balance) - parseFloat(args.playerbetInput.betAmount);
+    await account.save();
 
+    //  Add the house balance
+    const houseAccount = await Account.findById("6516eff5218a1ba827bb2a5e");
+    houseAccount.balance =
+      parseFloat(houseAccount?.balance) +
+      parseFloat(args.playerbetInput.betAmount);
+    await houseAccount.save();
+    //  Get the possible win
     let possibleWin = args.playerbetInput.betAmount * args.playerbetInput.point;
     const nextRound = await getRoundFromDatabase();
+
     const bet = new Playerbet({
       betAmount: args.playerbetInput.betAmount,
       point: args.playerbetInput.point,
@@ -33,12 +50,20 @@ const betsResolvers = {
       possibleWin: possibleWin,
       win: false,
     });
-
-    // Deduct amount from the player account, add to the house total
-
-    const user = await Player.findById(args.playerbetInput.userId);
+    //  Place the bet
 
     const results = await bet.save();
+
+    const betrans = new BetTransaction({
+      type: "bet",
+      usertype: "player",
+      amount: args.playerbetInput.betAmount,
+      account: account,
+    });
+
+    await betrans.save();
+
+    const user = await Player.findById(args.playerbetInput.userId);
 
     // Format and return the result
     const createdBet = {
