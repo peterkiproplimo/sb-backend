@@ -191,7 +191,8 @@ async function updateTimerWithMultipliers(multiplier) {
 
       const playerBets = await getEndResults(
         currentroundId,
-        multiplier.bustpoint
+        multiplier.bustpoint,
+        "endresults"
       );
 
       io.emit("livedata", playerBets);

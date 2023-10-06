@@ -40,9 +40,9 @@ async function checkBetsForWinsAndLosses(roundId, gamestatus) {
     }));
 
     // Combine both arrays into a single finalResponse array
-    // const finalResponse = [...betsFinalResponse, ...fakeplayersFinalResponse];
+    const finalResponse = [...betsFinalResponse, ...fakeplayersFinalResponse];
 
-    return betsFinalResponse;
+    return finalResponse;
     // return bets;
   } catch (error) {
     console.error("Error checking bets:", error);
@@ -50,7 +50,7 @@ async function checkBetsForWinsAndLosses(roundId, gamestatus) {
   }
 }
 
-async function getEndResults(roundId, endValue) {
+async function getEndResults(roundId, endValue, gamestatus) {
   try {
     const db = await connectToDatabase();
 
@@ -126,9 +126,25 @@ async function getEndResults(roundId, endValue) {
       model: Player, // Reference the User model
     });
 
+    const betsFinalResponse = betsWithDetails.map((bet) => ({
+      ...bet.toObject(), // Convert the Mongoose document to a plain JavaScript object
+      gamestatus: gamestatus, // Add the gamestatus property
+    }));
+
+    // Iterate through each object in fakeplayers and add the gamestatus property
+    const fakeplayersFinalResponse = fakeplayers.map((fakeplayer) => ({
+      ...fakeplayer,
+      gamestatus: gamestatus,
+    }));
+
+    // Combine both arrays into a single finalResponse array
+    const finalResponse = [...betsFinalResponse, ...fakeplayersFinalResponse];
+
+    return finalResponse;
+
     // const finalResponse = [...betsWithDetails, ...fakeplayers];
 
-    return betsWithDetails;
+    // return betsWithDetails;
   } catch (error) {
     console.error("Error checking bets:", error);
     throw error; // Rethrow the error to handle it at a higher level if needed
