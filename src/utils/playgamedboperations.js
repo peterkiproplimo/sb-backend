@@ -40,9 +40,9 @@ async function checkBetsForWinsAndLosses(roundId, gamestatus) {
     }));
 
     // Combine both arrays into a single finalResponse array
-    const finalResponse = [...betsFinalResponse, ...fakeplayersFinalResponse];
+    // const finalResponse = [...betsFinalResponse, ...fakeplayersFinalResponse];
 
-    return finalResponse;
+    return betsFinalResponse;
     // return bets;
   } catch (error) {
     console.error("Error checking bets:", error);
@@ -126,9 +126,9 @@ async function getEndResults(roundId, endValue) {
       model: Player, // Reference the User model
     });
 
-    const finalResponse = [...betsWithDetails, ...fakeplayers];
+    // const finalResponse = [...betsWithDetails, ...fakeplayers];
 
-    return finalResponse;
+    return betsWithDetails;
   } catch (error) {
     console.error("Error checking bets:", error);
     throw error; // Rethrow the error to handle it at a higher level if needed
@@ -251,18 +251,15 @@ async function setWinners(bustboint, currentroundId) {
 
     // Update all documents where bustpoint is <= bustboint
     const result = await db.collection("playerbets").updateMany(
-      { point: { $lte: bustboint } }, // Filter criteria
+      { point: { $lte: bustboint }, round: currentroundId }, // Filter criteria
       { $set: { win: true } } // Update operation
     );
 
     // Check if the update was successful
     if (result.modifiedCount > 0) {
       // Fetch the updated documents if needed
-      const winners = await db
-        .collection("playerbets")
-        .find({ win: true })
-        .toArray();
-      console.log(winners);
+      const winners = await db.collection("playerbets").find().toArray();
+
       return winners;
     } else {
       // console.log("No winners found.");

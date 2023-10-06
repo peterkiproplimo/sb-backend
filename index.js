@@ -292,7 +292,7 @@ async function startGame() {
 //  Start server and Game
 
 server.listen(3002, async () => {
-  // await startGame();
+  await startGame();
   getMultiplierValue();
 
   console.log(`listening on 3002`);
