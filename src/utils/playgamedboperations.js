@@ -119,7 +119,7 @@ async function getEndResults(roundId, endValue, gamestatus) {
     }
 
     const fakeplayers = getFakePlayers().map((fakeplayer) => {
-      if (fakeplayer.point <= bustPoint) {
+      if (fakeplayer.point <= endValue) {
         fakeplayer.win = true;
         fakeplayer.busted = false;
       }
