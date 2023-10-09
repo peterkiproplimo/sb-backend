@@ -135,7 +135,9 @@ const mpesaResolvers = {
       const consumer_secret = "R8Kd6wFX6ot3L7Th";
       const url =
         "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials";
-      const auth = btoa(`${consumer_key}:${consumer_secret}`);
+      const auth = Buffer.from(`${consumer_key}:${consumer_secret}`).toString(
+        "base64"
+      );
       const { data } = await axios.get(url, {
         headers: { Authorization: "Basic" + " " + auth },
       });
