@@ -54,7 +54,7 @@ function generateFakePlayersAndBets(numPlayers) {
       busted: true,
       _id: faker.string.uuid(24),
       betAmount: parseFloat(faker.finance.amount(1, 1000, 2)),
-      point: parseFloat(faker.finance.amount(0, 20, 2)),
+      point: parseFloat(faker.finance.amount(1, 20, 2)),
       userId: {
         playerbets: [],
         _id: faker.string.uuid(24),
