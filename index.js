@@ -160,6 +160,7 @@ async function fetchMultipliersBatch() {
     console.error("Error fetching multipliers:", error);
   }
 }
+
 async function updateTimerWithMultipliers(multiplier) {
   setemitOngoingRound(true);
   setemitEndRound(false);
@@ -317,10 +318,6 @@ setInterval(async () => {
         "waitingnext"
       );
 
-      console.log(playerBets);
-      // console.log("bet next round");
-      // const fakePlayers = getFakePlayers();
-      // console.log(fakePlayers);
       io.emit("livedata", playerBets);
     } else if (getemitOngoingRound()) {
       const multvalue = getMultiplierValue();
@@ -333,7 +330,7 @@ setInterval(async () => {
         currentroundId,
         "ongoing"
       );
-      console.log(playerBets);
+      // console.log(playerBets);
       io.emit("livedata", playerBets);
     } else if (getemitEndRound()) {
       // Generate fake players for the next round
