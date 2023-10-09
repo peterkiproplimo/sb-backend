@@ -318,7 +318,8 @@ setInterval(async () => {
       const currentroundId = await getCurrentRoundFromDatabase();
       const playerBets = await checkBetsForWinsAndLosses(
         currentroundId,
-        "waitingnext"
+        "waitingnext",
+        0
       );
 
       io.emit("livedata", playerBets);
@@ -331,7 +332,8 @@ setInterval(async () => {
       await setWinners(multvalue, currentroundId);
       const playerBets = await checkBetsForWinsAndLosses(
         currentroundId,
-        "ongoing"
+        "ongoing",
+        multvalue
       );
       // console.log(playerBets);
       io.emit("livedata", playerBets);

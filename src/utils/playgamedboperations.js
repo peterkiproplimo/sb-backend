@@ -13,7 +13,7 @@ const {
   setFakePlayers,
 } = require("../utils/fakePlayerUtils");
 
-async function checkBetsForWinsAndLosses(roundId, gamestatus) {
+async function checkBetsForWinsAndLosses(roundId, gamestatus, multvalue) {
   try {
     const db = await connectToDatabase();
 
@@ -27,7 +27,20 @@ async function checkBetsForWinsAndLosses(roundId, gamestatus) {
       model: Player, // Reference the User model
     });
 
-    const fakeplayers = getFakePlayers();
+    const fakeplayers = getFakePlayers().map((fakeplayer) => {
+      if (fakeplayer.point <= multvalue) {
+        fakeplayer.win = true;
+        fakeplayer.busted = false;
+      }
+      return fakeplayer;
+    });
+
+    const sortedWinners = fakeplayers.sort((a, b) =>
+      a.win === b.win ? 0 : a.win ? -1 : 1
+    );
+
+    // Set the new updated list of fake players
+    // setFakePlayers(sortedWinners);
 
     const betsFinalResponse = betsWithDetails.map((bet) => ({
       ...bet.toObject(), // Convert the Mongoose document to a plain JavaScript object
@@ -35,7 +48,7 @@ async function checkBetsForWinsAndLosses(roundId, gamestatus) {
     }));
 
     // Iterate through each object in fakeplayers and add the gamestatus property
-    const fakeplayersFinalResponse = fakeplayers.map((fakeplayer) => ({
+    const fakeplayersFinalResponse = sortedWinners.map((fakeplayer) => ({
       ...fakeplayer,
       gamestatus: gamestatus,
     }));
@@ -281,14 +294,19 @@ async function setWinners(bustboint, currentroundId) {
     );
 
     const fakeplayers = getFakePlayers().map((fakeplayer) => {
-      if (fakeplayer.point <= bustPoint) {
+      if (fakeplayer.point <= bustboint) {
         fakeplayer.win = true;
         fakeplayer.busted = false;
       }
       return fakeplayer;
     });
 
-    setFakePlayers(fakeplayers);
+    const sortedWinners = fakeplayers.sort((a, b) =>
+      a.win === b.win ? 0 : a.win ? -1 : 1
+    );
+
+    // Set the new updated list of fake players
+    setFakePlayers(sortedWinners);
 
     // console.log(fakeplayers);
     // Check if the update was successful
