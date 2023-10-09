@@ -347,9 +347,9 @@ setInterval(async () => {
   }
 
   //  Function to perform the live chat
-  // const livechat = await getLiveChat();
+  const livechat = await getLiveChat();
 
-  // io.emit("livechat", livechat);
+  io.emit("livechat", livechat);
 }, 300);
 
 // Print the generated fake players
