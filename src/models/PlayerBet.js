@@ -17,6 +17,10 @@ const betSchema = new Schema(
       type: String,
       required: true,
     },
+    withholdingtax: {
+      type: String,
+      required: false,
+    },
     round: {
       type: String,
       required: true,

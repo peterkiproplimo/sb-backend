@@ -43,6 +43,8 @@ const betsResolvers = {
     await houseAccount.save();
     //  Get the possible win
     let possibleWin = args.playerbetInput.betAmount * args.playerbetInput.point;
+    const winamount = possibleWin - args.playerbetInput.betAmount;
+    const withholdingtax = (20 / 100) * winamount;
     const nextRound = await getRoundFromDatabase();
 
     const bet = new Playerbet({
@@ -52,6 +54,7 @@ const betsResolvers = {
       round: nextRound,
       possibleWin: possibleWin,
       win: false,
+      withholdingtax: withholdingtax,
     });
     //  Place the bet
 
