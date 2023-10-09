@@ -175,7 +175,7 @@ async function updateTimerWithMultipliers(multiplier) {
       io.emit("updateTimer", "");
       io.emit("loadwinners", "");
 
-      io.emit("successMessage", "Busted @" + multiplier.bustpoint);
+      io.emit("successMessage", multiplier.bustpoint);
 
       setemitEndRound(true, multiplier.bustpoint);
       setemitOngoingRound(false);
