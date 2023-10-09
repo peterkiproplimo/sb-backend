@@ -118,7 +118,15 @@ async function getEndResults(roundId, endValue, gamestatus) {
       }
     }
 
-    const fakeplayers = getFakePlayers();
+    const fakeplayers = getFakePlayers().map((fakeplayer) => {
+      if (fakeplayer.point <= bustPoint) {
+        fakeplayer.win = true;
+        fakeplayer.busted = false;
+      }
+      return fakeplayer;
+    });
+
+    setFakePlayers(fakeplayers);
     // Fetch and return the updated bets from the database
     const updatedBets = await Playerbet.find({ round: roundId });
     const betsWithDetails = await Playerbet.populate(updatedBets, {
