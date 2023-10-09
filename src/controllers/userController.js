@@ -65,6 +65,9 @@ const userResolvers = {
             phone: phoneNumber2,
             active: true,
             user: result.id,
+            karibubonus: 0,
+            isfirstdebosit: false,
+            bonusredeemed: false,
           });
           await account.save();
 
