@@ -10,6 +10,7 @@ const {
   generateFakePlayers,
   generateFakePlayersAndBets,
   getFakePlayers,
+  setFakePlayers,
 } = require("../utils/fakePlayerUtils");
 
 async function checkBetsForWinsAndLosses(roundId, gamestatus) {
