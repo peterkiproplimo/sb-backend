@@ -144,9 +144,12 @@ const mpesaResolvers = {
       const account = await Account.findOne({
         user: args.userId,
       });
-      account.karibubonus = 0;
-      account.isfirstdebosit = false;
-      account.bonusredeemed = true;
+
+      if (account.isfirstdebosit) {
+        account.karibubonus = parseFloat(args.amount) * 2;
+        account.isfirstdebosit = false;
+      }
+
       account.balance = parseFloat(account?.balance) + parseFloat(args.amount);
       await account.save();
       // const ipAddress = req.socket.remoteAddress;

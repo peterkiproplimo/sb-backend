@@ -161,6 +161,7 @@ const accountResolvers = {
     return {
       _id: account?.id,
       balance: account?.balance,
+      karibubonus: account?.karibubonus,
       user: user,
       createdAt: new Date(account?._doc?.createdAt).toISOString(),
       updatedAt: new Date(account?._doc?.updatedAt).toISOString(),

@@ -66,6 +66,7 @@ const userResolvers = {
             active: true,
             user: result.id,
             karibubonus: 0,
+            totalbetamount: 0,
             isfirstdebosit: false,
             bonusredeemed: false,
           });

@@ -21,6 +21,11 @@ const accountSchema = new Schema(
       required: false,
       default: 0,
     },
+    totalbetamount: {
+      type: Number,
+      required: false,
+      default: 0,
+    },
     isfirstdebosit: {
       type: Boolean,
       required: false,

@@ -91,6 +91,7 @@ updatedAt:String!
 type Account{
 _id:ID!
 balance:String!
+karibubonus:String
 active:Boolean!
 user:Player
 phone:String
