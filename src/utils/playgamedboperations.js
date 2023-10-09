@@ -271,9 +271,21 @@ async function setWinners(bustboint, currentroundId) {
       { $set: { win: true } } // Update operation
     );
 
+    const fakeplayers = getFakePlayers().map((fakeplayer) => {
+      if (fakeplayer.point <= bustPoint) {
+        fakeplayer.win = true;
+        fakeplayer.busted = false;
+      }
+      return fakeplayer;
+    });
+
+    setFakePlayers(fakeplayers);
+
+    // console.log(fakeplayers);
     // Check if the update was successful
     if (result.modifiedCount > 0) {
       // Fetch the updated documents if needed
+
       const winners = await db.collection("playerbets").find().toArray();
 
       return winners;
