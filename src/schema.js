@@ -92,6 +92,7 @@ type Account{
 _id:ID!
 balance:String!
 karibubonus:String
+totalbalance:String
 active:Boolean!
 user:Player
 phone:String

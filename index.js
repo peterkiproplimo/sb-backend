@@ -124,6 +124,30 @@ app.post("/mpesa-callback", (req, res) => {
   res.json({ result: "Callback received and processed successfully" });
 });
 
+app.post("/mpesa-result", (req, res) => {
+  // Handle the incoming M-Pesa callback data here
+  const mpesaCallbackData = req.body;
+  console.log("Received M-Pesa callback:", mpesaCallbackData);
+
+  // Perform any necessary processing based on the callback data
+  // ...
+
+  // Respond to the M-Pesa API with an appropriate response (e.g., a success message)
+  res.json({ result: "Callback received and processed successfully" });
+});
+
+app.post("/mpesa-timeout", (req, res) => {
+  // Handle the incoming M-Pesa callback data here
+  const mpesaCallbackData = req.body;
+  console.log("Received M-Pesa callback:", mpesaCallbackData);
+
+  // Perform any necessary processing based on the callback data
+  // ...
+
+  // Respond to the M-Pesa API with an appropriate response (e.g., a success message)
+  res.json({ result: "Callback received and processed successfully" });
+});
+
 let timerPaused = false; // Flag t
 let currentMultiplierBatch = []; // Array to store the current batch of multipliers
 let batchIndex = 0;

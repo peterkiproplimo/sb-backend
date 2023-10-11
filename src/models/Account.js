@@ -31,6 +31,10 @@ const accountSchema = new Schema(
       required: false,
       default: false,
     },
+    bonusexpirydate: {
+      type: Date,
+      required: false,
+    },
     bonusredeemed: {
       type: Boolean,
       required: false,

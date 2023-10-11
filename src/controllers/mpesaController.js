@@ -145,9 +145,15 @@ const mpesaResolvers = {
         user: args.userId,
       });
 
-      if (account.isfirstdebosit) {
+      if (account.isfirstdebosit && parseFloat(args.amount) >= 100) {
         account.karibubonus = parseFloat(args.amount) * 2;
         account.isfirstdebosit = false;
+        const currentDate = new Date();
+        const sevenDaysLater = new Date(currentDate);
+        sevenDaysLater.setDate(currentDate.getDate() + 7);
+        const formattedDate = sevenDaysLater.toISOString().replace(/\.000/, "");
+
+        account.bonusexpirydate = formattedDate;
       }
 
       account.balance = parseFloat(account?.balance) + parseFloat(args.amount);
