@@ -150,7 +150,7 @@ type Transaction {
 _id:ID!
 type: String
 amount: String
-user:User
+user:Player
 transactionId:String
 trans_id:String
 bill_ref_number:String
@@ -159,6 +159,10 @@ balance:String
 username:String
 createdAt:String
 updatedAt:String
+MerchantRequestID:String
+CheckoutRequestID:String
+mpesaReceiptNumber:String
+phone:String
 }
 
 type AuthData {

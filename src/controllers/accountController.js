@@ -72,11 +72,15 @@ const accountResolvers = {
   },
 
   allTransactions: async (args, req) => {
-    const trans = await Transaction.find().sort({ createdAt: -1 });
+    const trans = await Transaction.find()
+      .sort({ createdAt: -1 })
+      .populate("user");
+    // const user = await Player.findById(trans.user);
     return trans.map((trans) => {
       return {
         ...trans?._doc,
         _id: trans?.id,
+
         createdAt: new Date(trans?._doc?.createdAt).toISOString(),
         updatedAt: new Date(trans?._doc?.updatedAt).toISOString(),
       };
