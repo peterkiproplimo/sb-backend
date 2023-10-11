@@ -129,6 +129,61 @@ const mpesaResolvers = {
   },
 
   depositTest: async (args, req) => {
+    try {
+      const consumer_key = "ROqiKlEFF9Gb4BmYtTbhPlxk0NYfATg8";
+      const consumer_secret = "R8Kd6wFX6ot3L7Th";
+      const url =
+        "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials";
+      const auth = btoa(`${consumer_key}:${consumer_secret}`);
+      const { data } = await axios.get(url, {
+        headers: { Authorization: "Basic" + " " + auth },
+      });
+      if (data.access_token) {
+        const timestamp = formatDate();
+        const shortcode = 174379;
+        const passkey =
+          "MTc0Mzc5YmZiMjc5ZjlhYTliZGJjZjE1OGU5N2RkNzFhNDY3Y2QyZTBjODkzMDU5YjEwZjc4ZTZiNzJhZGExZWQyYzkxOTIwMTYwMjE2MTY1NjI3";
+        const password = Buffer.from(shortcode + passkey + timestamp).toString(
+          "base64"
+        );
+
+        let req = unirest(
+          "POST",
+          "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest"
+        )
+          .headers({
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${data.access_token}`,
+            Host: "api.safaricom.co.ke",
+          })
+          .send(
+            JSON.stringify({
+              BusinessShortCode: shortcode,
+              Password: password,
+              Timestamp: timestamp,
+              TransactionType: "CustomerPayBillOnline",
+              Amount: parseInt(args.amount),
+              PartyA: parseInt(args.phone),
+              PartyB: shortcode,
+              PhoneNumber: parseInt(args.phone),
+              CallBackURL:
+                "https://sb-backend-test.onrender.com/mpesa-callback",
+              AccountReference: parseInt(args.phone),
+              TransactionDesc: "Deposit to SAFARIBUST Account",
+            })
+          )
+          .end((res) => {
+            console.log(res);
+            // if (res.error) {
+            //   console.log(res);
+            // }
+          });
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  },
+  depositTestBackup: async (args, req) => {
     console.log(args);
     try {
       const trans = new Transaction({
