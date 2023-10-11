@@ -184,55 +184,30 @@ const mpesaResolvers = {
             })
           )
           .end(async (res) => {
-            console.log(res.body);
-            const trans = new Transaction({
-              type: "Deposit",
-              MerchantRequestID: res.body.MerchantRequestID,
-              CheckoutRequestID: res.body.CheckoutRequestID,
-              trans_time: timestamp,
-              amount: args.amount,
-              phone: args.phone,
-              user: args.userId,
-            });
-            await trans.save();
+            if (res.body.ResponseCode == "0") {
+              console.log(res.body);
+              const trans = new Transaction({
+                type: "Deposit",
+                MerchantRequestID: res.body.MerchantRequestID,
+                CheckoutRequestID: res.body.CheckoutRequestID,
+                trans_time: timestamp,
+                amount: args.amount,
+                phone: args.phone,
+                user: args.userId,
+              });
+              await trans.save();
 
-            const account = await Account.findOne({
-              user: args.userId,
-            });
-
-            if (account.isfirstdebosit && parseFloat(args.amount) >= 100) {
-              account.karibubonus = parseFloat(args.amount) * 2;
-              account.isfirstdebosit = false;
-              const currentDate = new Date();
-              const sevenDaysLater = new Date(currentDate);
-              sevenDaysLater.setDate(currentDate.getDate() + 7);
-              const formattedDate = sevenDaysLater
-                .toISOString()
-                .replace(/\.000/, "");
-
-              account.bonusexpirydate = formattedDate;
+              const user = await Player.findById(args.userId);
+              const account = await Account.findOne({ user: args.userId });
+              return {
+                _id: account?.id,
+                balance: account?.balance,
+                user: user,
+                createdAt: new Date(account?._doc?.createdAt).toISOString(),
+                updatedAt: new Date(account?._doc?.updatedAt).toISOString(),
+                active: account?.active,
+              };
             }
-
-            account.balance =
-              parseFloat(account?.balance) + parseFloat(args.amount);
-            await account.save();
-            // const ipAddress = req.socket.remoteAddress;
-            const log = new Logs({
-              ip: "deposits",
-              description: `${account?.user?.username} deposited ${args.amount}- Account Name:${account?.user?.username}`,
-              user: args.userId,
-            });
-            await log.save();
-
-            const user = await Player.findById(args.userId);
-            return {
-              _id: account?.id,
-              balance: account?.balance,
-              user: user,
-              createdAt: new Date(account?._doc?.createdAt).toISOString(),
-              updatedAt: new Date(account?._doc?.updatedAt).toISOString(),
-              active: account?.active,
-            };
           });
       }
     } catch (err) {
