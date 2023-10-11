@@ -221,14 +221,14 @@ const adminResolvers = {
   //  Get a list of all the accounts
 
   accounts: async (args, req) => {
-    const acc = await Account.find().sort({ createdAt: -1 });
+    const acc = await Account.find().sort({ createdAt: -1 }).populate("user");
     return acc.map(async (acc) => {
       // const user = await singleUser.bind(this, acc?._doc.user)
-      const user = await User.findOne({ _id: acc?._doc.user });
+      // const user = await User.findOne({ _id: acc?._doc.user });
       return {
         ...acc?._doc,
         _id: acc?.id,
-        user: user,
+        // user: user,
         createdAt: new Date(acc?._doc?.createdAt).toISOString(),
         updatedAt: new Date(acc?._doc?.updatedAt).toISOString(),
       };
@@ -246,7 +246,7 @@ const adminResolvers = {
       return {
         ...it._doc,
         _id: it.id,
-        user: it._doc.user,
+        //  user: it._doc.user,
         createdAt: new Date(it._doc.createdAt).toISOString(),
         updatedAt: new Date(it._doc.updatedAt).toISOString(),
       };

@@ -14,8 +14,8 @@ const betSchema = new Schema(
       required: true,
     },
     userId: {
-      type: String,
-      required: true,
+      type: Schema.Types.ObjectId,
+      ref: "Player",
     },
     withholdingtax: {
       type: String,

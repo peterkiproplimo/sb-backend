@@ -217,6 +217,7 @@ createdAt:String!
 updatedAt:String!
 }
 
+
 input UserInput {
 username:String!
 phone: String!
@@ -378,7 +379,7 @@ accountBalance(userId:String):Account!
 transactions(userId:String):[Transaction!]!
 bets(userId:String):[Bet!]!
 historyBets(userId:String):[Bet!]!
-allBets:[Bet!]!
+allBets:[Playerbet!]!
 filteredBets:[Bet!]!
 allTransactions:[Transaction!]!
 logs:[Logs!]!

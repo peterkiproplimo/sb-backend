@@ -303,13 +303,15 @@ const betsResolvers = {
   //  Get all the bets
 
   allBets: async (args, req) => {
-    const bets = await Bet.find().sort({ createdAt: -1 });
+    const bets = await Playerbet.find()
+      .sort({ createdAt: -1 })
+      .populate("userId");
     console.log(bets);
     return bets.map((bet) => {
       return {
         ...bet?._doc,
         _id: bet?.id,
-        user: singleUser.bind(this, bet?._doc?.user),
+        // user: singleUser.bind(this, bet?._doc?.user),
         createdAt: new Date(bet?._doc?.createdAt).toISOString(),
         updatedAt: new Date(bet?._doc?.updatedAt).toISOString(),
       };
