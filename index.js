@@ -123,35 +123,40 @@ app.post("/mpesa-callback", async (req, res) => {
   });
 
   if (transaction) {
-    if (
-      mpesaCallbackData.Body.stkCallback.ResultCode == 1032 &&
-      mpesaCallbackData.Body.stkCallback.ResultDesc ==
-        "Request canceled by user"
-    ) {
-      transaction.status = "cancelled";
-      await transaction.save();
+    if (mpesaCallbackData.Body.stkCallback.ResultCode == 1032) {
+      try {
+        // Transaction canceled by the user
+        transaction.status = "cancelled";
+        await transaction.save();
+      } catch (error) {
+        console.error("Error updating transaction (cancellation):", error);
+      }
     } else if (mpesaCallbackData.Body.stkCallback.ResultCode == 0) {
       // Update the transaction with the data from the response body
-      transaction.status = "successfull";
-      transaction.amount =
-        mpesaCallbackData.Body.stkCallback.CallbackMetadata.Item.find(
-          (item) => item.Name === "Amount"
-        ).Value;
-      transaction.mpesaReceiptNumber =
-        mpesaCallbackData.Body.stkCallback.CallbackMetadata.Item.find(
-          (item) => item.Name === "MpesaReceiptNumber"
-        ).Value;
-      transaction.transactionDate =
-        mpesaCallbackData.Body.stkCallback.CallbackMetadata.Item.find(
-          (item) => item.Name === "TransactionDate"
-        ).Value;
-      transaction.phone =
-        mpesaCallbackData.Body.stkCallback.CallbackMetadata.Item.find(
-          (item) => item.Name === "PhoneNumber"
-        ).Value;
+      try {
+        transaction.status = "successfull";
+        transaction.amount =
+          mpesaCallbackData.Body.stkCallback.CallbackMetadata.Item.find(
+            (item) => item.Name === "Amount"
+          ).Value;
+        transaction.mpesaReceiptNumber =
+          mpesaCallbackData.Body.stkCallback.CallbackMetadata.Item.find(
+            (item) => item.Name === "MpesaReceiptNumber"
+          ).Value;
+        transaction.transactionDate =
+          mpesaCallbackData.Body.stkCallback.CallbackMetadata.Item.find(
+            (item) => item.Name === "TransactionDate"
+          ).Value;
+        transaction.phone =
+          mpesaCallbackData.Body.stkCallback.CallbackMetadata.Item.find(
+            (item) => item.Name === "PhoneNumber"
+          ).Value;
 
-      // Save the updated transaction
-      await transaction.save();
+        // Save the updated transaction
+        await transaction.save();
+      } catch (error) {
+        console.error("Error updating transaction (success):", error);
+      }
     }
 
     console.log("Transaction updated successfully.");
