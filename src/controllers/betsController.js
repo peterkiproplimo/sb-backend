@@ -284,7 +284,7 @@ const betsResolvers = {
   //  Get bets for a paricular user
 
   bets: async (args, req) => {
-    const bets = await Bet.find({ user: args.userId })
+    const bets = await Playerbet.find({ user: args.userId })
       .sort({
         createdAt: -1,
       })

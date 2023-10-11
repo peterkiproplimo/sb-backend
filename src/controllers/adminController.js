@@ -15,6 +15,7 @@ const Role = require("../models/roleModel");
 const Permission = require("../models/permissionModel");
 const permissions = require("../../permissions.json");
 const Player = require("../models/Player");
+const User = require("../models/User");
 
 const connectToDatabase = require("../../config/database");
 const { AggregationCursor } = require("mongoose");
@@ -213,7 +214,7 @@ const adminResolvers = {
   //    Get a list of all the admins
 
   admins: async (args, req) => {
-    const users = await Admin.find().sort({ createdAt: -1 });
+    const users = await User.find().sort({ createdAt: -1 });
 
     return users;
   },

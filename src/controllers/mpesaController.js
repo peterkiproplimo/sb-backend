@@ -335,25 +335,32 @@ const mpesaResolvers = {
     }
 
     const ipAddress = req.socket.remoteAddress;
+
     try {
-      const consumer_key = "qhygNtCpa5tAMxAf3sjvvxXvHTtJkoAf";
-      const consumer_secret = "gN9j1ZYPz4PBcOjr";
+      const consumer_key = "gA2VYetg7GO5FjudxZCpIk7DGJCbKwGz";
+      const consumer_secret = "SKdWCAxxcOFrmx8h";
       const url =
         "https://api.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials";
-      const auth = btoa(`${consumer_key}:${consumer_secret}`);
+      const authString = `${consumer_key}:${consumer_secret}`;
+
+      // Convert the string to a Buffer
+      const buffer = Buffer.from(authString, "utf-8");
+
+      // Encode the Buffer as Base64
+      const auth = buffer.toString("base64");
+      console.log(auth);
       const { data } = await axios.get(url, {
         headers: { Authorization: "Basic" + " " + auth },
       });
       if (data.access_token) {
         const timestamp = formatDate();
-        const shortcode = 3034427;
+        const shortcode = 182781;
         const passkey =
-          "BCZcLvkd0lJU+AkbjLcbesMIdn4viqoI9B9jhiTMs2yJlxWAiLTeNm/ftOXz9rlgWdqHlMOW1JirTs/yGpH/yad/BECGKjCtrC0Wi0sj7e1vgoutLBgzXaUrNkSPQxE9aPAuw1Of4DROwy1eYtby+M0Ir/3qFDEWprkn/RRdsLGfaIv5leWGOa1SIbv0vdY13gBQAT1h2kiMWbyHZKgzcO90mZ5GerfUJk/ID4s/3DF+XkOe0Zmfg/1hX8va36SI67gY2OOlf60fYp5Ss2p1ISlE6qgudSd76Qxk3xTf9QhdoJmGPFt5Izq828h90+T139kINIkoOikMPcKYrvbCXA==";
+          "dxgf3qG1VqA64+H7cS6bZX9am7dQhN1In37AYxuSofEXSDxDpSE9xeWwdfeKllrGJkvRhuzYPm0XB697PriCGdUHb/DxMZ6W0kMH8Sx2vHQRAZRAtx7HBIFL+u7i3tG81hXW2C+mvpFGvKpr+2GZ4rQvIvIeiQ5eCM201NmTn1+3CJHEieGXyc7duYseZ1vwINUK0HJTyA8K7JFM/grsq5oCwmghrXOl/ATluoKHLmMakDfBafu3Bv3nG8cdlqs83QSLBJD9RqImhLeUOl1u53Xon/jRAKZ2FiW7LhuJ1McVJz6Ck5u9sM9c0A43kzivvEbATqno+y+8GuxHyktaHQ==";
         // const password = Buffer.from(
         //   shortcode + passkey + timestamp
         // ).toString("base64");
 
-        let unirest = require("unirest");
         let req = unirest(
           "POST",
           "https://api.safaricom.co.ke/mpesa/b2c/v1/paymentrequest"
@@ -373,9 +380,8 @@ const mpesaResolvers = {
               PartyB: parseInt(args.phone),
               Remarks: `Withdrawal: ${args.username}-${args.phone}`,
               QueueTimeOutURL:
-                "https://www.safaribust.co.ke/pesaxpress/B2C/timeout.php",
-              ResultURL:
-                "https://www.safaribust.co.ke/pesaxpress/B2C/result.php",
+                "https://sb-backend-test.onrender.com/mpesa-result",
+              ResultURL: "https://sb-backend-test.onrender.com/mpesa-timeout",
               Occassion: `Withdrawal: ${args.username}-${args.phone}`,
             })
           )
@@ -391,7 +397,7 @@ const mpesaResolvers = {
               description: `Withdrawn ${args.amount} - Account Name:${args.phone}`,
               user: args.userId,
             });
-            await og.save();
+            await log.save();
           });
       }
     } catch (err) {
