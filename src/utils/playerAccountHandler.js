@@ -8,7 +8,6 @@ const BetTransaction = require("../models/BetTransactions");
 const Transaction = require("../models/transactions");
 const Transrequest = require("../models/Transrequest");
 const Logs = require("../models/logs");
-const Player = require("../models/Player");
 async function updatePlayerAc(account, transaction) {
   try {
     if (account.isfirstdebosit && parseFloat(transaction.amount) >= 100) {
