@@ -17,6 +17,14 @@ const transactionSchema = new Schema(
       type: String,
       required: false,
     },
+    MerchantRequestID: {
+      type: String,
+      required: false,
+    },
+    CheckoutRequestID: {
+      type: String,
+      required: false,
+    },
     trans_time: {
       type: String,
       required: false,
@@ -34,6 +42,10 @@ const transactionSchema = new Schema(
       required: false,
     },
     username: {
+      type: String,
+      required: false,
+    },
+    phone: {
       type: String,
       required: false,
     },

@@ -130,26 +130,29 @@ const mpesaResolvers = {
 
   depositTest: async (args, req) => {
     try {
-      const consumer_key = "ROqiKlEFF9Gb4BmYtTbhPlxk0NYfATg8";
-      const consumer_secret = "R8Kd6wFX6ot3L7Th";
+      const consumer_key = "5PEvsVfLvBHx3SaJszsuJvzUEMIC3KGu";
+      const consumer_secret = "lnqSApRJLo3ahd20";
       const url =
-        "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials";
+        "https://api.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials";
       const auth = btoa(`${consumer_key}:${consumer_secret}`);
+
       const { data } = await axios.get(url, {
         headers: { Authorization: "Basic" + " " + auth },
       });
       if (data.access_token) {
         const timestamp = formatDate();
-        const shortcode = 174379;
+        const shortcode = 200038;
         const passkey =
-          "MTc0Mzc5YmZiMjc5ZjlhYTliZGJjZjE1OGU5N2RkNzFhNDY3Y2QyZTBjODkzMDU5YjEwZjc4ZTZiNzJhZGExZWQyYzkxOTIwMTYwMjE2MTY1NjI3";
+          "1b4a4259275aa64f74807e4bce8bd0a2f99e4059c510ebd1721af80f0d3b1a10";
         const password = Buffer.from(shortcode + passkey + timestamp).toString(
           "base64"
         );
 
+        console.log(password);
+
         let req = unirest(
           "POST",
-          "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest"
+          "https://api.safaricom.co.ke/mpesa/stkpush/v1/processrequest"
         )
           .headers({
             "Content-Type": "application/json",
@@ -172,11 +175,56 @@ const mpesaResolvers = {
               TransactionDesc: "Deposit to SAFARIBUST Account",
             })
           )
-          .end((res) => {
-            console.log(res);
-            // if (res.error) {
-            //   console.log(res);
-            // }
+          .end(async (res) => {
+            console.log(res.body);
+            const trans = new Transaction({
+              type: "Deposit",
+              MerchantRequestID: res.body.MerchantRequestID,
+              CheckoutRequestID: res.body.CheckoutRequestID,
+              trans_time: timestamp,
+              amount: args.amount,
+              phone: args.phone,
+              user: args.userId,
+            });
+            await trans.save();
+
+            const account = await Account.findOne({
+              user: args.userId,
+            });
+
+            if (account.isfirstdebosit && parseFloat(args.amount) >= 100) {
+              account.karibubonus = parseFloat(args.amount) * 2;
+              account.isfirstdebosit = false;
+              const currentDate = new Date();
+              const sevenDaysLater = new Date(currentDate);
+              sevenDaysLater.setDate(currentDate.getDate() + 7);
+              const formattedDate = sevenDaysLater
+                .toISOString()
+                .replace(/\.000/, "");
+
+              account.bonusexpirydate = formattedDate;
+            }
+
+            account.balance =
+              parseFloat(account?.balance) + parseFloat(args.amount);
+            await account.save();
+            // const ipAddress = req.socket.remoteAddress;
+            const log = new Logs({
+              ip: "deposits",
+              description: `${account?.user?.username} deposited ${args.amount}- Account Name:${account?.user?.username}`,
+              user: args.userId,
+            });
+            await log.save();
+
+            const user = await Player.findById(args.userId);
+            return {
+              _id: account?.id,
+              balance: account?.balance,
+              user: user,
+              createdAt: new Date(account?._doc?.createdAt).toISOString(),
+              updatedAt: new Date(account?._doc?.updatedAt).toISOString(),
+              active: account?.active,
+            };
           });
       }
     } catch (err) {

@@ -13,6 +13,7 @@ const resolvers = require("./src/resolvers");
 const isAuth = require("./src/middleware/is-auth");
 const house = require("./src/models/house");
 const Account = require("./src/models/Account");
+const Transaction = require("./src/models/transactions");
 // Update the path if needed
 const cors = require("cors");
 
@@ -112,10 +113,41 @@ io.on("connection", onConnection);
 io.use(socketAuth);
 app.use(cors());
 
-app.post("/mpesa-callback", (req, res) => {
+app.post("/mpesa-callback", async (req, res) => {
   // Handle the incoming M-Pesa callback data here
   const mpesaCallbackData = req.body;
   console.log("Received M-Pesa callback:", mpesaCallbackData);
+  const transaction = await Transaction.findOne({
+    MerchantRequestID: mpesaCallbackData.Body.stkCallback.MerchantRequestID,
+    CheckoutRequestID: mpesaCallbackData.Body.stkCallback.CheckoutRequestID,
+  });
+
+  if (transaction) {
+    // Update the transaction with the data from the response body
+    transaction.amount =
+      mpesaCallbackData.Body.stkCallback.CallbackMetadata.Item.find(
+        (item) => item.Name === "Amount"
+      ).Value;
+    transaction.mpesaReceiptNumber =
+      mpesaCallbackData.Body.stkCallback.CallbackMetadata.Item.find(
+        (item) => item.Name === "MpesaReceiptNumber"
+      ).Value;
+    transaction.transactionDate =
+      mpesaCallbackData.Body.stkCallback.CallbackMetadata.Item.find(
+        (item) => item.Name === "TransactionDate"
+      ).Value;
+    transaction.phone =
+      mpesaCallbackData.Body.stkCallback.CallbackMetadata.Item.find(
+        (item) => item.Name === "PhoneNumber"
+      ).Value;
+
+    // Save the updated transaction
+    await transaction.save();
+
+    console.log("Transaction updated successfully.");
+  } else {
+    console.log("Transaction not found in the database.");
+  }
 
   // Perform any necessary processing based on the callback data
   // ...
