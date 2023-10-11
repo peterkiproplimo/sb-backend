@@ -8,6 +8,7 @@ var mysql = require("mysql");
 //importing mongoose models
 const Account = require("../models/Account");
 const Transaction = require("../models/transactions");
+const Transrequest = require("../models/Transrequest");
 const Logs = require("../models/logs");
 const Player = require("../models/Player");
 const Mpesa = require("mpesa-node");
@@ -196,6 +197,14 @@ const mpesaResolvers = {
                 user: args.userId,
               });
               await trans.save();
+
+              const transrequest = new Transrequest({
+                amount: args.amount,
+                phone: args.phone,
+                user: args.userId,
+              });
+
+              await transrequest.save();
 
               const user = await Player.findById(args.userId);
               const account = await Account.findOne({ user: args.userId });

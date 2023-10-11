@@ -20,15 +20,15 @@ const logsSchema = new Schema(
       type: Number,
       required: false,
     },
-    transactionId:{
+    transactionId: {
       type: String,
       required: false,
     },
-     balance:{
+    balance: {
       type: String,
       required: false,
     },
-    conversationID:{
+    conversationID: {
       type: String,
       required: false,
     },
@@ -42,7 +42,7 @@ const logsSchema = new Schema(
     },
     user: {
       type: Schema.Types.ObjectId,
-      ref: "User",
+      ref: "Player",
     },
   },
   { timestamps: true }

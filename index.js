@@ -55,6 +55,8 @@ const {
   getEndResults,
 } = require("./src/utils/playgamedboperations");
 
+const { updatePlayerAc } = require("./src/utils/playerAccountHandler");
+
 const corsOptions = {
   origin: "*",
   credentials: true, //access-control-allow-credentials:true
@@ -154,12 +156,15 @@ app.post("/mpesa-callback", async (req, res) => {
 
         // Save the updated transaction
         await transaction.save();
+
+        const playeraccount = await Account.findById(transaction.user);
+
+        console.log(playeraccount);
+        updatePlayerAc(playeraccount, transaction);
       } catch (error) {
         console.error("Error updating transaction (success):", error);
       }
     }
-
-    console.log("Transaction updated successfully.");
   } else {
     console.log("Transaction not found in the database.");
   }
