@@ -25,6 +25,14 @@ const transactionSchema = new Schema(
       type: String,
       required: false,
     },
+    mpesaReceiptNumber: {
+      type: String,
+      required: false,
+    },
+    transactionDate: {
+      type: String,
+      required: false,
+    },
     trans_time: {
       type: String,
       required: false,
