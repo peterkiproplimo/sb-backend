@@ -2,7 +2,7 @@ require("dotenv").config();
 
 const bcrypt = require("bcryptjs");
 const moment = require("moment");
-
+const mongoose = require("mongoose");
 //importing mongoose models
 const Account = require("../models/Account");
 const Bet = require("../models/Bet");
@@ -140,14 +140,136 @@ async function fetchPlayersData() {
 function fetchWithholdingTaxData() {
   return { total: 2000.0 }; // Replace with actual data
 }
-function fetchWalletsTotalData() {
-  return { grandTotal: 2000.0 }; // Replace with actual data
+async function fetchWalletsTotalData() {
+  let totalmoney = 0;
+  const pipeline = [
+    {
+      $match: {
+        _id: { $ne: mongoose.Types.ObjectId("6523f69762c8841fb3313ade") },
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        totalBalance: { $sum: { $toDouble: "$balance" } },
+      },
+    },
+  ];
+
+  // Use Mongoose's aggregation framework to calculate the sum
+  await Account.aggregate(pipeline, (err, result) => {
+    if (err) {
+      console.error("Error calculating the sum:", err);
+    } else {
+      const total = result.length > 0 ? result[0].totalBalance : 0;
+      totalmoney = total;
+      console.log(
+        "Aggregate balance for all accounts except the specified account:",
+        total
+      );
+    }
+  });
+  return { grandTotal: totalmoney }; // Replace with actual data
 }
-function fetchHouseWinsData() {
-  return { monthlyTotal: 2000.0 }; // Replace with actual data
+async function fetchHouseWinsData() {
+  const today = new Date();
+  let mytotalmoney = 0;
+  // Set the time to midnight (00:00:00)
+  today.setHours(0, 0, 0, 0);
+
+  // Calculate the start date of the current month
+  const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+
+  // Define the criteria for the query to filter records for the current month
+  const criteria = {
+    win: false,
+    createdAt: { $gte: firstDayOfMonth, $lt: today },
+  };
+
+  const pipeline = [
+    { $match: criteria },
+    {
+      $group: {
+        _id: null,
+        totalAmount: {
+          $sum: {
+            $cond: [
+              { $ifNull: ["$betAmount", false] },
+              { $toDouble: "$betAmount" },
+              0, // Default value for non-numeric values
+            ],
+          },
+        },
+      },
+    },
+  ];
+
+  // Use Mongoose's aggregation framework to calculate the sum
+  await Playerbet.aggregate(pipeline, (err, result) => {
+    if (err) {
+      console.error("Error calculating the sum:", err);
+    } else {
+      const sum = result.length > 0 ? result[0].totalAmount : 0;
+      mytotalmoney = sum;
+      console.log(
+        "Sum of amount for Playerbets with win=false this month:",
+        sum
+      );
+    }
+  });
+
+  // Return the total for the current month
+  return { monthlyTotal: mytotalmoney };
 }
-function fetchHouseLossesData() {
-  return { monthlyTotal: 2000.0 }; // Replace with actual data
+async function fetchHouseLossesData() {
+  const today = new Date();
+  let mytotalmoney = 0;
+  // Set the time to midnight (00:00:00)
+  today.setHours(0, 0, 0, 0);
+
+  // Calculate the start date of the current month
+  const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+
+  // Define the criteria for the query to filter records for the current month
+  const criteria = {
+    win: true,
+    createdAt: { $gte: firstDayOfMonth, $lt: today },
+  };
+
+  const pipeline = [
+    { $match: criteria },
+    {
+      $group: {
+        _id: null,
+        totalAmount: {
+          $sum: {
+            $cond: [
+              { $ifNull: ["$betAmount", false] },
+              { $toDouble: "$betAmount" },
+              0, // Default value for non-numeric values
+            ],
+          },
+        },
+      },
+    },
+  ];
+
+  // Use Mongoose's aggregation framework to calculate the sum
+  await Playerbet.aggregate(pipeline, (err, result) => {
+    if (err) {
+      console.error("Error calculating the sum:", err);
+    } else {
+      const sum = result.length > 0 ? result[0].totalAmount : 0;
+      mytotalmoney = sum;
+      console.log(
+        "Sum of amount for Playerbets with win=false this month:",
+        sum
+      );
+    }
+  });
+
+  // Return the total for the current month
+  return { monthlyTotal: mytotalmoney }; // Replace with actual data
 }
 const adminResolvers = {
   Dashboard: () => {
