@@ -16,15 +16,99 @@ const Permission = require("../models/permissionModel");
 const permissions = require("../../permissions.json");
 const Player = require("../models/Player");
 const User = require("../models/User");
+const Playerbet = require("../models/PlayerBet");
 
 const connectToDatabase = require("../../config/database");
 const { AggregationCursor } = require("mongoose");
-function fetchHouseRevenueData() {
-  return { currentDay: 1000.0 }; // Replace with actual data
+async function fetchHouseRevenueData() {
+  const today = new Date();
+  let totalmoney = 0;
+  // Set the time to midnight (00:00:00)
+  today.setHours(0, 0, 0, 0);
+
+  // Define the criteria for the query
+  const criteria = {
+    win: false,
+    createdAt: { $gte: today },
+  };
+
+  // Create an aggregation pipeline to calculate the sum
+  const pipeline = [
+    { $match: criteria },
+    {
+      $group: {
+        _id: null,
+        totalAmount: {
+          $sum: {
+            $cond: [
+              { $ifNull: ["$betAmount", false] },
+              { $toDouble: "$betAmount" },
+              0, // Default value for non-numeric values
+            ],
+          },
+        },
+      },
+    },
+  ];
+
+  // Use Mongoose's aggregation framework to calculate the sum
+  await Playerbet.aggregate(pipeline, (err, result) => {
+    if (err) {
+      console.error("Error calculating the sum:", err);
+    } else {
+      const sum = result.length > 0 ? result[0].totalAmount : 0;
+      totalmoney = sum;
+      console.log("Sum of amount for Playerbets with win=false today:", sum);
+    }
+  });
+  // console.log(total);
+  return { currentDay: totalmoney };
+  // Replace with actual data
 }
 
-function fetchHouselosesTodayData() {
-  return { currentDay: 1000.0 }; // Replace with actual data
+async function fetchHouselosesTodayData() {
+  const today = new Date();
+  // Set the time to midnight (00:00:00)
+  today.setHours(0, 0, 0, 0);
+  let totalmoney = 0;
+  // Define the criteria for the query
+  const criteria = {
+    win: true,
+    createdAt: { $gte: today },
+  };
+
+  // Create an aggregation pipeline to calculate the sum
+  const pipeline = [
+    { $match: criteria },
+    {
+      $group: {
+        _id: null,
+        totalAmount: {
+          $sum: {
+            $cond: [
+              { $ifNull: ["$betAmount", false] },
+              { $toDouble: "$betAmount" },
+              0, // Default value for non-numeric values
+            ],
+          },
+        },
+      },
+    },
+  ];
+
+  // Use Mongoose's aggregation framework to calculate the sum
+  await Playerbet.aggregate(pipeline, (err, result) => {
+    if (err) {
+      console.error("Error calculating the sum:", err);
+    } else {
+      const sum = result.length > 0 ? result[0].totalAmount : 0;
+
+      totalmoney = sum;
+      console.log("Sum of amount for Playerbets with win=false today:", sum);
+    }
+  });
+  return { currentDay: totalmoney };
+  // Replace with actual data
 }
 
 function fetchMPESABalanceData() {
