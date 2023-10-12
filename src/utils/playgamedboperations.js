@@ -185,7 +185,8 @@ async function updatePlayedField(multiplier) {
       { $set: { played: 1 } }
     );
 
-    await createHistory(multiplier);
+    historybets = await createHistory(multiplier);
+    return historybets;
   } catch (error) {
     console.error("Error updating played field:", error);
   }
@@ -292,6 +293,9 @@ async function createHistory(multiplier) {
     round: multiplier.round,
   });
   await history.save();
+
+  const historybets = await History.find().sort({ createdAt: -1 }).limit(20);
+  return historybets;
 }
 
 //  Update winners as the multiplier continues

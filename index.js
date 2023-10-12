@@ -262,7 +262,9 @@ async function updateTimerWithMultipliers(multiplier) {
       setemitOngoingRound(false);
       setemitNextRound(false);
 
-      updatePlayedField(multiplier);
+      const historybets = updatePlayedField(multiplier);
+
+      io.emit("historybets", historybets);
 
       // Update win/ lose in database
       const currentroundId = await getCurrentRoundFromDatabase();
