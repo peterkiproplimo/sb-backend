@@ -264,6 +264,7 @@ betAmount: Float!
 point: Float!
 userId: Player!
 round: String!
+withholdingtax:Float
 possibleWin: Float
 win:Boolean
 createdAt: String!

@@ -11,7 +11,10 @@ const Logs = require("../models/logs");
 async function updatePlayerAc(account, transaction) {
   try {
     if (account.isfirstdebosit && parseFloat(transaction.amount) >= 100) {
-      account.karibubonus = parseFloat(transaction.amount) * 2;
+      account.karibubonus = parseFloat(args.amount) * 2;
+      if (account.karibubonus >= 10000) {
+        account.karibubonus = 10000;
+      }
       account.isfirstdebosit = false;
       const currentDate = new Date();
       const sevenDaysLater = new Date(currentDate);

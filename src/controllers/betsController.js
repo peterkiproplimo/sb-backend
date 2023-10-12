@@ -20,6 +20,9 @@ const {
 const betsResolvers = {
   createPlayerbet: async (args, req) => {
     // Check player AC balanc
+    let lessbonusamount = 0;
+    const currentDate = new Date();
+
     try {
       const account = await Account.findOne({
         user: args.playerbetInput.userId,
@@ -30,14 +33,46 @@ const betsResolvers = {
       ) {
         throw new Error("Insufficient account account balance");
       }
+      // Check if player has bonus then deduct the bonus
       // Subtract the player account balance
-      account.balance =
-        parseFloat(account?.balance) -
-        parseFloat(args.playerbetInput.betAmount);
-      account.totalbetamount =
-        parseFloat(account?.totalbetamount) +
-        parseFloat(args.playerbetInput.betAmount);
-      await account.save();
+      if (
+        account.karibubonus > 0 &&
+        account.karibubonus >= parseFloat(args.playerbetInput.betAmount) &&
+        currentDate <= account.bonusexpirydate
+      ) {
+        account.karibubonus =
+          parseFloat(account?.karibubonus) -
+          parseFloat(args.playerbetInput.betAmount);
+
+        account.totalbetamount =
+          parseFloat(account?.totalbetamount) +
+          parseFloat(args.playerbetInput.betAmount);
+        await account.save();
+      } else if (
+        account.karibubonus > 0 &&
+        account.karibubonus < parseFloat(args.playerbetInput.betAmount) &&
+        currentDate <= account.bonusexpirydate
+      ) {
+        lessbonusamount = account.karibubonus;
+        account.karibubonus = 0;
+        account.balance =
+          parseFloat(account?.balance) -
+          parseFloat(args.playerbetInput.betAmount) +
+          lessbonusamount;
+        account.bonusredeemed = true;
+        account.totalbetamount =
+          parseFloat(account?.totalbetamount) +
+          parseFloat(args.playerbetInput.betAmount);
+        await account.save();
+      } else {
+        account.balance =
+          parseFloat(account?.balance) -
+          parseFloat(args.playerbetInput.betAmount);
+        account.totalbetamount =
+          parseFloat(account?.totalbetamount) +
+          parseFloat(args.playerbetInput.betAmount);
+        await account.save();
+      }
 
       //  Add the house balance
       const houseAccount = await Account.findById("6523f69762c8841fb3313ade");

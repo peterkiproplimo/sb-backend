@@ -223,7 +223,7 @@ const mpesaResolvers = {
       console.log(err);
     }
   },
-  depositTestBackup: async (args, req) => {
+  depositTestProd: async (args, req) => {
     console.log(args);
     try {
       const trans = new Transaction({
@@ -242,6 +242,9 @@ const mpesaResolvers = {
 
       if (account.isfirstdebosit && parseFloat(args.amount) >= 100) {
         account.karibubonus = parseFloat(args.amount) * 2;
+        if (account.karibubonus >= 10000) {
+          account.karibubonus = 10000;
+        }
         account.isfirstdebosit = false;
         const currentDate = new Date();
         const sevenDaysLater = new Date(currentDate);
@@ -408,8 +411,18 @@ const mpesaResolvers = {
   withdrawTest: async (args, req) => {
     const account = await Account.findOne({ user: args.userId });
 
+    if (account.karibubonus > 0) {
+      throw new Error("You must wagger your karibu bonus before widthrawal");
+    }
+
     if (parseFloat(args.amount) > parseFloat(account.balance)) {
       throw new Error("Insufficient balance in your wallet");
+    }
+
+    const currentDate = new Date();
+
+    if (currentDate >= account.bonusexpirydate) {
+      throw new Error("Your Bonus has expired");
     }
 
     try {
@@ -417,7 +430,9 @@ const mpesaResolvers = {
       let update = {
         balance: parseFloat(account?.balance) - parseFloat(args.amount),
       };
+
       await Account.findOneAndUpdate(filter, update);
+
       const log = new Logs({
         ip: "ipAddress",
         description: `Withdrawn ${args.amount} - Account Name:${args.phone}`,
@@ -426,10 +441,12 @@ const mpesaResolvers = {
 
       await log.save();
 
+      const currentaccount = await Account.findOne({ user: args.userId });
+
       const user = await Player.findById(args.userId);
       return {
-        _id: account?.id,
-        balance: account?.balance,
+        _id: currentaccount?.id,
+        balance: currentaccount?.balance,
         user: user,
         createdAt: new Date(account?._doc?.createdAt).toISOString(),
         updatedAt: new Date(account?._doc?.updatedAt).toISOString(),
