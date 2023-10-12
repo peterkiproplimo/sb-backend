@@ -4,6 +4,7 @@ const Player = require("../models/Player");
 const Playerbet = require("../models/PlayerBet");
 const { ObjectId } = require("mongodb");
 const Account = require("../models/Account");
+const History = require("../models/history");
 const BetTransaction = require("../models/BetTransactions");
 
 const {
@@ -183,6 +184,8 @@ async function updatePlayedField(multiplier) {
       { _id: multiplier._id },
       { $set: { played: 1 } }
     );
+
+    await createHistory(multiplier);
   } catch (error) {
     console.error("Error updating played field:", error);
   }
@@ -282,6 +285,15 @@ async function updateRound(multiplier, gameround) {
   }
 }
 
+async function createHistory(multiplier) {
+  const history = new History({
+    hash: multiplier.seedeed,
+    point: multiplier.bustpoint,
+    round: multiplier.round,
+  });
+  await history.save();
+}
+
 //  Update winners as the multiplier continues
 async function setWinners(bustboint, currentroundId) {
   try {
@@ -336,4 +348,5 @@ module.exports = {
   updateRound,
   setWinners,
   getEndResults,
+  createHistory,
 };

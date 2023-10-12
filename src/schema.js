@@ -88,6 +88,15 @@ createdAt:String!
 updatedAt:String!
 }
 
+type History{
+  _id:ID!
+  point:String!
+  hash:String!
+  round:String!
+  createdAt:String!
+  updatedAt:String!
+  }
+
 type Account{
 _id:ID!
 balance:String!
@@ -388,7 +397,7 @@ deductAccountBalance(userId:String, amount:String, backend:Boolean, dataToken:St
 adminrefundAccount(userId:String, amount:String, backend:Boolean, initiator:String!):Account!
 admindeductAccountBalance(userId:String, amount:String, backend:Boolean, initiator:String!):Account!
 refundAccount(userId:String, amount:String, backend:Boolean):Account!
-history(userId:String):[BetHistory!]!
+history:[History!]!
 accounts:[Account!]
 house:[House!]!
 updateHouse(amount:Float!, win:Boolean!, userId:String!):House!

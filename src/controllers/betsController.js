@@ -11,6 +11,7 @@ const house = require("../models/house");
 const Playerbet = require("../models/PlayerBet");
 const Player = require("../models/Player");
 const BetTransaction = require("../models/BetTransactions");
+const History = require("../models/history");
 
 const {
   getRoundFromDatabase,
@@ -370,15 +371,13 @@ const betsResolvers = {
   //  Get the bet history for a particular user
 
   history: async (args, req) => {
-    const history = await BetHistory.find({ user: args.userId })
-      .sort({ createdAt: -1 })
-      .limit(30);
+    const history = await History.find().sort({ createdAt: -1 }).limit(20);
 
     return history.map((bet) => {
       return {
         ...bet?._doc,
         _id: bet?.id,
-        user: singleUser.bind(this, bet?._doc?.user),
+
         createdAt: new Date(bet?._doc?.createdAt).toISOString(),
         updatedAt: new Date(bet?._doc?.updatedAt).toISOString(),
       };

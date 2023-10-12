@@ -9,11 +9,15 @@ const betHistorySchema = new Schema(
       type: String,
       required: true,
     },
-    user: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
+    hash: {
+      type: String,
+      required: true,
+    },
+    round: {
+      type: String,
+      required: false,
     },
   },
   { timestamps: true }
 );
-module.exports = mongoose.model("BetHistory", betHistorySchema);
+module.exports = mongoose.model("History", betHistorySchema);

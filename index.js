@@ -53,6 +53,7 @@ const {
   updateRound,
   setWinners,
   getEndResults,
+  createHistory,
 } = require("./src/utils/playgamedboperations");
 
 const { updatePlayerAc } = require("./src/utils/playerAccountHandler");
