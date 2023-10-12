@@ -137,8 +137,31 @@ async function fetchPlayersData() {
   return { total: playerCount, onlineToday: todayUserCount }; // Replace with actual data
 }
 
-function fetchWithholdingTaxData() {
-  return { total: 2000.0 }; // Replace with actual data
+async function fetchWithholdingTaxData() {
+  let totalmoney = 0;
+  const pipeline = [
+    {
+      $group: {
+        _id: null,
+        totalWithholdingTax: {
+          $sum: { $toDouble: "$withholdingtax" },
+        },
+      },
+    },
+  ];
+
+  // Use Mongoose's aggregation framework to calculate the sum
+  await Playerbet.aggregate(pipeline, (err, result) => {
+    if (err) {
+      console.error("Error calculating the total withholding tax:", err);
+    } else {
+      const total = result.length > 0 ? result[0].totalWithholdingTax : 0;
+      totalmoney = total;
+      console.log("Total withholding tax:", total);
+    }
+  });
+
+  return { total: totalmoney }; // Replace with actual data
 }
 async function fetchWalletsTotalData() {
   let totalmoney = 0;
