@@ -19,8 +19,75 @@ const User = require("../models/User");
 
 const connectToDatabase = require("../../config/database");
 const { AggregationCursor } = require("mongoose");
+function fetchHouseRevenueData() {
+  return { currentDay: 1000.0 }; // Replace with actual data
+}
 
+function fetchHouselosesTodayData() {
+  return { currentDay: 1000.0 }; // Replace with actual data
+}
+
+function fetchMPESABalanceData() {
+  return { paybillTotal: 2000.0, b2cTotal: 1500.0 }; // Replace with actual data
+}
+async function fetchPlayersData() {
+  const playerCount = await Player.countDocuments();
+  // const onlineUserCount = await Player.countDocuments({ online: true });
+  const today = new Date();
+  // Set the time to midnight (00:00:00)
+  today.setHours(0, 0, 0, 0);
+
+  // Define the criteria for the query
+  const criteria = {
+    action: "login",
+    createdAt: { $gte: today },
+  };
+  const todayUserCount = Logs.countDocuments(criteria, (err, count) => {
+    if (err) {
+      console.error("Error counting logs:", err);
+    } else {
+      console.log("Count of login logs today:", count);
+    }
+  });
+
+  return { total: playerCount, onlineToday: todayUserCount }; // Replace with actual data
+}
+
+function fetchWithholdingTaxData() {
+  return { total: 2000.0 }; // Replace with actual data
+}
+function fetchWalletsTotalData() {
+  return { grandTotal: 2000.0 }; // Replace with actual data
+}
+function fetchHouseWinsData() {
+  return { monthlyTotal: 2000.0 }; // Replace with actual data
+}
+function fetchHouseLossesData() {
+  return { monthlyTotal: 2000.0 }; // Replace with actual data
+}
 const adminResolvers = {
+  Dashboard: () => {
+    // Your logic to fetch and return the data for the dashboard
+    const houseRevenueData = fetchHouseRevenueData();
+    const HouseLosesToday = fetchHouselosesTodayData();
+    const mpesaBalanceData = fetchMPESABalanceData();
+    const playersData = fetchPlayersData();
+    const withholdingTaxData = fetchWithholdingTaxData();
+    const walletsTotalData = fetchWalletsTotalData();
+    const houseWinsData = fetchHouseWinsData();
+    const houseLossesData = fetchHouseLossesData();
+
+    return {
+      houseRevenue: houseRevenueData,
+      houseLose: HouseLosesToday,
+      mpesaBalance: mpesaBalanceData,
+      players: playersData,
+      withholdingTax: withholdingTaxData,
+      walletsTotal: walletsTotalData,
+      houseWins: houseWinsData,
+      houseLosses: houseLossesData,
+    };
+  },
   // Get the number of winners  in a particular month
   winnersPerMonth: async () => {
     const bets = await Bet.aggregate([

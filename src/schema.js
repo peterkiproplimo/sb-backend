@@ -114,6 +114,7 @@ _id:ID!
 numberofbets:Float!
 }
 
+
 type Deposit{
 amount:String!
 }
@@ -224,6 +225,51 @@ crush:Float
 won:Boolean
 createdAt:String!
 updatedAt:String!
+}
+
+type HouseRevenue {
+  currentDay: Float
+}
+
+type HouseLosesToday {
+  currentDay: Float
+}
+
+type MPESABalance {
+  paybillTotal: Float
+  b2cTotal: Float
+}
+
+type Players {
+  total: Int
+  onlineToday: Int
+}
+
+type WithholdingTax {
+  total: Float
+}
+
+type WalletsTotal {
+  grandTotal: Float
+}
+
+type HouseWins {
+  monthlyTotal: Float
+}
+
+type HouseLosses {
+  monthlyTotal: Float
+}
+
+type DashboardData {
+  houseRevenue: HouseRevenue
+  houseLose: HouseLosesToday
+  mpesaBalance: MPESABalance
+  players: Players
+  withholdingTax: WithholdingTax
+  walletsTotal: WalletsTotal
+  houseWins: HouseWins
+  houseLosses: HouseLosses
 }
 
 
@@ -433,6 +479,7 @@ accountBalanceUpdate(userId:String!, amount:String!):Account
 transactionDetails(trans_id:String!):Account
 calculateBalance:AccountBalance
 getAllPlayers: [Player]!
+Dashboard: DashboardData
 }
 
 

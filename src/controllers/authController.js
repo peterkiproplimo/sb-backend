@@ -40,6 +40,7 @@ const authResolvers = {
 
     const ipAddress = req.socket.remoteAddress;
     const log = new Logs({
+      action: "login",
       ip: ipAddress,
       description: `${user.username} logged in`,
       user: user._id,
