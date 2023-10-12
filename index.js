@@ -158,7 +158,7 @@ app.post("/mpesa-callback", async (req, res) => {
         // Save the updated transaction
         await transaction.save();
 
-        const playeraccount = await Account.findById(transaction.user);
+        const playeraccount = await Account.findOne({ user: transaction.user });
 
         console.log(playeraccount);
         updatePlayerAc(playeraccount, transaction);

@@ -157,8 +157,6 @@ const mpesaResolvers = {
           "base64"
         );
 
-        console.log(password);
-
         let req = unirest(
           "POST",
           "https://api.safaricom.co.ke/mpesa/stkpush/v1/processrequest"
