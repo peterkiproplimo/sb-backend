@@ -184,6 +184,7 @@ const mpesaResolvers = {
           )
           .end(async (res) => {
             if (res.body.ResponseCode == "0") {
+              const account = await Account.findOne({ user: args.userId });
               console.log(res.body);
               const trans = new Transaction({
                 type: "Deposit",
@@ -193,6 +194,7 @@ const mpesaResolvers = {
                 amount: args.amount,
                 phone: args.phone,
                 user: args.userId,
+                account: account,
               });
               await trans.save();
 
@@ -205,7 +207,7 @@ const mpesaResolvers = {
               await transrequest.save();
 
               const user = await Player.findById(args.userId);
-              const account = await Account.findOne({ user: args.userId });
+
               return {
                 _id: account?.id,
                 balance: account?.balance,

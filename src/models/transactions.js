@@ -69,6 +69,10 @@ const transactionSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "Player",
     },
+    account: {
+      type: Schema.Types.ObjectId,
+      ref: "Account",
+    },
   },
   { timestamps: true }
 );
