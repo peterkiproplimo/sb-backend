@@ -7,6 +7,7 @@ const Player = require("../models/Player");
 const Admin = require("../models/admins");
 const Logs = require("../models/logs");
 const AdminLog = require("../models/adminlogs");
+const User = require("../models/User");
 
 const authResolvers = {
   login: async (args, req) => {
@@ -65,9 +66,9 @@ const authResolvers = {
 
   adminLogin: async (args, req) => {
     console.log(args);
-    const user = await Admin.findOne({
+    const user = await User.findOne({
       username: args.loginInput.username,
-    });
+    }).populate("role");
     if (!user) {
       throw new Error("Invalid credentials. Please try again!");
     }
@@ -105,8 +106,11 @@ const authResolvers = {
     );
     return {
       userId: user.id,
+      phone: user.phone,
+      username: user.username,
       type: user.type,
       token: token,
+
       online: user.online,
       tokenExpiration: 15,
     };

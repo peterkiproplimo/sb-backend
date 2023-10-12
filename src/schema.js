@@ -166,14 +166,14 @@ phone:String
 }
 
 type AuthData {
-userId: ID!
-token: String!
-type:String!
-username:String!
-online:Boolean!
+userId: ID
+token: String
+type:String
+username:String
+online:Boolean
 phone:String
 dataToken:String
-tokenExpiration: Int!
+tokenExpiration: Int
 otp:String
 }
 
