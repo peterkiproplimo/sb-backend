@@ -161,6 +161,7 @@ _id:ID!
 type: String
 amount: String
 user:Player
+account:Account
 transactionId:String
 trans_id:String
 bill_ref_number:String

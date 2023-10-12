@@ -74,7 +74,8 @@ const accountResolvers = {
   allTransactions: async (args, req) => {
     const trans = await Transaction.find()
       .sort({ createdAt: -1 })
-      .populate("user");
+      .populate("user")
+      .populate("account");
     // const user = await Player.findById(trans.user);
     return trans.map((trans) => {
       return {
