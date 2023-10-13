@@ -69,7 +69,7 @@ app.use(isAuth);
 app.use((req, res, next) => {
   res.setHeader(
     "Access-Control-Allow-Origin",
-    "https://safaribust.techsavanna.technology"
+    "https://safaribust.techsavanna.technology,http://localhost:3001,https://sbadmin.techsavanna.technology"
   );
   res.setHeader(
     "Access-Control-Allow-Methods",
