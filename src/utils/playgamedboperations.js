@@ -294,7 +294,7 @@ async function createHistory(multiplier) {
   });
   await history.save();
 
-  const historybets = await History.find().sort({ createdAt: -1 }).limit(20);
+  const historybets = await History.find().sort({ createdAt: -1 }).limit(10);
   return historybets;
 }
 
