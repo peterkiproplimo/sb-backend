@@ -71,6 +71,7 @@ app.use((req, res, next) => {
     "https://safaribust.techsavanna.technology",
     "http://localhost:3001",
     "https://sbadmin.techsavanna.technology",
+    "http://localhost:5173",
   ];
   const origin = req.headers.origin;
   if (allowedOrigins.includes(origin)) {
