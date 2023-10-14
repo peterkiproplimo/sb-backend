@@ -213,7 +213,6 @@ const userResolvers = {
           user.deleted = true;
           await user.save();
         }
-        return bcrypt.hash(args.userInput.password, 12);
       })
       .catch((err) => {
         console.log(err);

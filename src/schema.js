@@ -8,7 +8,7 @@ type:String!
 active:Boolean!
 online:Boolean
 password: String!
-dataToken:String!
+dataToken:String
 username:String!
 label:String
 firstDeposit:Float
