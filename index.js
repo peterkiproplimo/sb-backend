@@ -273,12 +273,9 @@ async function updateTimerWithMultipliers(multiplier) {
       setemitOngoingRound(false);
       setemitNextRound(false);
 
-      const historybets = await updatePlayedField(multiplier);
-
-      io.emit("historybets", historybets);
-
-      // Update win/ lose in database
-      const currentroundId = await getCurrentRoundFromDatabase();
+      // const currentroundId = await getCurrentRoundFromDatabase();
+      const currentroundId = multiplier.round;
+      console.log(currentroundId);
 
       const playerBets = await getEndResults(
         currentroundId,
@@ -287,6 +284,12 @@ async function updateTimerWithMultipliers(multiplier) {
       );
 
       io.emit("livedata", playerBets);
+
+      const historybets = await updatePlayedField(multiplier);
+
+      io.emit("historybets", historybets);
+
+      // Update win/ lose in database
 
       // Generate fake players for the next round here
 
@@ -384,7 +387,7 @@ async function startGame() {
 //  Start server and Game
 
 server.listen(3002, async () => {
-  await startGame();
+  // await startGame();
   getMultiplierValue();
 
   console.log(`listening on 3002`);
