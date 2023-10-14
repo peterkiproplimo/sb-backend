@@ -275,7 +275,7 @@ async function updateTimerWithMultipliers(multiplier) {
 
       // const currentroundId = await getCurrentRoundFromDatabase();
       const currentroundId = multiplier.round;
-      console.log(currentroundId);
+      // console.log(currentroundId);
 
       const playerBets = await getEndResults(
         currentroundId,
@@ -387,7 +387,7 @@ async function startGame() {
 //  Start server and Game
 
 server.listen(3002, async () => {
-  // await startGame();
+  await startGame();
   getMultiplierValue();
 
   console.log(`listening on 3002`);

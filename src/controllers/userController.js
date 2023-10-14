@@ -14,7 +14,11 @@ const Admin = require("../models/admins");
 const OTP = require("../models/verifier");
 const userResolvers = {
   createUser: (args, req) => {
-    return Player.findOne({ username: args.userInput.username })
+    const phoneNumber = formatKenyanPhoneNumber(args.userInput.phone);
+    return Player.findOne({
+      username: args.userInput.username,
+      phone: phoneNumber,
+    })
       .then((user) => {
         if (user) {
           throw new Error("User already exists!!!");
@@ -22,7 +26,6 @@ const userResolvers = {
         return bcrypt.hash(args.userInput.password, 12);
       })
       .then(async (hashedPass) => {
-        const phoneNumber = formatKenyanPhoneNumber(args.userInput.phone);
         const otp = await OTP.findOne({
           otp: args.userInput.otp,
           phone: phoneNumber,
