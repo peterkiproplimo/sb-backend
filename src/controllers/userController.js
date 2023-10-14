@@ -145,7 +145,7 @@ const userResolvers = {
       };
     });
   },
-  createAdmin: (args, req) => {
+  createAdmin: async (args, req) => {
     return User.findOne({ username: args.userInput.username })
       .then((user) => {
         if (user) {
@@ -206,6 +206,21 @@ const userResolvers = {
       });
   },
 
+  deleteAdmin: async (args, req) => {
+    return User.findOne({ username: args.userInput.username })
+      .then(async (user) => {
+        if (user) {
+          user.deleted = true;
+          await user.save();
+        }
+        return bcrypt.hash(args.userInput.password, 12);
+      })
+      .catch((err) => {
+        console.log(err);
+        throw err;
+      });
+  },
+
   //  Find one user detail
   aUser: async (args, req) => {
     try {
@@ -230,7 +245,6 @@ const userResolvers = {
   },
 
   //  Change player password - DONE
-
   changePassword: async (args, req) => {
     const user = await Player.findOne({ username: args.username });
     if (!user) {
@@ -320,7 +334,7 @@ const generateOtp = async (user, phone, type) => {
     },
   };
 
-  request(options, function (error, response) {
+  request(options, function (error) {
     if (error) throw new Error(error);
     // console.log(response.body);
   });
