@@ -435,7 +435,7 @@ adminLogin(loginInput:LoginInput): AuthData!
 accountBalance(userId:String):Account!
 transactions(userId:String):[Transaction!]!
 bets(userId:String):[Bet!]!
-historyBets(userId:String):[Bet!]!
+historyBets(userId:String):[Playerbet!]!
 allBets:[Playerbet!]!
 filteredBets:[Bet!]!
 allTransactions:[Transaction!]!

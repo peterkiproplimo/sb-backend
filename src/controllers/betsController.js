@@ -300,17 +300,17 @@ const betsResolvers = {
 
   // Get the History bets
   historyBets: async (args, req) => {
-    const bets = await Bet.find({ user: args.userId })
+    const bets = await Playerbet.find({ userId: args.userId })
+      .populate("userId")
       .sort({
         createdAt: -1,
       })
-      .limit(50);
+      .limit(20);
 
     return bets.map((bet) => {
       return {
         ...bet?._doc,
         _id: bet?.id,
-        user: singleUser.bind(this, bet?._doc.user),
         createdAt: new Date(bet?._doc?.createdAt).toISOString(),
         updatedAt: new Date(bet?._doc?.updatedAt).toISOString(),
       };
