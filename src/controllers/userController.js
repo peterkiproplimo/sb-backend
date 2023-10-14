@@ -45,7 +45,7 @@ const userResolvers = {
 
         otp.verified = true;
 
-        const verified = await otp.save();
+        await otp.save();
 
         const user = new Player({
           type: args.userInput.type,
