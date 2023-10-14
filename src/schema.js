@@ -274,7 +274,7 @@ type DashboardData {
 }
 
 
-input UserInput {
+input PlayerInput {
 username:String!
 phone: String!
 type:String!
@@ -428,7 +428,7 @@ type Permission {
 
 type RootQuery{
 users: [User!]!
-aUser(username:String!):Player!
+aPlayer(username:String!):Player!
 admins: [Admin!]!
 login(loginInput:LoginInput): AuthData!
 adminLogin(loginInput:LoginInput): AuthData!
@@ -487,7 +487,7 @@ Dashboard: DashboardData
 
 type RootMutation{
 changePassword(username:String, password:String, initiator:String!, otp:String!):Player!
-createUser(userInput:UserInput): AuthData!
+createPlayer(userInput:PlayerInput): AuthData!
 createAdmin(userInput:AdminUserInput): AuthData!
 createBet(betInput:BetInput):Bet!
 createTransaction(transactionInput:TransactionInput):Transaction!

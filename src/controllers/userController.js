@@ -13,7 +13,7 @@ const Player = require("../models/Player");
 const Admin = require("../models/admins");
 const OTP = require("../models/verifier");
 const userResolvers = {
-  createUser: (args, req) => {
+  createPlayer: (args, req) => {
     const phoneNumber = formatKenyanPhoneNumber(args.userInput.phone);
     return Player.findOne({
       username: args.userInput.username,
@@ -221,7 +221,7 @@ const userResolvers = {
   },
 
   //  Find one user detail
-  aUser: async (args, req) => {
+  aPlayer: async (args, req) => {
     try {
       const user = await Player.findOne({ username: args.username });
 
