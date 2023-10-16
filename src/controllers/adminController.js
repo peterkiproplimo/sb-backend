@@ -592,50 +592,50 @@ const adminResolvers = {
 
   // Suspend an account
 
-  suspendAccount: async (args, req) => {
-    let filter = { _id: args.accountId };
-    let update = { active: false };
-    const account = await Account.findOneAndUpdate(filter, update);
-    const ipAddress = req.socket.remoteAddress;
-    const log = new AdminLog({
-      ip: ipAddress,
-      description: `${args.initiator} suspended ${account.id}`,
-      user: account.user.id,
-    });
+  // suspendAccount: async (args, req) => {
+  //   let filter = { _id: args.accountId };
+  //   let update = { active: false };
+  //   const account = await Account.findOneAndUpdate(filter, update);
+  //   const ipAddress = req.socket.remoteAddress;
+  //   const log = new AdminLog({
+  //     ip: ipAddress,
+  //     description: `${args.initiator} suspended ${account.id}`,
+  //     user: account.user.id,
+  //   });
 
-    await log.save();
+  //   await log.save();
 
-    return {
-      ...account._doc,
-      _id: account.id,
-      user: singleUser.bind(this, account._doc.user),
-      createdAt: new Date(account._doc.createdAt).toISOString(),
-      updatedAt: new Date(account._doc.updatedAt).toISOString(),
-    };
-  },
+  //   return {
+  //     ...account._doc,
+  //     _id: account.id,
+  //     user: singleUser.bind(this, account._doc.user),
+  //     createdAt: new Date(account._doc.createdAt).toISOString(),
+  //     updatedAt: new Date(account._doc.updatedAt).toISOString(),
+  //   };
+  // },
 
   //  Activate a particular account.
 
-  activateAccount: async (args, req) => {
-    let filter = { _id: args.accountId };
-    let update = { active: true };
-    const account = await Account.findOneAndUpdate(filter, update);
-    const ipAddress = req.socket.remoteAddress;
-    const log = new AdminLog({
-      ip: ipAddress,
-      description: `${args.initiator} activated ${account.id}`,
-      user: account.user.id,
-    });
+  // activateAccount: async (args, req) => {
+  //   let filter = { _id: args.accountId };
+  //   let update = { active: true };
+  //   const account = await Account.findOneAndUpdate(filter, update);
+  //   const ipAddress = req.socket.remoteAddress;
+  //   const log = new AdminLog({
+  //     ip: ipAddress,
+  //     description: `${args.initiator} activated ${account.id}`,
+  //     user: account.user.id,
+  //   });
 
-    await log.save();
-    return {
-      ...account._doc,
-      _id: account.id,
-      user: singleUser.bind(this, account._doc.user),
-      createdAt: new Date(account._doc.createdAt).toISOString(),
-      updatedAt: new Date(account._doc.updatedAt).toISOString(),
-    };
-  },
+  //   await log.save();
+  //   return {
+  //     ...account._doc,
+  //     _id: account.id,
+  //     user: singleUser.bind(this, account._doc.user),
+  //     createdAt: new Date(account._doc.createdAt).toISOString(),
+  //     updatedAt: new Date(account._doc.updatedAt).toISOString(),
+  //   };
+  // },
 
   //  Activate a player in the system
 

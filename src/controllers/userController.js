@@ -39,7 +39,8 @@ const userResolvers = {
     };
   },
   // users methods
-  getUsers: async () => await User.find(),
+  getUser: async ({ userId }) => await User.findById(userId),
+  getUsers: async () => await User.find().sort({ createdAt: -1 }),
   createUser: (args, req) => {
     const phoneNumber = formatKenyanPhoneNumber(args.userInput.phoneNumber);
     return User.findOne({
@@ -53,7 +54,7 @@ const userResolvers = {
       })
       .then(async (hashedPass) => {
         const user = new User({
-          role: args.userInput.roleId,
+          role: args.userInput.role,
           username: args.userInput.username,
           phoneNumber: phoneNumber,
           password: hashedPass,
@@ -76,7 +77,7 @@ const userResolvers = {
 
   updateUser: (args, req) => {
     const phoneNumber = formatKenyanPhoneNumber(args.userInput.phoneNumber);
-    return User.findB({
+    return User.findOne({
       username: args.userInput.username,
     })
       .then((user) => {
@@ -104,9 +105,7 @@ const userResolvers = {
   },
 
   deleteUser: (args, req) => {
-    return User.findOne({
-      username: args.username,
-    })
+    return User.findById(args.userId)
       .then((user) => {
         if (!user) {
           throw new Error("User NOT found!!");
@@ -131,9 +130,7 @@ const userResolvers = {
       });
   },
   restoreUser: (args, req) => {
-    return User.findOne({
-      username: args.username,
-    })
+    return User.findById(args.userId)
       .then((user) => {
         if (!user) {
           throw new Error("User NOT found!!");
@@ -159,14 +156,12 @@ const userResolvers = {
   },
 
   suspendUser: (args, req) => {
-    return User.find({
-      username: args.username,
-    })
+    return User.findById(args.userId)
       .then((user) => {
         if (!user) {
           throw new Error("User NOT found!!");
         }
-        user.active = false;
+        user.status = false;
         return user.save();
       })
       .then(async (result) => {
@@ -186,9 +181,7 @@ const userResolvers = {
       });
   },
   activateUser: (args, req) => {
-    return User.findOne({
-      username: args.username,
-    })
+    return User.findById(args.userId)
       .then((user) => {
         if (!user) {
           throw new Error("User NOT found!!");

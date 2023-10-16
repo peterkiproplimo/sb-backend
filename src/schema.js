@@ -445,6 +445,7 @@ type Response {
 
 type RootQuery{
   getUsers: [User!]!
+  getUser(userId: String): User!
   aPlayer(username:String!):Player!
   admins: [Admin!]!
   login(loginInput:LoginInput): AuthData!
@@ -498,6 +499,9 @@ type RootQuery{
   calculateBalance:AccountBalance
   getAllPlayers: [Player]!
   Dashboard: DashboardData
+
+  
+  getAccounts(page: Int, limit: Int): [Account!]!
 }
 
 
@@ -517,8 +521,6 @@ type RootMutation{
   generateAdminOtp(username:String, userId:String):OTP!
   transactionStatus(reference:String!):Transaction
   depositTest(phone:String!, amount:Float!, userId:String!):Account
-  suspendAccount(accountId:String!, initiator:String):Account
-  activateAccount(accountId:String!, initiator:String):Account
   depositManual(phone:String!, userId:String!):Account
   suspendPlayer(username:String,initiator:String!):User!
   activatePlayer(username:String,initiator:String!):User!
@@ -533,13 +535,17 @@ type RootMutation{
   logoutPlayer(username:String!):Player!
 
 
-  adminLogin(username: String, password: String): adminAuthData!
+  adminLogin(username: String!, password: String!): adminAuthData!
   createUser(userInput: CreateUserInput): User!
   updateUser(userInput: UpdateUserInput): User!
-  deleteUser(username: String!): Response!
-  restoreUser(username: String!): Response!
-  suspendUser(username: String!): Response!
-  activateUser(username: String!): Response!
+  deleteUser(userId: String!): Response!
+  restoreUser(userId: String!): Response!
+  suspendUser(userId: String!): Response!
+  activateUser(userId: String!): Response!
+
+  updateBalance(accountId: String!, amount: Float): Account!
+  restoreAccount(accountId: String!): Response!
+  suspendAccount(accountId: String!): Response!
 }
 
 
