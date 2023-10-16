@@ -8,21 +8,31 @@ const UserSchema = new Schema(
       type: String,
       required: true,
     },
-    phone: {
+    phoneNumber: {
       type: String,
       required: true,
     },
-    deleted: {
-      type: Boolean,
-      required: false,
+    role: {
+      //1-admin, 2-Manager, 3-secretary
+      // these are administrative levels stored as 1 or 2 or 3
+      type: String,
+      required: true,
     },
     password: {
       type: String,
       required: true,
     },
-    role: {
-      type: Schema.Types.ObjectId,
-      ref: "Role",
+    status: {
+      // true for active and false for inactive
+      type: Number,
+      default: true,
+      required: true,
+    },
+    deleted: {
+      // true if deleted
+      type: Number,
+      default: false,
+      required: true,
     },
   },
   {
