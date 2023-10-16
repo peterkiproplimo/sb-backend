@@ -13,6 +13,7 @@ const Player = require("../models/Player");
 const Admin = require("../models/admins");
 const OTP = require("../models/verifier");
 const userResolvers = {
+<<<<<<< HEAD
   getUsers: async () => await User.find(),
   deleteUsers: async () => await User.find(),
 
@@ -20,6 +21,12 @@ const userResolvers = {
     const phoneNumber = formatKenyanPhoneNumber(args.userInput.phoneNumber);
     return User.findOne({
       username: args.userInput.username,
+=======
+  createPlayer: (args, req) => {
+    const phoneNumber = formatKenyanPhoneNumber(args.userInput.phone);
+    return Player.findOne({
+      $or: [{ username: args.userInput.username }, { phone: phoneNumber }],
+>>>>>>> origin/master
     })
       .then((user) => {
         if (user) {
