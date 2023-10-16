@@ -34,15 +34,15 @@ function generateFakePlayers(numPlayers) {
 function generateFakePlayersAndBets(numPlayers) {
   const fakePlayersAndBets = [];
 
-  const maxUsernameLength = 6;
+  const maxUsernameLength = 10;
 
   // Generate a username and trim it to the desired length
-  const myusername = faker.internet.userName().substr(0, maxUsernameLength);
+  const username = faker.internet.userName().substr(0, maxUsernameLength);
 
   for (let i = 0; i < numPlayers; i++) {
     const fakePlayer = {
       type: "regular",
-      myusername,
+      username,
       active: true,
       phone: generatePhoneNumber(),
       online: false,
