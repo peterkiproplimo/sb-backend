@@ -202,6 +202,82 @@ const accountResolvers = {
       updatedAt: new Date(transact._doc.updatedAt).toISOString(),
     };
   },
+
+
+  /* admin accounts tab methods start here*/
+  // get all the accounts in descending order default to page1 and 15 records per page
+  getAccounts: async ({page=1, limit=25}) => await Account.find().sort({ createdAt: -1 }).skip((page-1)*limit).limit(limit).populate("user"),
+  updateBalance: (args, req) =>{
+    try {
+       return Account.findById(args.accountId).populate("user").then(async (account)=>{
+        if (!account) {
+          throw new Error("Player not found");
+      }
+      // account.balance = parseFloat(account.balance) + args.amount     //uncomment if balance update is by addition 
+      account.balance = parseFloat(args.amount) //this get the new updated balance
+        await account.save()
+        const ipAddress = req.socket.remoteAddress;
+        const log = new Logs({
+          ip: ipAddress,
+          description: `${account.username} balance updated`,
+          user: account.username,
+        });
+    
+      log.save();
+      return account;
+      })
+    } catch (error) {
+      throw new Error("Balance update failed, Please try again later")
+    }
+  },
+  suspendAccount: (args, req) => {
+    return Account.find(args.accountId)
+      .then((account) => {
+        if (!account) {
+          throw new Error("Account NOT found!!");
+        }
+        account.active = false
+        return account.save();
+      })
+      .then(async (result) => {
+        const ipAddress = req.socket.remoteAddress;
+        const log = new AdminLog({
+          ip: ipAddress,
+          description: `Suspended account for user ${result.user.username}`, //this will be changed to the authenticated user creating the logs
+          user: result.id,
+        });
+
+        await log.save();
+        return {
+          status: "success",
+          message: `suspended account for user ${result.user.username}`,
+        };
+      });
+  },
+  restoreAccount: (args, req) => {
+    return Account.findById(args.accountId)
+      .then((account) => {
+        if (!account) {
+          throw new Error("Account NOT found!!");
+        }
+        account.status = true
+        return account.save();
+      })
+      .then(async (result) => {
+        const ipAddress = req.socket.remoteAddress;
+        const log = new AdminLog({
+          ip: ipAddress,
+          description: `Hold account for user ${result.user.username}`, //this will be changed to the authenticated user creating the logs
+          user: result.id,
+        });
+
+        await log.save();
+        return {
+          status: "success",
+          message: `Hold account for user ${result.user.username}`,
+        };
+      });
+  },
 };
 
 module.exports = accountResolvers;

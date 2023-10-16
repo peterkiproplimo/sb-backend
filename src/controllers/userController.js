@@ -39,7 +39,8 @@ adminLogin: async ({username, password}) => {
   };
 },
   // users methods
-  getUsers: async () => await User.find(),
+  getUser: async ({userId}) => await User.findById(userId),
+  getUsers: async () => await User.find().sort({ createdAt: -1 }),
   createUser: (args, req) => {
     const phoneNumber = formatKenyanPhoneNumber(args.userInput.phoneNumber);
     return User.findOne({
@@ -53,7 +54,7 @@ adminLogin: async ({username, password}) => {
       })
       .then(async (hashedPass) => {
         const user = new User({
-          role: args.userInput.roleId,
+          role: args.userInput.role,
           username: args.userInput.username,
           phoneNumber: phoneNumber,
           password: hashedPass,
@@ -166,7 +167,7 @@ adminLogin: async ({username, password}) => {
         if (!user) {
           throw new Error("User NOT found!!");
         }
-        user.active = false
+        user.status = false
         return user.save();
       })
       .then(async (result) => {
@@ -193,7 +194,7 @@ adminLogin: async ({username, password}) => {
         if (!user) {
           throw new Error("User NOT found!!");
         }
-        user.active = true
+        user.status = true
         return user.save();
       })
       .then(async (result) => {
