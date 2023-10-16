@@ -64,6 +64,14 @@ const utilsResolvers = {
 
     const phone = formatKenyanPhoneNumber(args.phone);
 
+    const player = Player.findOne({
+      $or: [{ username: args.username }, { phone: phone }],
+    });
+
+    if (user) {
+      throw new Error("Player already exists!!!");
+    }
+
     console.log("This is my phone number", args.phone);
     const otp = otpGenerator.generate(5, {
       upperCaseAlphabets: true,
