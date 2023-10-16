@@ -34,10 +34,10 @@ function generateFakePlayers(numPlayers) {
 function generateFakePlayersAndBets(numPlayers) {
   const fakePlayersAndBets = [];
 
-  const maxUsernameLength = 10;
+  const maxUsernameLength = 6;
 
   // Generate a username and trim it to the desired length
-  const username = faker.internet.userName().substr(0, maxUsernameLength);
+  const myusername = faker.internet.userName().substr(0, maxUsernameLength);
 
   for (let i = 0; i < numPlayers; i++) {
     const fakePlayer = {
@@ -53,6 +53,8 @@ function generateFakePlayersAndBets(numPlayers) {
       createdAt: faker.date.past({ years: 1 }),
       updatedAt: faker.date.recent(),
     };
+
+    console.log(fakePlayer);
 
     const fakeBet = {
       win: false,
