@@ -2,19 +2,16 @@ const { buildSchema } = require("graphql");
 
 const schema = buildSchema(`
 type User {
-_id: ID!
-phone:String!
-type:String!
-active:Boolean!
-online:Boolean
-password: String!
-dataToken:String
-username:String!
-label:String
-firstDeposit:Float
-createdAt:String!
-updatedAt:String!
-
+  _id: ID!
+  phoneNumber:String
+  status:Boolean!
+  deleted:Boolean!
+  password: String!
+  tokenValidity:String
+  username:String!
+  role:String
+  createdAt:String
+  updatedAt:String
 }
 
 type Player {
@@ -368,7 +365,13 @@ input CreateUserInput {
   username: String!
   phoneNumber: String!
   password: String!
-  roleId: ID!
+  role: String!
+}
+input UpdateUserInput {
+  _id: ID!
+  username: String
+  phoneNumber: String
+  role: String!
 }
 
 input CreateRoleInput {
@@ -427,7 +430,7 @@ type Permission {
 
 
 type RootQuery{
-users: [User!]!
+getUsers: [User!]!
 aPlayer(username:String!):Player!
 admins: [Admin!]!
 login(loginInput:LoginInput): AuthData!
@@ -514,6 +517,9 @@ createRole(roleInput : CreateRoleInput): Role
 withdrawTest(userId: String!, amount: Float!, phone: String!): Account
 createChat(chatInput: ChatInput!): Chat!
 logoutPlayer(username:String!):Player!
+createUser(userInput: CreateUserInput): User!
+updateUser(userInput: UpdateUserInput): User!
+deleteUser(userID: String): User!
 }
 
 
