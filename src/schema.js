@@ -521,8 +521,6 @@ type RootMutation{
   generateAdminOtp(username:String, userId:String):OTP!
   transactionStatus(reference:String!):Transaction
   depositTest(phone:String!, amount:Float!, userId:String!):Account
-  suspendAccount(accountId:String!, initiator:String):Account
-  activateAccount(accountId:String!, initiator:String):Account
   depositManual(phone:String!, userId:String!):Account
   suspendPlayer(username:String,initiator:String!):User!
   activatePlayer(username:String,initiator:String!):User!
