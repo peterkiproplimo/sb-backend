@@ -275,7 +275,7 @@ async function updateTimerWithMultipliers(multiplier) {
 
       // const currentroundId = await getCurrentRoundFromDatabase();
       const currentroundId = multiplier.round;
-      // console.log(currentroundId);
+      console.log("current round id", currentroundId);
 
       const playerBets = await getEndResults(
         currentroundId,
