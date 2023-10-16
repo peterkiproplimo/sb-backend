@@ -428,98 +428,118 @@ type Permission {
   description: String!
 }
 
+type adminAuthData {
+  userId: ID!
+  username: String!
+  role: String!
+  token: String!
+  tokenValidity: Int!
+}
+
+type Response {
+  status: String
+  message: String
+}
+
+
 
 type RootQuery{
-getUsers: [User!]!
-aPlayer(username:String!):Player!
-admins: [Admin!]!
-login(loginInput:LoginInput): AuthData!
-adminLogin(loginInput:LoginInput): AuthData!
-accountBalance(userId:String):Account!
-transactions(userId:String):[Transaction!]!
-bets(userId:String):[Bet!]!
-historyBets(userId:String):[Playerbet!]!
-allBets:[Playerbet!]!
-filteredBets:[Bet!]!
-allTransactions:[Transaction!]!
-logs:[Logs!]!
-deductAccountBalance(userId:String, amount:String, backend:Boolean, dataToken:String!):Account!
-adminrefundAccount(userId:String, amount:String, backend:Boolean, initiator:String!):Account!
-admindeductAccountBalance(userId:String, amount:String, backend:Boolean, initiator:String!):Account!
-refundAccount(userId:String, amount:String, backend:Boolean):Account!
-history:[History!]!
-accounts:[Account!]
-house:[House!]!
-updateHouse(amount:Float!, win:Boolean!, userId:String!):House!
-getHouse:[House!]!
-getCurrentRound(round:Float!):[Bet!]!   
-betsPerMonth:[betAggregate!]! 
-winnersPerRound:[winnersPerRound!]!
-losersPerRound:[losersPerRound!]!
-winnersPerMonth:[winnersPerMonth!]!
-losersPerMonth:[losersPerMonth!]!
-usersPerMonth:[usersPerMonth!]!
-activesPerMonth:[usersPerMonth]
-winnersBets:WinnersBets
-houseAmount:[HouseAmount!]!
-activeUser:[ActiveUsers!]!
-logout(username:String!, initiator:String!):User!
-logoutUser(username:String!):User!
-countActives:ActivesCount
-actives:[User!]!
-players:[Player!]!
-permissions:[Permission!]!
-roles:[Role!]!
-verifyOtp(otp:String!):OTP
-systemLogs:[AdminLogs!]!
-customerToTal:CustomerToTal
-taxToTal:CustomerToTal
-userTT(userId:String!):PlayerToTal
-totalDeposits(userId:String!):TotalDeposits
-totalWidrawal(phone:String!):TotalDeposits
-withdraw(amount:Float, userId:String!, username:String!, phone:String!):Deposit
-userTransaction(phone:String!):Transaction
-accountBalanceUpdate(userId:String!, amount:String!):Account
-transactionDetails(trans_id:String!):Account
-calculateBalance:AccountBalance
-getAllPlayers: [Player]!
-Dashboard: DashboardData
+  getUsers: [User!]!
+  aPlayer(username:String!):Player!
+  admins: [Admin!]!
+  login(loginInput:LoginInput): AuthData!
+  adminLogin(loginInput:LoginInput): AuthData!
+  accountBalance(userId:String):Account!
+  transactions(userId:String):[Transaction!]!
+  bets(userId:String):[Bet!]!
+  historyBets(userId:String):[Playerbet!]!
+  allBets:[Playerbet!]!
+  filteredBets:[Bet!]!
+  allTransactions:[Transaction!]!
+  logs:[Logs!]!
+  deductAccountBalance(userId:String, amount:String, backend:Boolean, dataToken:String!):Account!
+  adminrefundAccount(userId:String, amount:String, backend:Boolean, initiator:String!):Account!
+  admindeductAccountBalance(userId:String, amount:String, backend:Boolean, initiator:String!):Account!
+  refundAccount(userId:String, amount:String, backend:Boolean):Account!
+  history:[History!]!
+  accounts:[Account!]
+  house:[House!]!
+  updateHouse(amount:Float!, win:Boolean!, userId:String!):House!
+  getHouse:[House!]!
+  getCurrentRound(round:Float!):[Bet!]!   
+  betsPerMonth:[betAggregate!]! 
+  winnersPerRound:[winnersPerRound!]!
+  losersPerRound:[losersPerRound!]!
+  winnersPerMonth:[winnersPerMonth!]!
+  losersPerMonth:[losersPerMonth!]!
+  usersPerMonth:[usersPerMonth!]!
+  activesPerMonth:[usersPerMonth]
+  winnersBets:WinnersBets
+  houseAmount:[HouseAmount!]!
+  activeUser:[ActiveUsers!]!
+  logout(username:String!, initiator:String!):User!
+  logoutUser(username:String!):User!
+  countActives:ActivesCount
+  actives:[User!]!
+  players:[Player!]!
+  permissions:[Permission!]!
+  roles:[Role!]!
+  verifyOtp(otp:String!):OTP
+  systemLogs:[AdminLogs!]!
+  customerToTal:CustomerToTal
+  taxToTal:CustomerToTal
+  userTT(userId:String!):PlayerToTal
+  totalDeposits(userId:String!):TotalDeposits
+  totalWidrawal(phone:String!):TotalDeposits
+  withdraw(amount:Float, userId:String!, username:String!, phone:String!):Deposit
+  userTransaction(phone:String!):Transaction
+  accountBalanceUpdate(userId:String!, amount:String!):Account
+  transactionDetails(trans_id:String!):Account
+  calculateBalance:AccountBalance
+  getAllPlayers: [Player]!
+  Dashboard: DashboardData
 }
 
 
 
 type RootMutation{
-changePassword(username:String, password:String, initiator:String!, otp:String!):Player!
-createPlayer(userInput:PlayerInput): AuthData!
-createAdmin(userInput:AdminUserInput): AuthData!
-createBet(betInput:BetInput):Bet!
-createTransaction(transactionInput:TransactionInput):Transaction!
-createLogs(logsInput:LogsInput):Logs
-createBetHistory(point:String!, user:String!):BetHistory!
-createGameData(round:String!, level:String!):GameData
-createActives(user:String!, round:String!, amount:String):ActiveUsers
-generateOtp(username:String, phone:String):OTP!
-generateForgetpasswordOtp(username:String):OTP!
-generateAdminOtp(username:String, userId:String):OTP!
-transactionStatus(reference:String!):Transaction
-depositTest(phone:String!, amount:Float!, userId:String!):Account
-suspendAccount(accountId:String!, initiator:String):Account
-activateAccount(accountId:String!, initiator:String):Account
-depositManual(phone:String!, userId:String!):Account
-suspendPlayer(username:String,initiator:String!):User!
-activatePlayer(username:String,initiator:String!):User!
-changeType(username:String, type:String, initiator:String!):Admin!
-changeAdminPassword(username:String, password:String,initiator:String!):User!
-editAdminUserPhone(username:String, phone:String, initiator:String!):User!
-editAdminUser(username:String, initiator:String!, phone:String, type:String!):Admin!
-createPlayerbet(playerbetInput: PlayerbetInput!): Playerbet
-createRole(roleInput : CreateRoleInput): Role
-withdrawTest(userId: String!, amount: Float!, phone: String!): Account
-createChat(chatInput: ChatInput!): Chat!
-logoutPlayer(username:String!):Player!
-createUser(userInput: CreateUserInput): User!
-updateUser(userInput: UpdateUserInput): User!
-deleteUser(username: String!): User!
+  changePassword(username:String, password:String, initiator:String!, otp:String!):Player!
+  createPlayer(userInput:PlayerInput): AuthData!
+  createAdmin(userInput:AdminUserInput): AuthData!
+  createBet(betInput:BetInput):Bet!
+  createTransaction(transactionInput:TransactionInput):Transaction!
+  createLogs(logsInput:LogsInput):Logs
+  createBetHistory(point:String!, user:String!):BetHistory!
+  createGameData(round:String!, level:String!):GameData
+  createActives(user:String!, round:String!, amount:String):ActiveUsers
+  generateOtp(username:String, phone:String):OTP!
+  generateForgetpasswordOtp(username:String):OTP!
+  generateAdminOtp(username:String, userId:String):OTP!
+  transactionStatus(reference:String!):Transaction
+  depositTest(phone:String!, amount:Float!, userId:String!):Account
+  suspendAccount(accountId:String!, initiator:String):Account
+  activateAccount(accountId:String!, initiator:String):Account
+  depositManual(phone:String!, userId:String!):Account
+  suspendPlayer(username:String,initiator:String!):User!
+  activatePlayer(username:String,initiator:String!):User!
+  changeType(username:String, type:String, initiator:String!):Admin!
+  changeAdminPassword(username:String, password:String,initiator:String!):User!
+  editAdminUserPhone(username:String, phone:String, initiator:String!):User!
+  editAdminUser(username:String, initiator:String!, phone:String, type:String!):Admin!
+  createPlayerbet(playerbetInput: PlayerbetInput!): Playerbet
+  createRole(roleInput : CreateRoleInput): Role
+  withdrawTest(userId: String!, amount: Float!, phone: String!): Account
+  createChat(chatInput: ChatInput!): Chat!
+  logoutPlayer(username:String!):Player!
+
+
+  adminLogin(username: String, password: String): adminAuthData!
+  createUser(userInput: CreateUserInput): User!
+  updateUser(userInput: UpdateUserInput): User!
+  deleteUser(username: String!): Response!
+  restoreUser(username: String!): Response!
+  suspendUser(username: String!): Response!
+  activateUser(username: String!): Response!
 }
 
 

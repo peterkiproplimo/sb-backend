@@ -13,6 +13,32 @@ const Player = require("../models/Player");
 const Admin = require("../models/admins");
 const OTP = require("../models/verifier");
 const userResolvers = {
+// admin login route
+adminLogin: async ({username, password}) => {
+  const user = await User.findOne({ username: username });
+  if (!user) {
+    throw new Error("User Not Found");
+  }
+  const isUser = await bcrypt.compare(password, user.password);
+  if (!isUser) {
+    throw new Error("Incorrect Password/Username");
+  }
+
+  const token = await jwt.sign(
+    { userId: user.id, username: user.username },
+    process.env.SECRET_KEY,
+
+    { expiresIn: "7d" }
+  );
+  return {
+    userId: user.id,
+    username: user.username,
+    role: user.role,
+    token,
+    tokenValidity: 24000,
+  };
+},
+  // users methods
   getUsers: async () => await User.find(),
   createUser: (args, req) => {
     const phoneNumber = formatKenyanPhoneNumber(args.userInput.phoneNumber);
@@ -85,19 +111,105 @@ const userResolvers = {
         if (!user) {
           throw new Error("User NOT found!!");
         }
-        return user.remove();
+        user.deleted = true
+        return user.save();
       })
       .then(async (result) => {
         console.log(123);
         const ipAddress = req.socket.remoteAddress;
         const log = new AdminLog({
           ip: ipAddress,
-          description: `Deleted a user ${args.userInput.username}`, //this will be changed to the authenticated user creating the logs
+          description: `Deleted a user ${args.username}`, //this will be changed to the authenticated user creating the logs
           user: result.id,
         });
 
         await log.save();
-        return result;
+        return {
+          status: "success",
+          message: `Deleted user ${args.username}`,
+        };
+      });
+  },
+  restoreUser: (args, req) => {
+    return User.findOne({
+      username: args.username,
+    })
+      .then((user) => {
+        if (!user) {
+          throw new Error("User NOT found!!");
+        }
+        user.deleted = false
+        return user.save();
+      })
+      .then(async (result) => {
+        console.log(123);
+        const ipAddress = req.socket.remoteAddress;
+        const log = new AdminLog({
+          ip: ipAddress,
+          description: `Deleted a user ${args.username}`, //this will be changed to the authenticated user creating the logs
+          user: result.id,
+        });
+
+        await log.save();
+        return {
+          status: "success",
+          message: `Deleted user ${args.username}`,
+        };
+      });
+  },
+
+  suspendUser: (args, req) => {
+    return User.find({
+      username: args.username,
+    })
+      .then((user) => {
+        if (!user) {
+          throw new Error("User NOT found!!");
+        }
+        user.active = false
+        return user.save();
+      })
+      .then(async (result) => {
+        console.log(123);
+        const ipAddress = req.socket.remoteAddress;
+        const log = new AdminLog({
+          ip: ipAddress,
+          description: `Deleted a user ${args.username}`, //this will be changed to the authenticated user creating the logs
+          user: result.id,
+        });
+
+        await log.save();
+        return {
+          status: "success",
+          message: `Deleted user ${args.username}`,
+        };
+      });
+  },
+  activateUser: (args, req) => {
+    return User.findOne({
+      username: args.username,
+    })
+      .then((user) => {
+        if (!user) {
+          throw new Error("User NOT found!!");
+        }
+        user.active = true
+        return user.save();
+      })
+      .then(async (result) => {
+        console.log(123);
+        const ipAddress = req.socket.remoteAddress;
+        const log = new AdminLog({
+          ip: ipAddress,
+          description: `Deleted a user ${args.username}`, //this will be changed to the authenticated user creating the logs
+          user: result.id,
+        });
+
+        await log.save();
+        return {
+          status: "success",
+          message: `Deleted user ${args.username}`,
+        };
       });
   },
 };
