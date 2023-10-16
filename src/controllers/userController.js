@@ -13,7 +13,6 @@ const Player = require("../models/Player");
 const Admin = require("../models/admins");
 const OTP = require("../models/verifier");
 const userResolvers = {
-<<<<<<< HEAD
   getUsers: async () => await User.find(),
   deleteUsers: async () => await User.find(),
 
@@ -21,12 +20,6 @@ const userResolvers = {
     const phoneNumber = formatKenyanPhoneNumber(args.userInput.phoneNumber);
     return User.findOne({
       username: args.userInput.username,
-=======
-  createPlayer: (args, req) => {
-    const phoneNumber = formatKenyanPhoneNumber(args.userInput.phone);
-    return Player.findOne({
-      $or: [{ username: args.userInput.username }, { phone: phoneNumber }],
->>>>>>> origin/master
     })
       .then((user) => {
         if (user) {
@@ -114,64 +107,6 @@ const userResolvers = {
         return result;
       });
   },
-
-  // confirmOTP: async ({ phoneNumber, code }) => {
-  //   const resetCode = await OTP.findOne({ otp: code }).populate("user");
-  //   if (!resetCode) {
-  //     throw new Error("Invalid Code");
-  //   }
-  //   if (phoneNumber !== resetCode.user.phoneNumber) {
-  //     resetCode.delete();
-  //     throw new Error("Invalid Code phone Number");
-  //   }
-  //   try {
-  //     const expired = moment().diff(moment(resetCode.createdAt));
-  //     if (expired > 60000) {
-  //       await resetCode.delete();
-  //       throw new Error("Code Expired, Try again");
-  //     }
-  //     await resetCode.delete();
-  //     return {
-  //       status: "success",
-  //       code: "success",
-  //       message: "Code Verified",
-  //     };
-  //   } catch (error) {
-  //     console.error(new Error(error));
-  //     return {
-  //       status: "error",
-  //       message: "Request Failed",
-  //     };
-  //   }
-  // },
-
-  // // funtion to send otp to user
-  // getUserOTP: async ({ phoneNumber }) => {
-  //   const phoneNumber = formatKenyanPhoneNumber(phoneNumber);
-  //   try {
-  //     const otp = otpGenerator.generate(5, {
-  //       upperCaseAlphabets: true,
-  //       lowerCaseAlphabets: false,
-  //       digits: true,
-  //       specialChars: false,
-  //     });
-
-  //     const otpCreator = new OTP({
-  //       otp: otp,
-  //       verified: false,
-  //       user: phoneNumber,
-  //     });
-  //     const generator = await otpCreator.save();
-  //     await MsgSend(otp, phoneNumber).then((res) => {
-  //       return {
-  //         status: "success",
-  //         message: "Verification code sent to your phone",
-  //       };
-  //     });
-  //   } catch (error) {
-  //     throw new Error("Request Failed, Try again later!");
-  //   }
-  // },
 };
 
 function formatKenyanPhoneNumber(phoneNumber) {
