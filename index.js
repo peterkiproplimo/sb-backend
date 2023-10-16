@@ -369,7 +369,7 @@ async function getNextMultiplier() {
   if (batchIndex < currentMultiplierBatch.length) {
     const nextMultiplier = currentMultiplierBatch[batchIndex];
     batchIndex++;
-    updateRound(nextMultiplier, nextGameroundID);
+    await updateRound(nextMultiplier, nextGameroundID);
     return nextMultiplier;
   } else {
     // If the batch is exhausted, fetch a new batch
