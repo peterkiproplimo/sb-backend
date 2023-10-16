@@ -13,31 +13,31 @@ const Player = require("../models/Player");
 const Admin = require("../models/admins");
 const OTP = require("../models/verifier");
 const userResolvers = {
-// admin login route
-adminLogin: async ({username, password}) => {
-  const user = await User.findOne({ username: username });
-  if (!user) {
-    throw new Error("User Not Found");
-  }
-  const isUser = await bcrypt.compare(password, user.password);
-  if (!isUser) {
-    throw new Error("Incorrect Password/Username");
-  }
+  // admin login route
+  adminLogin: async ({ username, password }) => {
+    const user = await User.findOne({ username: username });
+    if (!user) {
+      throw new Error("User Not Found");
+    }
+    const isUser = await bcrypt.compare(password, user.password);
+    if (!isUser) {
+      throw new Error("Incorrect Password/Username");
+    }
 
-  const token = await jwt.sign(
-    { userId: user.id, username: user.username },
-    process.env.SECRET_KEY,
+    const token = await jwt.sign(
+      { userId: user.id, username: user.username },
+      process.env.SECRET_KEY,
 
-    { expiresIn: "7d" }
-  );
-  return {
-    userId: user.id,
-    username: user.username,
-    role: user.role,
-    token,
-    tokenValidity: 24000,
-  };
-},
+      { expiresIn: "7d" }
+    );
+    return {
+      userId: user.id,
+      username: user.username,
+      role: user.role,
+      token,
+      tokenValidity: 24000,
+    };
+  },
   // users methods
   getUsers: async () => await User.find(),
   createUser: (args, req) => {
@@ -111,7 +111,7 @@ adminLogin: async ({username, password}) => {
         if (!user) {
           throw new Error("User NOT found!!");
         }
-        user.deleted = true
+        user.deleted = true;
         return user.save();
       })
       .then(async (result) => {
@@ -138,7 +138,7 @@ adminLogin: async ({username, password}) => {
         if (!user) {
           throw new Error("User NOT found!!");
         }
-        user.deleted = false
+        user.deleted = false;
         return user.save();
       })
       .then(async (result) => {
@@ -166,7 +166,7 @@ adminLogin: async ({username, password}) => {
         if (!user) {
           throw new Error("User NOT found!!");
         }
-        user.active = false
+        user.active = false;
         return user.save();
       })
       .then(async (result) => {
@@ -193,7 +193,7 @@ adminLogin: async ({username, password}) => {
         if (!user) {
           throw new Error("User NOT found!!");
         }
-        user.active = true
+        user.active = true;
         return user.save();
       })
       .then(async (result) => {
