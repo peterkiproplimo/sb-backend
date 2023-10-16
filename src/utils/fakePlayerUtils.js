@@ -55,8 +55,6 @@ function generateFakePlayersAndBets(numPlayers) {
       updatedAt: faker.date.recent(),
     };
 
-    console.log(fakePlayer);
-
     const fakeBet = {
       win: false,
       busted: true,
