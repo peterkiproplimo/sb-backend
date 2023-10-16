@@ -68,7 +68,7 @@ const utilsResolvers = {
       $or: [{ username: args.username }, { phone: phone }],
     });
 
-    if (user) {
+    if (player) {
       throw new Error("Player already exists!!!");
     }
 
