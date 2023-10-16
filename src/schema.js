@@ -540,10 +540,10 @@ type RootMutation{
   adminLogin(username: String!, password: String!): adminAuthData!
   createUser(userInput: CreateUserInput): User!
   updateUser(userInput: UpdateUserInput): User!
-  deleteUser(username: String!): Response!
-  restoreUser(username: String!): Response!
-  suspendUser(username: String!): Response!
-  activateUser(username: String!): Response!
+  deleteUser(userId: String!): Response!
+  restoreUser(userId: String!): Response!
+  suspendUser(userId: String!): Response!
+  activateUser(userId: String!): Response!
 
   updateBalance(accountId: String!, amount: Float): Account!
   restoreAccount(accountId: String!): Response!

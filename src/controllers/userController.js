@@ -77,7 +77,7 @@ adminLogin: async ({username, password}) => {
 
   updateUser: (args, req) => {
     const phoneNumber = formatKenyanPhoneNumber(args.userInput.phoneNumber);
-    return User.findB({
+    return User.findOne({
       username: args.userInput.username,
     })
       .then((user) => {
@@ -105,10 +105,7 @@ adminLogin: async ({username, password}) => {
   },
 
   deleteUser: (args, req) => {
-    return User.findOne({
-      username: args.username,
-    })
-      .then((user) => {
+    return User.findById(args.userId).then((user) => {
         if (!user) {
           throw new Error("User NOT found!!");
         }
@@ -132,10 +129,7 @@ adminLogin: async ({username, password}) => {
       });
   },
   restoreUser: (args, req) => {
-    return User.findOne({
-      username: args.username,
-    })
-      .then((user) => {
+    return User.findById(args.userId).then((user) => {
         if (!user) {
           throw new Error("User NOT found!!");
         }
@@ -160,9 +154,7 @@ adminLogin: async ({username, password}) => {
   },
 
   suspendUser: (args, req) => {
-    return User.find({
-      username: args.username,
-    })
+    return User.findById(args.userId)
       .then((user) => {
         if (!user) {
           throw new Error("User NOT found!!");
@@ -187,9 +179,7 @@ adminLogin: async ({username, password}) => {
       });
   },
   activateUser: (args, req) => {
-    return User.findOne({
-      username: args.username,
-    })
+    return User.findById(args.userId)
       .then((user) => {
         if (!user) {
           throw new Error("User NOT found!!");
