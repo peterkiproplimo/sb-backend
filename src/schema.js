@@ -519,7 +519,7 @@ createChat(chatInput: ChatInput!): Chat!
 logoutPlayer(username:String!):Player!
 createUser(userInput: CreateUserInput): User!
 updateUser(userInput: UpdateUserInput): User!
-deleteUser(userID: String): User!
+deleteUser(username: String!): User!
 }
 
 

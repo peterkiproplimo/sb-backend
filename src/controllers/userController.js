@@ -14,8 +14,6 @@ const Admin = require("../models/admins");
 const OTP = require("../models/verifier");
 const userResolvers = {
   getUsers: async () => await User.find(),
-  deleteUsers: async () => await User.find(),
-
   createUser: (args, req) => {
     const phoneNumber = formatKenyanPhoneNumber(args.userInput.phoneNumber);
     return User.findOne({
@@ -80,26 +78,21 @@ const userResolvers = {
   },
 
   deleteUser: (args, req) => {
-    const phoneNumber = formatKenyanPhoneNumber(args.userInput.phoneNumber);
     return User.findOne({
-      username: args.userInput.username,
+      username: args.username,
     })
       .then((user) => {
         if (!user) {
           throw new Error("User NOT found!!");
         }
-        user.role = args.userInput.roleId;
-        user.username = args.userInput.username;
-        user.phoneNumber = phoneNumber;
-        user.password = hashedPass;
-        return user.save();
+        return user.remove();
       })
       .then(async (result) => {
         console.log(123);
         const ipAddress = req.socket.remoteAddress;
         const log = new AdminLog({
           ip: ipAddress,
-          description: `Created a new user ${args.userInput.username}`, //this will be changed to the authenticated user creating the logs
+          description: `Deleted a user ${args.userInput.username}`, //this will be changed to the authenticated user creating the logs
           user: result.id,
         });
 
