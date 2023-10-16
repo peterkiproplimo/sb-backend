@@ -16,8 +16,7 @@ const userResolvers = {
   createPlayer: (args, req) => {
     const phoneNumber = formatKenyanPhoneNumber(args.userInput.phone);
     return Player.findOne({
-      username: args.userInput.username,
-      phone: phoneNumber,
+      $or: [{ username: args.userInput.username }, { phone: phoneNumber }],
     })
       .then((user) => {
         if (user) {
