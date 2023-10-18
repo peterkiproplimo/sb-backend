@@ -343,7 +343,7 @@ input PlayerbetInput {
   point: Float!
   userId: ID!
   round: String!
-  win: Boolean!
+  win: Boolean
 }
   
 input LogsInput {

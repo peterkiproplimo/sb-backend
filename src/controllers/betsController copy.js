@@ -36,13 +36,44 @@ const betsResolvers = {
       }
       // Check if player has bonus then deduct the bonus
       // Subtract the player account balance
-      account.balance =
-        parseFloat(account?.balance) -
-        parseFloat(args.playerbetInput.betAmount);
-      account.totalbetamount =
-        parseFloat(account?.totalbetamount) +
-        parseFloat(args.playerbetInput.betAmount);
-      await account.save();
+      if (
+        account.karibubonus > 0 &&
+        account.karibubonus >= parseFloat(args.playerbetInput.betAmount) &&
+        currentDate <= account.bonusexpirydate
+      ) {
+        account.karibubonus =
+          parseFloat(account?.karibubonus) -
+          parseFloat(args.playerbetInput.betAmount);
+
+        account.totalbetamount =
+          parseFloat(account?.totalbetamount) +
+          parseFloat(args.playerbetInput.betAmount);
+        await account.save();
+      } else if (
+        account.karibubonus > 0 &&
+        account.karibubonus < parseFloat(args.playerbetInput.betAmount) &&
+        currentDate <= account.bonusexpirydate
+      ) {
+        lessbonusamount = account.karibubonus;
+        account.karibubonus = 0;
+        account.balance =
+          parseFloat(account?.balance) -
+          parseFloat(args.playerbetInput.betAmount) +
+          lessbonusamount;
+        account.bonusredeemed = true;
+        account.totalbetamount =
+          parseFloat(account?.totalbetamount) +
+          parseFloat(args.playerbetInput.betAmount);
+        await account.save();
+      } else {
+        account.balance =
+          parseFloat(account?.balance) -
+          parseFloat(args.playerbetInput.betAmount);
+        account.totalbetamount =
+          parseFloat(account?.totalbetamount) +
+          parseFloat(args.playerbetInput.betAmount);
+        await account.save();
+      }
 
       //  Add the house balance
       const houseAccount = await Account.findById("6523f69762c8841fb3313ade");
@@ -50,7 +81,6 @@ const betsResolvers = {
         parseFloat(houseAccount?.balance) +
         parseFloat(args.playerbetInput.betAmount);
       await houseAccount.save();
-
       //  Get the possible win
       let currentpossibleWin =
         args.playerbetInput.betAmount * args.playerbetInput.point;
