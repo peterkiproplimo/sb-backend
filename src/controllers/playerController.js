@@ -334,7 +334,6 @@ const generateOtp = async (user, phone, type) => {
 
   request(options, function (error) {
     if (error) throw new Error(error);
-    // console.log(response.body);
   });
 
   const ipAddress = "ada";

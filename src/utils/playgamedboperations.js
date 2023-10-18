@@ -87,6 +87,7 @@ async function getEndResults(roundId, endValue, gamestatus) {
         const account = await Account.findOne({
           user: bet.userId,
         });
+        console.log(account);
         if (account.user == bet.userId) {
           account.balance =
             parseFloat(account?.balance) + parseFloat(bet.possibleWin);
