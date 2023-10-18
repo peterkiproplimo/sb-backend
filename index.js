@@ -387,7 +387,7 @@ async function startGame() {
 //  Start server and Game
 
 server.listen(3002, async () => {
-  // await startGame();
+  await startGame();
   getMultiplierValue();
 
   console.log(`listening on 3002`);
@@ -449,8 +449,5 @@ setInterval(async () => {
 
   io.emit("livechat", livechat);
 }, 300);
-
-// Print the generated fake players
-// console.log(fakePlayers);
 
 module.exports = { io };

@@ -318,6 +318,7 @@ point: Float!
 userId: Player!
 round: String!
 withholdingtax:Float
+winamount:String
 possibleWin: Float
 win:Boolean
 createdAt: String!

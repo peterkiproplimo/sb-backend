@@ -116,21 +116,6 @@ async function getEndResults(roundId, endValue, gamestatus) {
 
           await betrans2.save();
         }
-      } else {
-        // loseAmount += bet.betAmount;
-        // If the condition is not met, set win to false
-        // await Playerbet.updateOne(
-        //   { _id: bet._id },
-        //   { $set: { busted: true, win: false } }
-        // );
-        // const account = await Account.findOne({
-        //   user: bet.userId,
-        // });
-        // if (account.user == bet.userId) {
-        //   account.balance =
-        //     parseFloat(account?.balance) - parseFloat(bet.betAmount);
-        //   await account.save();
-        // }
       }
     }
 
