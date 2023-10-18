@@ -436,9 +436,30 @@ type adminAuthData {
   tokenValidity: Int!
 }
 
+type FAQ{
+  _id: ID!
+  question: String!
+  answer: String!
+}
+
+input FaqInput{
+  question: String!
+  answer: String!
+}
+
 type Response {
   status: String
   message: String
+}
+
+type Policy {
+  _id: ID
+  policy: String
+}
+
+type Terms {
+  _id: ID
+  terms: String
 }
 
 
@@ -502,6 +523,9 @@ type RootQuery{
 
   
   getAccounts(page: Int, limit: Int): [Account!]!
+  getFAQs: [FAQ!]!
+  getPolicy: Policy
+  getTerms: Terms
 }
 
 
@@ -546,6 +570,13 @@ type RootMutation{
   updateBalance(accountId: String!, amount: Float): Account!
   restoreAccount(accountId: String!): Response!
   suspendAccount(accountId: String!): Response!
+
+  
+  createFAQ(faqInput: FaqInput!): Response!
+  updateFAQ(faqId: String!, faqInput: FaqInput!): Response!
+  deleteFAQ(faqId: String!): Response!
+  updatePolicy(policy: String!): Response!
+  updateTerms(terms: String!): Response!
 }
 
 
