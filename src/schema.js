@@ -96,9 +96,9 @@ type History{
 
 type Account{
 _id:ID!
-balance:String!
-karibubonus:String
-totalbalance:String
+balance:Float!
+karibubonus:Float
+totalbalance:Float
 active:Boolean!
 user:Player
 phone:String
@@ -318,7 +318,7 @@ point: Float!
 userId: Player!
 round: String!
 withholdingtax:Float
-winamount:String
+winamount:Float
 possibleWin: Float
 win:Boolean
 createdAt: String!
