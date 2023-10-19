@@ -409,6 +409,7 @@ setInterval(async () => {
   try {
     if (getemitNextRound()) {
       const currentroundId = await getCurrentRoundFromDatabase();
+      console.log("Waiting for next round", currentroundId);
       const playerBets = await checkBetsForWinsAndLosses(
         currentroundId,
         "waitingnext",
