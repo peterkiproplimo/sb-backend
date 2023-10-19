@@ -363,6 +363,7 @@ async function getNextMultiplier() {
 
   currentRound = getnextRound();
 
+  //  Save next round in database
   io.emit("nextround", nextGameroundID);
   await saveRoundIndB(nextGameroundID);
 
@@ -387,8 +388,8 @@ async function startGame() {
 //  Start server and Game
 
 server.listen(3002, async () => {
-  await startGame();
-  getMultiplierValue();
+  // await startGame();
+  // getMultiplierValue();
 
   console.log(`listening on 3002`);
 });
