@@ -18,11 +18,11 @@ const betSchema = new Schema(
       ref: "Player",
     },
     withholdingtax: {
-      type: String,
+      type: Number,
       required: false,
     },
     winamount: {
-      type: String,
+      type: Number,
       required: false,
     },
     round: {
