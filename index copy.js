@@ -12,7 +12,6 @@ const resolvers = require("./src/resolvers");
 //import the midleware to check for every incoming request if user is authenticated
 const isAuth = require("./src/middleware/is-auth");
 const house = require("./src/models/house");
-const Game = require("./src/models/Game");
 const Account = require("./src/models/Account");
 const Transaction = require("./src/models/transactions");
 // Update the path if needed
@@ -36,8 +35,6 @@ const {
   getendValue,
   getCurrentRound,
   setCurrentRound,
-  getMultipliers,
-  setMultipliers,
 } = require("./src/utils/gameroundUtils");
 
 const { getLiveChat } = require("./src/utils/livechatUtils");
@@ -239,7 +236,10 @@ async function fetchMultipliersBatch() {
     const collection = db.collection("gameResults"); // Replace with your collection name
 
     // Fetch a batch of 100 multipliers and store them in currentMultiplierBatch
-    currentMultiplierBatch = await Game.find({ played: 0 }).limit(10);
+    currentMultiplierBatch = await collection
+      .find({ played: 0 })
+      .limit(10)
+      .toArray();
 
     if (currentMultiplierBatch.length === 0) {
       // Handle the case when there are no more multipliers in the database
@@ -255,6 +255,10 @@ async function fetchMultipliersBatch() {
 
 async function getNextMultiplier() {
   const nextGameroundID = await generateRandomID(32);
+  setNextRound(nextGameroundID);
+  setemitOngoingRound(true);
+
+  currentRound = getnextRound();
 
   //  Save next round in database
   io.emit("nextround", nextGameroundID);
@@ -262,8 +266,6 @@ async function getNextMultiplier() {
 
   if (batchIndex < currentMultiplierBatch.length) {
     const nextMultiplier = currentMultiplierBatch[batchIndex];
-    setemitOngoingRound(true);
-    setMultipliers(nextMultiplier);
     batchIndex++;
     await updateMultiplierSetRoundId(nextMultiplier, nextGameroundID);
     return nextMultiplier;
@@ -301,7 +303,7 @@ async function runMultiplierTimer(multiplier) {
       // Update winners/ losers
       const playerBets = await getEndResults(
         currentroundId,
-        multiplier,
+        multiplier.bustpoint,
         "endresults"
       );
 
@@ -366,14 +368,10 @@ async function waitCount() {
 
       if (nextMultiplier) {
         // Update all the players with the curent game id
-        const setro = await setAllNextRoundPlayersWithRoundId(nextMultiplier);
+        await setAllNextRoundPlayersWithRoundId(nextMultiplier);
         // Start the timer with the next multiplier
 
-        if (setro) {
-          await runMultiplierTimer(nextMultiplier);
-        } else {
-          await runMultiplierTimer(nextMultiplier);
-        }
+        await runMultiplierTimer(nextMultiplier);
       } else {
         // Handle the case when there are no more multipliers
         console.log("No more multipliers available.");
@@ -412,7 +410,7 @@ setInterval(async () => {
   try {
     if (getemitNextRound()) {
       const currentroundId = await getCurrentRoundFromDatabase();
-
+      console.log("Waiting for next round", currentroundId);
       const playerBets = await checkBetsForWinsAndLosses(
         currentroundId,
         "waitingnext",
@@ -422,9 +420,11 @@ setInterval(async () => {
       io.emit("livedata", playerBets);
     } else if (getemitOngoingRound()) {
       const multvalue = getMultiplierValue();
-      const multipliers = getMultipliers();
-      // console.log(multipliers);
+
       const currentroundId = await getCurrentRoundFromDatabase();
+
+      console.log("current running round", currentroundId);
+      // setCurrentRound(currentroundId);
 
       await setWinners(multvalue, currentroundId);
       const playerBets = await checkBetsForWinsAndLosses(

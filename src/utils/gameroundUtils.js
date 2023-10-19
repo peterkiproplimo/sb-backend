@@ -4,6 +4,7 @@ let emitOngoingRound = false;
 let emitEndRound = false;
 let bustpoint = 0;
 let currentround = "";
+let nextMultiplier = [];
 
 function getnextRound() {
   return nextGameroundID;
@@ -11,6 +12,14 @@ function getnextRound() {
 
 function setNextRound(GameroundID) {
   nextGameroundID = GameroundID;
+}
+
+function setMultipliers(nextMultiplier) {
+  nextMultiplier = nextMultiplier;
+}
+
+function getMultipliers(nextMultiplier) {
+  return nextMultiplier;
 }
 
 function getCurrentRound() {
@@ -74,4 +83,6 @@ module.exports = {
   getendValue,
   getCurrentRound,
   setCurrentRound,
+  setMultipliers,
+  getMultipliers,
 };

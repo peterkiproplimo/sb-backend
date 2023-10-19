@@ -65,7 +65,7 @@ const betsResolvers = {
         betAmount: args.playerbetInput.betAmount,
         point: args.playerbetInput.point,
         userId: args.playerbetInput.userId,
-        round: nextRound,
+        played: 0,
         possibleWin: possibleWin,
         win: false,
         winamount: winamount,

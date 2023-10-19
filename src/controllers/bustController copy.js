@@ -3,7 +3,7 @@ const connectToDatabase = require("../../config/database");
 const crypto = require("crypto");
 const mongoXlsx = require("mongo-xlsx");
 const fs = require("fs");
-const Game = require("../models/Game");
+const Round = require("../models/Game");
 
 const axios = require("axios");
 
@@ -125,10 +125,10 @@ function gameVerifier(seed) {
 
 async function generateAndSaveGameResults() {
   try {
-    // const { client, db } = await connectToDatabase();
+    const { client, db } = await connectToDatabase();
 
-    // const collectionName = "gameResults";
-    // const collection = db.collection(collectionName);
+    const collectionName = "gameResults";
+    const collection = db.collection(collectionName);
 
     const results = [];
 
@@ -137,16 +137,12 @@ async function generateAndSaveGameResults() {
       const saltedHash = gameResult(inputString);
 
       if (saltedHash.bustpoint <= 20) {
-        results.push({
-          bustpoint: saltedHash.bustpoint,
-          seedeed: inputString,
-          played: 0,
-        });
+        results.push(saltedHash);
       }
     }
 
     if (results.length > 0) {
-      await Game.create(results); // Insert the results into the "Round" collection
+      await collection.insertMany(results);
       console.log("Game results saved to MongoDB");
     } else {
       console.log("No eligible results to save.");

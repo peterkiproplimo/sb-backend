@@ -298,7 +298,7 @@ clientSeed:String!
 amount:Float!
 betAmount:Float!
 point:String!
-round:String!
+round:String
 user:String!
 win:Boolean
 auto:Boolean!
@@ -342,7 +342,7 @@ input PlayerbetInput {
   betAmount: Float!
   point: Float!
   userId: ID!
-  round: String!
+  round: String
   win: Boolean
 }
   

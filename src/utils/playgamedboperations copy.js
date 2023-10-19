@@ -65,22 +65,19 @@ async function checkBetsForWinsAndLosses(roundId, gamestatus, multvalue) {
   }
 }
 
-async function getEndResults(roundId, nextMultiplier, gamestatus) {
+async function getEndResults(roundId, endValue, gamestatus) {
   try {
+    const db = await connectToDatabase();
+
     // Fetch all player bets from the "Playerbets" collection
-    const bets = await Playerbet.find({
-      roundid: nextMultiplier._id,
-    });
-
-    console.log("Multiplier ", nextMultiplier);
-
-    console.log("Bets for round " + nextMultiplier._id, bets);
+    const bets = await Playerbet.find({ round: roundId });
+    console.log("Bets for round " + roundId, bets);
     let winAmount = 0;
     let loseAmount = 0;
     const houseAccount = await Account.findById("6523f69762c8841fb3313ade");
     // Iterate through the bets and update the "win" field based on the condition
     for (const bet of bets) {
-      if (bet.point <= nextMultiplier.bustpoint) {
+      if (bet.point <= endValue) {
         winAmount += bet.betAmount;
         // If the condition is met, set win to true
         await Playerbet.updateOne(
@@ -124,7 +121,7 @@ async function getEndResults(roundId, nextMultiplier, gamestatus) {
     }
 
     const fakeplayers = getFakePlayers().map((fakeplayer) => {
-      if (fakeplayer.point <= nextMultiplier.bustboint) {
+      if (fakeplayer.point <= endValue) {
         fakeplayer.win = true;
         fakeplayer.busted = false;
       }
@@ -133,11 +130,7 @@ async function getEndResults(roundId, nextMultiplier, gamestatus) {
 
     setFakePlayers(fakeplayers);
     // Fetch and return the updated bets from the database
-    // const updatedBets = await Playerbet.find({ round: nextMultiplier._id });
-    const updatedBets = await Playerbet.find({
-      roundid: nextMultiplier._id,
-    });
-
+    const updatedBets = await Playerbet.find({ round: roundId });
     const betsWithDetails = await Playerbet.populate(updatedBets, {
       path: "userId", // Match this with the field name in Playerbet model that references User model
       model: Player, // Reference the User model
@@ -342,8 +335,8 @@ async function setAllNextRoundPlayersWithRoundId(nextMultiplier) {
 
     // Update all documents where bustpoint is <= bustboint
     const result = await db.collection("playerbets").updateMany(
-      { played: 0 }, // Filter criteria
-      { $set: { roundid: nextMultiplier._id } } // Update operation
+      { round: "nextround" }, // Filter criteria
+      { $set: { round: nextMultiplier._id } } // Update operation
     );
 
     if (result.modifiedCount > 0) {

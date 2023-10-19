@@ -1,32 +1,24 @@
 const mongoose = require("mongoose");
+var uniqueValidator = require("mongoose-unique-validator");
 
 const Schema = mongoose.Schema;
 
-const GameSchema = new Schema(
+const betSchema = new Schema(
   {
-    bust: {
+    bustpoint: {
       type: Number,
       required: true,
     },
-    hash: {
+    seedeed: {
       type: String,
       required: true,
     },
-    status: {
-      //playing, ended
-      type: String,
+    played: {
+      type: Number,
       required: true,
     },
-    bets: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Bet",
-      },
-    ],
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
-
-module.exports = mongoose.model("Game", GameSchema);
+betSchema.plugin(uniqueValidator);
+module.exports = mongoose.model("Game", betSchema);

@@ -27,8 +27,21 @@ const betSchema = new Schema(
     },
     round: {
       type: String,
+      required: false,
+      // required: false,
+    },
+
+    roundid: {
+      type: Schema.Types.ObjectId,
+      ref: "Game",
+      required: false,
+    },
+
+    played: {
+      type: Number,
       required: true,
     },
+
     possibleWin: {
       type: Number,
       required: false,
