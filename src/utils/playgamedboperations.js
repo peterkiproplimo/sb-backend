@@ -343,7 +343,7 @@ async function setAllNextRoundPlayersWithRoundId(nextMultiplier) {
     // Update all documents where bustpoint is <= bustboint
     const result = await db.collection("playerbets").updateMany(
       { played: 0 }, // Filter criteria
-      { $set: { roundid: nextMultiplier._id } } // Update operation
+      { $set: { roundid: nextMultiplier._id, played: 1 } } // Update operation
     );
 
     if (result.modifiedCount > 0) {
