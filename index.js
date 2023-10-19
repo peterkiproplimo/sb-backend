@@ -237,7 +237,7 @@ fetchMultipliersBatch();
 async function fetchMultipliersBatch() {
   try {
     // Fetch a batch of 100 multipliers and store them in currentMultiplierBatch
-    currentMultiplierBatch = await Game.find({ played: 0 }).limit(10).lean();
+    currentMultiplierBatch = await Game.find({ played: 0 }).limit(10);
 
     if (currentMultiplierBatch.length === 0) {
       // Handle the case when there are no more multipliers in the database
@@ -256,14 +256,12 @@ async function getNextMultiplier() {
 
   //  Save next round in database
   io.emit("nextround", nextGameroundID);
-  // await saveNextRoundID(nextGameroundID);
-
+  setemitOngoingRound(true);
   if (batchIndex < currentMultiplierBatch.length) {
     const nextMultiplier = currentMultiplierBatch[batchIndex];
-    setemitOngoingRound(true);
+
     setMultipliers(nextMultiplier);
     batchIndex++;
-    // await updateMultiplierSetRoundId(nextMultiplier, nextGameroundID);
     return nextMultiplier;
   } else {
     // If the batch is exhausted, fetch a new batch
@@ -280,7 +278,7 @@ async function runMultiplierTimer(multiplier) {
   if (value < multiplier.bustpoint && !timerPaused) {
     // Increment the value by incrementStep
     setMultiplierValue((value += incrementStep));
-    // console.log("value" + value);
+
     io.emit("updateTimer", value.toFixed(2)); // Emit the updated value to all connected clients
   } else {
     if (value >= multiplier.bustpoint) {
@@ -379,8 +377,9 @@ async function startGame() {
 //  Start server and Game
 
 server.listen(3002, async () => {
-  // await startGame();
-  // getMultiplierValue();
+  await connectToDatabase();
+  await startGame();
+  getMultiplierValue();
 
   console.log(`listening on 3002`);
 });
@@ -397,39 +396,39 @@ function getMultiplierValue() {
 
 // Function to emit the live data
 
-// setInterval(async () => {
-//   try {
-//     if (getemitNextRound()) {
-//       const playerBets = await getPlayersWaitingForNextRound("waitingnext", 0);
+setInterval(async () => {
+  try {
+    if (getemitNextRound()) {
+      const playerBets = await getPlayersWaitingForNextRound("waitingnext", 0);
 
-//       io.emit("livedata", playerBets);
-//     } else if (getemitOngoingRound()) {
-//       const multvalue = getMultiplierValue();
-//       const multipliers = getMultipliers();
+      io.emit("livedata", playerBets);
+    } else if (getemitOngoingRound()) {
+      const multvalue = getMultiplierValue();
+      const multipliers = getMultipliers();
 
-//       await setWinners(multvalue, multipliers);
-//       const playerBets = await checkBetsForWinsAndLosses(
-//         multipliers,
-//         "ongoing",
-//         multvalue
-//       );
+      await setWinners(multvalue, multipliers);
+      const playerBets = await checkBetsForWinsAndLosses(
+        multipliers,
+        "ongoing",
+        multvalue
+      );
 
-//       io.emit("livedata", playerBets);
-//     } else if (getemitEndRound()) {
-//       // Generate fake players for the next round
-//     } else {
-//       // console.log("Ok3");
-//     }
-//     // Perform actions with player bets here
-//   } catch (error) {
-//     // Handle the error here
-//     console.error("An error occurred while checking bets:", error);
-//   }
+      io.emit("livedata", playerBets);
+    } else if (getemitEndRound()) {
+      // Generate fake players for the next round
+    } else {
+      // console.log("Ok3");
+    }
+    // Perform actions with player bets here
+  } catch (error) {
+    // Handle the error here
+    console.error("An error occurred while checking bets:", error);
+  }
 
-//   //  Function to perform the live chat
-//   const livechat = await getLiveChat();
+  //  Function to perform the live chat
+  const livechat = await getLiveChat();
 
-//   io.emit("livechat", livechat);
-// }, 300);
+  io.emit("livechat", livechat);
+}, 300);
 
 module.exports = { io };
