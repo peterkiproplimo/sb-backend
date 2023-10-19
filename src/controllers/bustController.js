@@ -125,11 +125,6 @@ function gameVerifier(seed) {
 
 async function generateAndSaveGameResults() {
   try {
-    // const { client, db } = await connectToDatabase();
-
-    // const collectionName = "gameResults";
-    // const collection = db.collection(collectionName);
-
     const results = [];
 
     for (let i = 0; i < 10000; i++) {
@@ -146,13 +141,12 @@ async function generateAndSaveGameResults() {
     }
 
     if (results.length > 0) {
-      await Game.create(results); // Insert the results into the "Round" collection
+      await Game.insertMany(results); // Insert the results into the "Game" collection
       console.log("Game results saved to MongoDB");
     } else {
       console.log("No eligible results to save.");
     }
 
-    client.close();
     console.log("Connection to MongoDB closed");
   } catch (error) {
     console.error("Error:", error);
@@ -195,6 +189,6 @@ async function exportToExcel() {
 
 // exportToExcel();
 
-// generateAndSaveGameResults();
+generateAndSaveGameResults();
 
 module.exports = bustResolvers;

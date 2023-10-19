@@ -237,7 +237,7 @@ fetchMultipliersBatch();
 async function fetchMultipliersBatch() {
   try {
     // Fetch a batch of 100 multipliers and store them in currentMultiplierBatch
-    currentMultiplierBatch = await Game.find({ played: 0 }).limit(10);
+    currentMultiplierBatch = await Game.find({ played: 0 }).limit(10).lean();
 
     if (currentMultiplierBatch.length === 0) {
       // Handle the case when there are no more multipliers in the database
@@ -379,8 +379,8 @@ async function startGame() {
 //  Start server and Game
 
 server.listen(3002, async () => {
-  await startGame();
-  getMultiplierValue();
+  // await startGame();
+  // getMultiplierValue();
 
   console.log(`listening on 3002`);
 });
@@ -418,7 +418,7 @@ setInterval(async () => {
     } else if (getemitEndRound()) {
       // Generate fake players for the next round
     } else {
-      console.log("Ok3");
+      // console.log("Ok3");
     }
     // Perform actions with player bets here
   } catch (error) {

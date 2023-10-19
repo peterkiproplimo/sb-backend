@@ -13,7 +13,7 @@ async function connectToDatabase() {
       serverSelectionTimeoutMS: 20000, // Timeout for server selection
     });
 
-    // console.log('Connected to MongoDB');
+    console.log("Connected to MongoDB");
 
     // Return the Mongoose connection
     return mongoose.connection;
