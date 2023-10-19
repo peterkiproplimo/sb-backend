@@ -57,9 +57,9 @@ async function checkBetsForWinsAndLosses(multipliers, gamestatus, multvalue) {
     }));
 
     // Combine both arrays into a single finalResponse array
-    // const finalResponse = [...betsFinalResponse, ...fakeplayersFinalResponse];
+    const finalResponse = [...betsFinalResponse, ...fakeplayersFinalResponse];
 
-    return betsFinalResponse;
+    return finalResponse;
     // return bets;
   } catch (error) {
     console.error("Error checking bets:", error);
@@ -124,7 +124,7 @@ async function getEndResults(nextMultiplier, gamestatus) {
       completed: 0,
     });
 
-    console.log(`Total to update, ${bets.length}`);
+    // console.log(`Total to update, ${bets.length}`);
 
     let winAmount = 0;
     let loseAmount = 0;
@@ -341,6 +341,7 @@ async function createHistory(multiplier) {
   await history.save();
 
   const historybets = await History.find().sort({ createdAt: -1 }).limit(10);
+  console.log(historybets);
   return historybets;
 }
 
