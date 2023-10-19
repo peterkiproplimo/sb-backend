@@ -16,6 +16,7 @@ const {
 
 async function checkBetsForWinsAndLosses(multipliers, gamestatus, multvalue) {
   try {
+    await connectToDatabase();
     // Fetch all player bets from the "Playerbets" collection
     // const bets = await db.collection("playerbets").find().toArray();
     const bets = await Playerbet.find({
@@ -69,6 +70,7 @@ async function checkBetsForWinsAndLosses(multipliers, gamestatus, multvalue) {
 
 async function getPlayersWaitingForNextRound(gamestatus, multvalue) {
   try {
+    await connectToDatabase();
     // Fetch all player bets from the "Playerbets" collection
     // const bets = await db.collection("playerbets").find().toArray();
     const bets = await Playerbet.find({ played: 0, completed: 0 });
@@ -118,6 +120,7 @@ async function getPlayersWaitingForNextRound(gamestatus, multvalue) {
 
 async function getEndResults(nextMultiplier, gamestatus) {
   try {
+    await connectToDatabase();
     // Fetch all player bets from the "Playerbets" collection
     const bets = await Playerbet.find({
       roundid: nextMultiplier._id,

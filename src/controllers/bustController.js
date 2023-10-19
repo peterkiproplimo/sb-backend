@@ -125,6 +125,7 @@ function gameVerifier(seed) {
 
 async function generateAndSaveGameResults() {
   try {
+    await connectToDatabase();
     const results = [];
 
     for (let i = 0; i < 10000; i++) {
@@ -141,7 +142,7 @@ async function generateAndSaveGameResults() {
     }
 
     if (results.length > 0) {
-      await Game.insertMany(results); // Insert the results into the "Game" collection
+      await Game.create(results); // Insert the results into the "Game" collection
       console.log("Game results saved to MongoDB");
     } else {
       console.log("No eligible results to save.");
