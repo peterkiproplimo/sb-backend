@@ -236,9 +236,6 @@ fetchMultipliersBatch();
 //  Fetch batch multipliers from the database
 async function fetchMultipliersBatch() {
   try {
-    const db = await connectToDatabase();
-    const collection = db.collection("gameResults"); // Replace with your collection name
-
     // Fetch a batch of 100 multipliers and store them in currentMultiplierBatch
     currentMultiplierBatch = await Game.find({ played: 0 }).limit(10);
 
@@ -259,14 +256,14 @@ async function getNextMultiplier() {
 
   //  Save next round in database
   io.emit("nextround", nextGameroundID);
-  await saveNextRoundID(nextGameroundID);
+  // await saveNextRoundID(nextGameroundID);
 
   if (batchIndex < currentMultiplierBatch.length) {
     const nextMultiplier = currentMultiplierBatch[batchIndex];
     setemitOngoingRound(true);
     setMultipliers(nextMultiplier);
     batchIndex++;
-    await updateMultiplierSetRoundId(nextMultiplier, nextGameroundID);
+    // await updateMultiplierSetRoundId(nextMultiplier, nextGameroundID);
     return nextMultiplier;
   } else {
     // If the batch is exhausted, fetch a new batch
@@ -296,8 +293,6 @@ async function runMultiplierTimer(multiplier) {
       setemitEndRound(true, multiplier.bustpoint);
       setemitOngoingRound(false);
       setemitNextRound(false);
-
-      const currentroundId = await getCurrentRoundFromDatabase(); //Get round
 
       // Update winners/ losers
       const playerBets = await getEndResults(multiplier, "endresults");
@@ -334,9 +329,6 @@ async function waitCount() {
   setemitNextRound(true);
   setemitOngoingRound(false);
   setemitEndRound(false);
-
-  const currentRound = await getRoundFromDatabase();
-  await setSavedNextRoundAsCurrentRound(currentRound);
 
   timerPaused = true;
   // Set the initial countdown value
@@ -425,9 +417,6 @@ setInterval(async () => {
       io.emit("livedata", playerBets);
     } else if (getemitEndRound()) {
       // Generate fake players for the next round
-
-      const endvalue = getendValue();
-      const currentroundId = getCurrentRound();
     } else {
       console.log("Ok3");
     }
