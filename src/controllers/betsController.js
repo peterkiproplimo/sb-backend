@@ -60,7 +60,7 @@ const betsResolvers = {
       let possibleWin =
         parseFloat(args.playerbetInput.betAmount) + finalwinamount;
       const nextRound = await getRoundFromDatabase();
-
+      console.log("Next round bet", nextRound);
       const bet = new Playerbet({
         betAmount: args.playerbetInput.betAmount,
         point: args.playerbetInput.point,
