@@ -397,39 +397,39 @@ function getMultiplierValue() {
 
 // Function to emit the live data
 
-setInterval(async () => {
-  try {
-    if (getemitNextRound()) {
-      const playerBets = await getPlayersWaitingForNextRound("waitingnext", 0);
+// setInterval(async () => {
+//   try {
+//     if (getemitNextRound()) {
+//       const playerBets = await getPlayersWaitingForNextRound("waitingnext", 0);
 
-      io.emit("livedata", playerBets);
-    } else if (getemitOngoingRound()) {
-      const multvalue = getMultiplierValue();
-      const multipliers = getMultipliers();
+//       io.emit("livedata", playerBets);
+//     } else if (getemitOngoingRound()) {
+//       const multvalue = getMultiplierValue();
+//       const multipliers = getMultipliers();
 
-      await setWinners(multvalue, multipliers);
-      const playerBets = await checkBetsForWinsAndLosses(
-        multipliers,
-        "ongoing",
-        multvalue
-      );
+//       await setWinners(multvalue, multipliers);
+//       const playerBets = await checkBetsForWinsAndLosses(
+//         multipliers,
+//         "ongoing",
+//         multvalue
+//       );
 
-      io.emit("livedata", playerBets);
-    } else if (getemitEndRound()) {
-      // Generate fake players for the next round
-    } else {
-      // console.log("Ok3");
-    }
-    // Perform actions with player bets here
-  } catch (error) {
-    // Handle the error here
-    console.error("An error occurred while checking bets:", error);
-  }
+//       io.emit("livedata", playerBets);
+//     } else if (getemitEndRound()) {
+//       // Generate fake players for the next round
+//     } else {
+//       // console.log("Ok3");
+//     }
+//     // Perform actions with player bets here
+//   } catch (error) {
+//     // Handle the error here
+//     console.error("An error occurred while checking bets:", error);
+//   }
 
-  //  Function to perform the live chat
-  const livechat = await getLiveChat();
+//   //  Function to perform the live chat
+//   const livechat = await getLiveChat();
 
-  io.emit("livechat", livechat);
-}, 300);
+//   io.emit("livechat", livechat);
+// }, 300);
 
 module.exports = { io };
