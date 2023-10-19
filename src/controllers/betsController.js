@@ -59,20 +59,18 @@ const betsResolvers = {
       const finalwinamount = winamount - withholdingtax;
       let possibleWin =
         parseFloat(args.playerbetInput.betAmount) + finalwinamount;
-      const nextRound = await getRoundFromDatabase();
-      console.log("Next round bet", nextRound);
+
       const bet = new Playerbet({
         betAmount: args.playerbetInput.betAmount,
         point: args.playerbetInput.point,
         userId: args.playerbetInput.userId,
         played: 0,
+        completed: 0,
         possibleWin: possibleWin,
         win: false,
         winamount: winamount,
         withholdingtax: withholdingtax,
       });
-
-      //  Place the bet
 
       const results = await bet.save();
 

@@ -14,13 +14,15 @@ const {
   setFakePlayers,
 } = require("../utils/fakePlayerUtils");
 
-async function checkBetsForWinsAndLosses(roundId, gamestatus, multvalue) {
+async function checkBetsForWinsAndLosses(multipliers, gamestatus, multvalue) {
   try {
-    const db = await connectToDatabase();
-
     // Fetch all player bets from the "Playerbets" collection
     // const bets = await db.collection("playerbets").find().toArray();
-    const bets = await Playerbet.find({ round: roundId });
+    const bets = await Playerbet.find({
+      roundid: multipliers._id,
+      played: 1,
+      completed: 0,
+    });
 
     // Use populate to include player details for each bet
     const betsWithDetails = await Playerbet.populate(bets, {
@@ -65,61 +67,110 @@ async function checkBetsForWinsAndLosses(roundId, gamestatus, multvalue) {
   }
 }
 
-async function getEndResults(roundId, nextMultiplier, gamestatus) {
+async function getPlayersWaitingForNextRound(gamestatus, multvalue) {
+  try {
+    // Fetch all player bets from the "Playerbets" collection
+    // const bets = await db.collection("playerbets").find().toArray();
+    const bets = await Playerbet.find({ played: 0, completed: 0 });
+
+    // Use populate to include player details for each bet
+    const betsWithDetails = await Playerbet.populate(bets, {
+      path: "userId", // Match this with the field name in Playerbet model that references User model
+      model: Player, // Reference the User model
+    });
+
+    const fakeplayers = getFakePlayers().map((fakeplayer) => {
+      if (fakeplayer.point <= multvalue) {
+        fakeplayer.win = true;
+        fakeplayer.busted = false;
+      }
+      return fakeplayer;
+    });
+
+    const sortedWinners = fakeplayers.sort((a, b) =>
+      a.win === b.win ? 0 : a.win ? -1 : 1
+    );
+
+    // Set the new updated list of fake players
+    // setFakePlayers(sortedWinners);
+
+    const betsFinalResponse = betsWithDetails.map((bet) => ({
+      ...bet.toObject(), // Convert the Mongoose document to a plain JavaScript object
+      gamestatus: gamestatus, // Add the gamestatus property
+    }));
+
+    // Iterate through each object in fakeplayers and add the gamestatus property
+    const fakeplayersFinalResponse = sortedWinners.map((fakeplayer) => ({
+      ...fakeplayer,
+      gamestatus: gamestatus,
+    }));
+
+    // Combine both arrays into a single finalResponse array
+    // const finalResponse = [...betsFinalResponse, ...fakeplayersFinalResponse];
+
+    return betsFinalResponse;
+    // return bets;
+  } catch (error) {
+    console.error("Error checking bets:", error);
+    throw error; // Rethrow the error to handle it at a higher level if needed
+  }
+}
+
+async function getEndResults(nextMultiplier, gamestatus) {
   try {
     // Fetch all player bets from the "Playerbets" collection
     const bets = await Playerbet.find({
       roundid: nextMultiplier._id,
+      completed: 0,
     });
 
-    console.log("Multiplier ", nextMultiplier);
+    console.log(`Total to update, ${bets.length}`);
 
-    console.log("Bets for round " + nextMultiplier._id, bets);
     let winAmount = 0;
     let loseAmount = 0;
     const houseAccount = await Account.findById("6523f69762c8841fb3313ade");
     // Iterate through the bets and update the "win" field based on the condition
     for (const bet of bets) {
+      await Playerbet.updateOne({ _id: bet._id }, { $set: { completed: 1 } });
+
       if (bet.point <= nextMultiplier.bustpoint) {
         winAmount += bet.betAmount;
         // If the condition is met, set win to true
         await Playerbet.updateOne(
-          { _id: bet._id },
+          { _id: bet._id, roundid: nextMultiplier._id },
           { $set: { busted: false, win: true } }
         );
 
         const account = await Account.findOne({
           user: bet.userId,
         });
-        // console.log(account);
-        if (account.user == bet.userId) {
-          account.balance =
-            parseFloat(account?.balance) + parseFloat(bet.possibleWin);
 
-          await account.save();
+        account.balance =
+          parseFloat(account?.balance) + parseFloat(bet.possibleWin);
 
-          const betrans = new BetTransaction({
-            type: "win",
-            usertype: "player",
-            amount: bet.possibleWin,
-            account: account,
-          });
+        await account.save();
 
-          await betrans.save();
+        const betrans = new BetTransaction({
+          type: "win",
+          usertype: "player",
+          amount: bet.possibleWin,
+          account: account,
+        });
 
-          houseAccount.balance =
-            parseFloat(houseAccount?.balance) - parseFloat(bet.possibleWin);
-          await houseAccount.save();
+        await betrans.save();
 
-          const betrans2 = new BetTransaction({
-            type: "lose",
-            usertype: "house",
-            amount: bet.possibleWin,
-            account: houseAccount,
-          });
+        houseAccount.balance =
+          parseFloat(houseAccount?.balance) - parseFloat(bet.possibleWin);
+        await houseAccount.save();
 
-          await betrans2.save();
-        }
+        const betrans2 = new BetTransaction({
+          type: "lose",
+          usertype: "house",
+          amount: bet.possibleWin,
+          account: houseAccount,
+        });
+
+        await betrans2.save();
       }
     }
 
@@ -157,6 +208,7 @@ async function getEndResults(roundId, nextMultiplier, gamestatus) {
     // Combine both arrays into a single finalResponse array
     // const finalResponse = [...betsFinalResponse, ...fakeplayersFinalResponse];
 
+    // console.log("Bets for round " + nextMultiplier._id, betsFinalResponse);
     return betsFinalResponse;
 
     // const finalResponse = [...betsWithDetails, ...fakeplayers];
@@ -293,13 +345,13 @@ async function createHistory(multiplier) {
 }
 
 //  Update winners as the multiplier continues
-async function setWinners(bustboint, currentroundId) {
+async function setWinners(bustboint, multipliers) {
   try {
     const db = await connectToDatabase();
 
     // Update all documents where bustpoint is <= bustboint
     const result = await db.collection("playerbets").updateMany(
-      { point: { $lte: bustboint }, round: currentroundId }, // Filter criteria
+      { point: { $lte: bustboint }, roundid: multipliers._id }, // Filter criteria
       { $set: { win: true } } // Update operation
     );
 
@@ -341,11 +393,15 @@ async function setAllNextRoundPlayersWithRoundId(nextMultiplier) {
     const db = await connectToDatabase();
 
     // Update all documents where bustpoint is <= bustboint
-    const result = await db.collection("playerbets").updateMany(
+    const result1 = await db.collection("playerbets").updateMany(
       { played: 0 }, // Filter criteria
-      { $set: { roundid: nextMultiplier._id, played: 1 } } // Update operation
+      { $set: { roundid: nextMultiplier._id } } // Update operation
     );
 
+    const result = await db.collection("playerbets").updateMany(
+      { roundid: nextMultiplier._id }, // Filter criteria
+      { $set: { played: 1 } } // Update operation
+    );
     if (result.modifiedCount > 0) {
       // Fetch the updated documents if needed
       return true;
@@ -371,4 +427,5 @@ module.exports = {
   getEndResults,
   createHistory,
   setAllNextRoundPlayersWithRoundId,
+  getPlayersWaitingForNextRound,
 };

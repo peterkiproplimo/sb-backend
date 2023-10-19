@@ -42,6 +42,12 @@ const betSchema = new Schema(
       required: true,
     },
 
+    completed: {
+      type: Number,
+      required: false,
+      default: 0,
+    },
+
     possibleWin: {
       type: Number,
       required: false,
