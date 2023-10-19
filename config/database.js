@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const MONGO_URI =
-  "mongodb+srv://Safaribust:ffFnYOKKFVSEWis6@cluster0.yuiecha.mongodb.net/?retryWrites=true&w=majority";
+  "mongodb+srv://Safaribust:VNZ38oRtKrVxd9Wu@cluster0.yuiecha.mongodb.net/?retryWrites=true&w=majority";
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 
@@ -10,7 +10,7 @@ async function connectToDatabase() {
     await mongoose.connect(MONGO_URI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
-      serverSelectionTimeoutMS: 20000, // Timeout for server selection
+      serverSelectionTimeoutMS: 200000, // Timeout for server selection
     });
 
     console.log("Connected to MongoDB");
