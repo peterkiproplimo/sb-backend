@@ -316,7 +316,7 @@ _id: ID!
 betAmount: Float!
 point: Float!
 userId: Player!
-round: String!
+round: String
 withholdingtax:Float
 winamount:Float
 possibleWin: Float
