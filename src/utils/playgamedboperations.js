@@ -71,6 +71,7 @@ async function getEndResults(roundId, endValue, gamestatus) {
 
     // Fetch all player bets from the "Playerbets" collection
     const bets = await Playerbet.find({ round: roundId });
+    console.log("Bets for round " + roundId, bets);
     let winAmount = 0;
     let loseAmount = 0;
     const houseAccount = await Account.findById("6523f69762c8841fb3313ade");
@@ -87,7 +88,7 @@ async function getEndResults(roundId, endValue, gamestatus) {
         const account = await Account.findOne({
           user: bet.userId,
         });
-        console.log(account);
+        // console.log(account);
         if (account.user == bet.userId) {
           account.balance =
             parseFloat(account?.balance) + parseFloat(bet.possibleWin);
