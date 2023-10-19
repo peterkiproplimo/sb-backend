@@ -387,7 +387,7 @@ async function startGame() {
 //  Start server and Game
 
 server.listen(3002, async () => {
-  await startGame();
+  // await startGame();
   getMultiplierValue();
 
   console.log(`listening on 3002`);
@@ -420,7 +420,9 @@ setInterval(async () => {
       const multvalue = getMultiplierValue();
 
       const currentroundId = await getCurrentRoundFromDatabase();
-      setCurrentRound(currentroundId);
+
+      console.log("current running round", currentroundId);
+      // setCurrentRound(currentroundId);
 
       await setWinners(multvalue, currentroundId);
       const playerBets = await checkBetsForWinsAndLosses(
