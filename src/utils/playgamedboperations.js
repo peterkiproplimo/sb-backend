@@ -55,9 +55,9 @@ async function checkBetsForWinsAndLosses(roundId, gamestatus, multvalue) {
     }));
 
     // Combine both arrays into a single finalResponse array
-    const finalResponse = [...betsFinalResponse, ...fakeplayersFinalResponse];
+    // const finalResponse = [...betsFinalResponse, ...fakeplayersFinalResponse];
 
-    return finalResponse;
+    return betsFinalResponse;
     // return bets;
   } catch (error) {
     console.error("Error checking bets:", error);
@@ -147,9 +147,9 @@ async function getEndResults(roundId, endValue, gamestatus) {
     }));
 
     // Combine both arrays into a single finalResponse array
-    const finalResponse = [...betsFinalResponse, ...fakeplayersFinalResponse];
+    // const finalResponse = [...betsFinalResponse, ...fakeplayersFinalResponse];
 
-    return finalResponse;
+    return betsFinalResponse;
 
     // const finalResponse = [...betsWithDetails, ...fakeplayers];
 
