@@ -390,8 +390,8 @@ async function startGame() {
 //  Start server and Game
 
 server.listen(3002, async () => {
-  await startGame();
-  getMultiplierValue();
+  // await startGame();
+  // getMultiplierValue();
 
   console.log(`listening on 3002`);
 });
@@ -408,50 +408,50 @@ function getMultiplierValue() {
 
 // Function to emit the live data
 
-setInterval(async () => {
-  try {
-    if (getemitNextRound()) {
-      const currentroundId = await getCurrentRoundFromDatabase();
+// setInterval(async () => {
+//   try {
+//     if (getemitNextRound()) {
+//       const currentroundId = await getCurrentRoundFromDatabase();
 
-      const playerBets = await checkBetsForWinsAndLosses(
-        currentroundId,
-        "waitingnext",
-        0
-      );
+//       const playerBets = await checkBetsForWinsAndLosses(
+//         currentroundId,
+//         "waitingnext",
+//         0
+//       );
 
-      io.emit("livedata", playerBets);
-    } else if (getemitOngoingRound()) {
-      const multvalue = getMultiplierValue();
-      const multipliers = getMultipliers();
-      // console.log(multipliers);
-      const currentroundId = await getCurrentRoundFromDatabase();
+//       io.emit("livedata", playerBets);
+//     } else if (getemitOngoingRound()) {
+//       const multvalue = getMultiplierValue();
+//       const multipliers = getMultipliers();
+//       // console.log(multipliers);
+//       const currentroundId = await getCurrentRoundFromDatabase();
 
-      await setWinners(multvalue, currentroundId);
-      const playerBets = await checkBetsForWinsAndLosses(
-        currentroundId,
-        "ongoing",
-        multvalue
-      );
-      // console.log(playerBets);
-      io.emit("livedata", playerBets);
-    } else if (getemitEndRound()) {
-      // Generate fake players for the next round
+//       await setWinners(multvalue, currentroundId);
+//       const playerBets = await checkBetsForWinsAndLosses(
+//         currentroundId,
+//         "ongoing",
+//         multvalue
+//       );
+//       // console.log(playerBets);
+//       io.emit("livedata", playerBets);
+//     } else if (getemitEndRound()) {
+//       // Generate fake players for the next round
 
-      const endvalue = getendValue();
-      const currentroundId = getCurrentRound();
-    } else {
-      console.log("Ok3");
-    }
-    // Perform actions with player bets here
-  } catch (error) {
-    // Handle the error here
-    console.error("An error occurred while checking bets:", error);
-  }
+//       const endvalue = getendValue();
+//       const currentroundId = getCurrentRound();
+//     } else {
+//       console.log("Ok3");
+//     }
+//     // Perform actions with player bets here
+//   } catch (error) {
+//     // Handle the error here
+//     console.error("An error occurred while checking bets:", error);
+//   }
 
-  //  Function to perform the live chat
-  const livechat = await getLiveChat();
+//   //  Function to perform the live chat
+//   const livechat = await getLiveChat();
 
-  io.emit("livechat", livechat);
-}, 300);
+//   io.emit("livechat", livechat);
+// }, 300);
 
 module.exports = { io };
