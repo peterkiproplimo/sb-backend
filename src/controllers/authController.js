@@ -50,10 +50,8 @@ const authResolvers = {
 
     const token = await jwt.sign(
       { userId: user.id, phone: user.phone },
-      "thisissupposedtobemysecret",
-      {
-        expiresIn: 60 * 30,
-      }
+      process.env.SECRET_KEY,
+      { expiresIn: "7d" }
     );
     return {
       userId: user.id,
@@ -62,7 +60,7 @@ const authResolvers = {
       phone: user.phone,
       token: token,
       dataToken: user.dataToken,
-      tokenExpiration: 15,
+      tokenExpiration: 24000,
       online: user.online,
     };
     // online: user.online,
