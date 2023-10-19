@@ -226,7 +226,7 @@ async function getEndResults(nextMultiplier, gamestatus) {
 async function setGameHasBeenPlayed(multiplier) {
   try {
     const db = await connectToDatabase();
-    const collection = db.collection("gameResults");
+    const collection = db.collection("games");
 
     // Update the "played" field to 1 for the current multiplier
     await collection.updateOne(
