@@ -106,9 +106,9 @@ async function getPlayersWaitingForNextRound(gamestatus, multvalue) {
     }));
 
     // Combine both arrays into a single finalResponse array
-    // const finalResponse = [...betsFinalResponse, ...fakeplayersFinalResponse];
+    const finalResponse = [...betsFinalResponse, ...fakeplayersFinalResponse];
 
-    return betsFinalResponse;
+    return finalResponse;
     // return bets;
   } catch (error) {
     console.error("Error checking bets:", error);
@@ -206,10 +206,10 @@ async function getEndResults(nextMultiplier, gamestatus) {
     }));
 
     // Combine both arrays into a single finalResponse array
-    // const finalResponse = [...betsFinalResponse, ...fakeplayersFinalResponse];
+    const finalResponse = [...betsFinalResponse, ...fakeplayersFinalResponse];
 
     // console.log("Bets for round " + nextMultiplier._id, betsFinalResponse);
-    return betsFinalResponse;
+    return finalResponse;
 
     // const finalResponse = [...betsWithDetails, ...fakeplayers];
 
@@ -336,7 +336,7 @@ async function createHistory(multiplier) {
   const history = new History({
     hash: multiplier.seedeed,
     point: multiplier.bustpoint,
-    round: multiplier.round,
+    round: multiplier._id,
   });
   await history.save();
 
