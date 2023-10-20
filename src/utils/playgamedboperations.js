@@ -153,27 +153,9 @@ async function getEndResults(nextMultiplier, gamestatus) {
 
         await account.save();
 
-        const betrans = new BetTransaction({
-          type: "win",
-          usertype: "player",
-          amount: bet.possibleWin,
-          account: account,
-        });
-
-        await betrans.save();
-
         houseAccount.balance =
           parseFloat(houseAccount?.balance) - parseFloat(bet.possibleWin);
         await houseAccount.save();
-
-        const betrans2 = new BetTransaction({
-          type: "lose",
-          usertype: "house",
-          amount: bet.possibleWin,
-          account: houseAccount,
-        });
-
-        await betrans2.save();
       }
     }
 
@@ -187,7 +169,7 @@ async function getEndResults(nextMultiplier, gamestatus) {
 
     setFakePlayers(fakeplayers);
     // Fetch and return the updated bets from the database
-    // const updatedBets = await Playerbet.find({ round: nextMultiplier._id });
+
     const updatedBets = await Playerbet.find({
       roundid: nextMultiplier._id,
     });
@@ -211,7 +193,6 @@ async function getEndResults(nextMultiplier, gamestatus) {
     // Combine both arrays into a single finalResponse array
     const finalResponse = [...betsFinalResponse, ...fakeplayersFinalResponse];
 
-    // console.log("Bets for round " + nextMultiplier._id, betsFinalResponse);
     return finalResponse;
 
     // const finalResponse = [...betsWithDetails, ...fakeplayers];
