@@ -101,9 +101,9 @@ type History{
 
 type Account{
 _id:ID!
-balance:String!
-karibubonus:String
-totalbalance:String
+balance:Float!
+karibubonus:Float
+totalbalance:Float
 active:Boolean!
 user:Player
 phone:String
@@ -303,7 +303,7 @@ clientSeed:String!
 amount:Float!
 betAmount:Float!
 point:String!
-round:String!
+round:String
 user:String!
 win:Boolean
 auto:Boolean!
@@ -323,6 +323,7 @@ point: Float!
 userId: Player!
 round: String
 withholdingtax:Float
+winamount:Float
 possibleWin: Float
 win:Boolean
 createdAt: String!
@@ -346,8 +347,8 @@ input PlayerbetInput {
   betAmount: Float!
   point: Float!
   userId: ID!
-  round: String!
-  win: Boolean!
+  round: String
+  win: Boolean
 }
   
 input LogsInput {

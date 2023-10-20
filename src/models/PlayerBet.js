@@ -18,17 +18,36 @@ const betSchema = new Schema(
       ref: "Player",
     },
     withholdingtax: {
-      type: String,
+      type: Number,
       required: false,
     },
     winamount: {
-      type: String,
+      type: Number,
       required: false,
     },
     round: {
       type: String,
+      required: false,
+      // required: false,
+    },
+
+    roundid: {
+      type: Schema.Types.ObjectId,
+      ref: "Game",
+      required: false,
+    },
+
+    played: {
+      type: Number,
       required: true,
     },
+
+    completed: {
+      type: Number,
+      required: false,
+      default: 0,
+    },
+
     possibleWin: {
       type: Number,
       required: false,

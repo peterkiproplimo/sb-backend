@@ -12,10 +12,6 @@ const Playerbet = require("../models/PlayerBet");
 const Player = require("../models/Player");
 const BetTransaction = require("../models/BetTransactions");
 const History = require("../models/history");
-const {
-  updatePlayerAc,
-  handleKaribuBonusAndBalance,
-} = require("../utils/playerAccountHandler");
 
 const {
   getRoundFromDatabase,
@@ -24,6 +20,10 @@ const {
 
 const betsResolvers = {
   createPlayerbet: async (args, req) => {
+    // Check player AC balanc
+    let lessbonusamount = 0;
+    const currentDate = new Date();
+
     try {
       const account = await Account.findOne({
         user: args.playerbetInput.userId,
@@ -34,18 +34,46 @@ const betsResolvers = {
       ) {
         throw new Error("Insufficient account account balance");
       }
-
-      await handleKaribuBonusAndBalance(account, args);
       // Check if player has bonus then deduct the bonus
       // Subtract the player account balance
+      if (
+        account.karibubonus > 0 &&
+        account.karibubonus >= parseFloat(args.playerbetInput.betAmount) &&
+        currentDate <= account.bonusexpirydate
+      ) {
+        account.karibubonus =
+          parseFloat(account?.karibubonus) -
+          parseFloat(args.playerbetInput.betAmount);
 
-      // account.balance =
-      //   parseFloat(account?.balance) -
-      //   parseFloat(args.playerbetInput.betAmount);
-      // account.totalbetamount =
-      //   parseFloat(account?.totalbetamount) +
-      //   parseFloat(args.playerbetInput.betAmount);
-      // await account.save();
+        account.totalbetamount =
+          parseFloat(account?.totalbetamount) +
+          parseFloat(args.playerbetInput.betAmount);
+        await account.save();
+      } else if (
+        account.karibubonus > 0 &&
+        account.karibubonus < parseFloat(args.playerbetInput.betAmount) &&
+        currentDate <= account.bonusexpirydate
+      ) {
+        lessbonusamount = account.karibubonus;
+        account.karibubonus = 0;
+        account.balance =
+          parseFloat(account?.balance) -
+          parseFloat(args.playerbetInput.betAmount) +
+          lessbonusamount;
+        account.bonusredeemed = true;
+        account.totalbetamount =
+          parseFloat(account?.totalbetamount) +
+          parseFloat(args.playerbetInput.betAmount);
+        await account.save();
+      } else {
+        account.balance =
+          parseFloat(account?.balance) -
+          parseFloat(args.playerbetInput.betAmount);
+        account.totalbetamount =
+          parseFloat(account?.totalbetamount) +
+          parseFloat(args.playerbetInput.betAmount);
+        await account.save();
+      }
 
       //  Add the house balance
       const houseAccount = await Account.findById("6523f69762c8841fb3313ade");
@@ -53,7 +81,6 @@ const betsResolvers = {
         parseFloat(houseAccount?.balance) +
         parseFloat(args.playerbetInput.betAmount);
       await houseAccount.save();
-
       //  Get the possible win
       let currentpossibleWin =
         args.playerbetInput.betAmount * args.playerbetInput.point;
@@ -62,18 +89,20 @@ const betsResolvers = {
       const finalwinamount = winamount - withholdingtax;
       let possibleWin =
         parseFloat(args.playerbetInput.betAmount) + finalwinamount;
+      const nextRound = await getRoundFromDatabase();
 
       const bet = new Playerbet({
         betAmount: args.playerbetInput.betAmount,
         point: args.playerbetInput.point,
         userId: args.playerbetInput.userId,
-        played: 0,
-        completed: 0,
+        round: nextRound,
         possibleWin: possibleWin,
         win: false,
         winamount: winamount,
         withholdingtax: withholdingtax,
       });
+
+      //  Place the bet
 
       const results = await bet.save();
 
@@ -133,7 +162,7 @@ const betsResolvers = {
   getAllPlayers: async () => {
     try {
       // Fetch all players from your data source (e.g., MongoDB)
-      const players = await Player.find().populate("account").populate("bets").sort({ createdAt: -1 });
+      const players = await Player.find().exec();
       return players;
     } catch (error) {
       throw new Error("Error fetching players: " + error.message);

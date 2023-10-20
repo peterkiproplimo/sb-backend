@@ -5,7 +5,7 @@ const Schema = mongoose.Schema;
 const accountSchema = new Schema(
   {
     balance: {
-      type: String,
+      type: Number,
       required: true,
     },
     active: {

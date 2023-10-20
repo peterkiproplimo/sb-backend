@@ -22,20 +22,74 @@ async function updatePlayerAc(account, transaction) {
       const formattedDate = sevenDaysLater.toISOString().replace(/\.000/, "");
 
       account.bonusexpirydate = formattedDate;
-    }
+      await account.save();
 
-    account.balance =
-      parseFloat(account?.balance) + parseFloat(transaction.amount);
-    await account.save();
+      const log = new Logs({
+        ip: "deposits",
+        description: `${account?.user?.username} deposited ${transaction.amount}- Account Name:${account?.user?.username}`,
+        user: transaction.userId,
+      });
+      await log.save();
+    } else {
+      account.balance =
+        parseFloat(account?.balance) + parseFloat(transaction.amount);
+      await account.save();
+
+      const log = new Logs({
+        ip: "deposits",
+        description: `${account?.user?.username} deposited ${transaction.amount}- Account Name:${account?.user?.username}`,
+        user: transaction.userId,
+      });
+      await log.save();
+    }
     // const ipAddress = req.socket.remoteAddress;
-    const log = new Logs({
-      ip: "deposits",
-      description: `${account?.user?.username} deposited ${transaction.amount}- Account Name:${account?.user?.username}`,
-      user: transaction.userId,
-    });
-    await log.save();
   } catch (err) {}
 }
+
+async function handleKaribuBonusAndBalance(account, args) {
+  let lessbonusamount = 0;
+  const currentDate = new Date();
+
+  if (
+    account.karibubonus > 0 &&
+    account.karibubonus >= parseFloat(args.playerbetInput.betAmount) &&
+    currentDate <= account.bonusexpirydate
+  ) {
+    account.karibubonus =
+      parseFloat(account?.karibubonus) -
+      parseFloat(args.playerbetInput.betAmount);
+
+    account.totalbetamount =
+      parseFloat(account?.totalbetamount) +
+      parseFloat(args.playerbetInput.betAmount);
+    await account.save();
+  } else if (
+    account.karibubonus > 0 &&
+    account.karibubonus < parseFloat(args.playerbetInput.betAmount) &&
+    currentDate <= account.bonusexpirydate
+  ) {
+    lessbonusamount = account.karibubonus;
+    account.karibubonus = 0;
+    account.balance =
+      parseFloat(account?.balance) -
+      parseFloat(args.playerbetInput.betAmount) +
+      lessbonusamount;
+    account.bonusredeemed = true;
+    account.totalbetamount =
+      parseFloat(account?.totalbetamount) +
+      parseFloat(args.playerbetInput.betAmount);
+    await account.save();
+  } else {
+    account.balance =
+      parseFloat(account?.balance) - parseFloat(args.playerbetInput.betAmount);
+    account.totalbetamount =
+      parseFloat(account?.totalbetamount) +
+      parseFloat(args.playerbetInput.betAmount);
+    await account.save();
+  }
+}
+
 module.exports = {
   updatePlayerAc,
+  handleKaribuBonusAndBalance,
 };

@@ -12,7 +12,6 @@ const resolvers = require("./src/resolvers");
 //import the midleware to check for every incoming request if user is authenticated
 const isAuth = require("./src/middleware/is-auth");
 const house = require("./src/models/house");
-const Game = require("./src/models/Game");
 const Account = require("./src/models/Account");
 const Transaction = require("./src/models/transactions");
 // Update the path if needed
@@ -36,8 +35,6 @@ const {
   getendValue,
   getCurrentRound,
   setCurrentRound,
-  getMultipliers,
-  setMultipliers,
 } = require("./src/utils/gameroundUtils");
 
 const { getLiveChat } = require("./src/utils/livechatUtils");
@@ -58,7 +55,6 @@ const {
   getEndResults,
   createHistory,
   setAllNextRoundPlayersWithRoundId,
-  getPlayersWaitingForNextRound,
 } = require("./src/utils/playgamedboperations");
 
 const { updatePlayerAc } = require("./src/utils/playerAccountHandler");
@@ -221,7 +217,7 @@ let timerPaused = false; // Flag t
 let currentMultiplierBatch = []; // Array to store the current batch of multipliers
 let batchIndex = 0;
 let value = 1.0;
-const incrementInterval = 100; // milliseconds
+const incrementInterval = 40; // milliseconds
 const incrementStep = 0.01; // Step to achieve 1 decimal place
 let targetValueIndex = 0;
 
@@ -236,8 +232,14 @@ fetchMultipliersBatch();
 //  Fetch batch multipliers from the database
 async function fetchMultipliersBatch() {
   try {
+    const db = await connectToDatabase();
+    const collection = db.collection("gameResults"); // Replace with your collection name
+
     // Fetch a batch of 100 multipliers and store them in currentMultiplierBatch
-    currentMultiplierBatch = await Game.find({ played: 0 }).limit(10);
+    currentMultiplierBatch = await collection
+      .find({ played: 0 })
+      .limit(10)
+      .toArray();
 
     if (currentMultiplierBatch.length === 0) {
       // Handle the case when there are no more multipliers in the database
@@ -253,15 +255,19 @@ async function fetchMultipliersBatch() {
 
 async function getNextMultiplier() {
   const nextGameroundID = await generateRandomID(32);
+  setNextRound(nextGameroundID);
+  setemitOngoingRound(true);
+
+  currentRound = getnextRound();
 
   //  Save next round in database
   io.emit("nextround", nextGameroundID);
-  setemitOngoingRound(true);
+  await saveNextRoundID(nextGameroundID);
+
   if (batchIndex < currentMultiplierBatch.length) {
     const nextMultiplier = currentMultiplierBatch[batchIndex];
-
-    setMultipliers(nextMultiplier);
     batchIndex++;
+    await updateMultiplierSetRoundId(nextMultiplier, nextGameroundID);
     return nextMultiplier;
   } else {
     // If the batch is exhausted, fetch a new batch
@@ -278,7 +284,7 @@ async function runMultiplierTimer(multiplier) {
   if (value < multiplier.bustpoint && !timerPaused) {
     // Increment the value by incrementStep
     setMultiplierValue((value += incrementStep));
-
+    // console.log("value" + value);
     io.emit("updateTimer", value.toFixed(2)); // Emit the updated value to all connected clients
   } else {
     if (value >= multiplier.bustpoint) {
@@ -292,8 +298,14 @@ async function runMultiplierTimer(multiplier) {
       setemitOngoingRound(false);
       setemitNextRound(false);
 
+      const currentroundId = await getCurrentRoundFromDatabase(); //Get round
+
       // Update winners/ losers
-      const playerBets = await getEndResults(multiplier, "endresults");
+      const playerBets = await getEndResults(
+        currentroundId,
+        multiplier.bustpoint,
+        "endresults"
+      );
 
       io.emit("livedata", playerBets);
 
@@ -328,6 +340,9 @@ async function waitCount() {
   setemitOngoingRound(false);
   setemitEndRound(false);
 
+  const currentRound = await getRoundFromDatabase();
+  await setSavedNextRoundAsCurrentRound(currentRound);
+
   timerPaused = true;
   // Set the initial countdown value
   let countdownValue = 10.0;
@@ -353,14 +368,10 @@ async function waitCount() {
 
       if (nextMultiplier) {
         // Update all the players with the curent game id
-        const setro = await setAllNextRoundPlayersWithRoundId(nextMultiplier);
+        await setAllNextRoundPlayersWithRoundId(nextMultiplier);
         // Start the timer with the next multiplier
 
-        if (setro) {
-          await runMultiplierTimer(nextMultiplier);
-        } else {
-          await runMultiplierTimer(nextMultiplier);
-        }
+        await runMultiplierTimer(nextMultiplier);
       } else {
         // Handle the case when there are no more multipliers
         console.log("No more multipliers available.");
@@ -377,7 +388,6 @@ async function startGame() {
 //  Start server and Game
 
 server.listen(3002, async () => {
-  await connectToDatabase();
   await startGame();
   getMultiplierValue();
 
@@ -399,25 +409,38 @@ function getMultiplierValue() {
 setInterval(async () => {
   try {
     if (getemitNextRound()) {
-      const playerBets = await getPlayersWaitingForNextRound("waitingnext", 0);
+      const currentroundId = await getCurrentRoundFromDatabase();
+      console.log("Waiting for next round", currentroundId);
+      const playerBets = await checkBetsForWinsAndLosses(
+        currentroundId,
+        "waitingnext",
+        0
+      );
 
       io.emit("livedata", playerBets);
     } else if (getemitOngoingRound()) {
       const multvalue = getMultiplierValue();
-      const multipliers = getMultipliers();
 
-      await setWinners(multvalue, multipliers);
+      const currentroundId = await getCurrentRoundFromDatabase();
+
+      console.log("current running round", currentroundId);
+      // setCurrentRound(currentroundId);
+
+      await setWinners(multvalue, currentroundId);
       const playerBets = await checkBetsForWinsAndLosses(
-        multipliers,
+        currentroundId,
         "ongoing",
         multvalue
       );
-
+      // console.log(playerBets);
       io.emit("livedata", playerBets);
     } else if (getemitEndRound()) {
       // Generate fake players for the next round
+
+      const endvalue = getendValue();
+      const currentroundId = getCurrentRound();
     } else {
-      // console.log("Ok3");
+      console.log("Ok3");
     }
     // Perform actions with player bets here
   } catch (error) {

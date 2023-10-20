@@ -9,6 +9,7 @@ var mysql = require("mysql");
 const Account = require("../models/Account");
 const Transaction = require("../models/transactions");
 const Transrequest = require("../models/Transrequest");
+
 const Logs = require("../models/logs");
 const Player = require("../models/Player");
 const Mpesa = require("mpesa-node");
@@ -60,7 +61,7 @@ const mpesaResolvers = {
               PartyB: shortcode,
               PhoneNumber: parseInt(args.phone),
               CallBackURL:
-                "https://sb-backend-test.onrender.com/mpesa-callback",
+                "https://sb-backend-cpe5.onrender.com/mpesa-callback",
               AccountReference: parseInt(args.phone),
               TransactionDesc: "Deposit to SAFARIBUST Account",
             })
@@ -177,7 +178,7 @@ const mpesaResolvers = {
               PartyB: shortcode,
               PhoneNumber: parseInt(args.phone),
               CallBackURL:
-                "https://sb-backend-test.onrender.com/mpesa-callback",
+                "https://sb-backend-cpe5.onrender.com/mpesa-callback",
               AccountReference: parseInt(args.phone),
               TransactionDesc: "Deposit to SAFARIBUST Account",
             })
@@ -383,8 +384,8 @@ const mpesaResolvers = {
               PartyB: parseInt(args.phone),
               Remarks: `Withdrawal: ${args.username}-${args.phone}`,
               QueueTimeOutURL:
-                "https://sb-backend-test.onrender.com/mpesa-result",
-              ResultURL: "https://sb-backend-test.onrender.com/mpesa-timeout",
+                "https://sb-backend-cpe5.onrender.com/mpesa-result",
+              ResultURL: "https://sb-backend-cpe5.onrender.com/mpesa-timeout",
               Occassion: `Withdrawal: ${args.username}-${args.phone}`,
             })
           )

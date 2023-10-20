@@ -1,4 +1,4 @@
- import { MONGO_URI } from '../config';
+ import { MONGO_URI } from '../../config';
 import mongoose, { ConnectOptions } from "mongoose";
 export default async() => {
 
