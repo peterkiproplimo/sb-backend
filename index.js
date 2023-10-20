@@ -24,8 +24,6 @@ const connectToDatabase = require("./config/database");
 const { socketIO } = require("./src/socket/socketio");
 const { connection } = require("./src/socket/gameHandler");
 const {
-  getnextRound,
-  setNextRound,
   setemitNextRound,
   setemitOngoingRound,
   setemitEndRound,
@@ -33,9 +31,6 @@ const {
   getemitOngoingRound,
   getemitEndRound,
   generateRandomID,
-  getendValue,
-  getCurrentRound,
-  setCurrentRound,
   getMultipliers,
   setMultipliers,
 } = require("./src/utils/gameroundUtils");
@@ -49,14 +44,8 @@ const {
 const {
   checkBetsForWinsAndLosses,
   setGameHasBeenPlayed,
-  getRoundFromDatabase,
-  getCurrentRoundFromDatabase,
-  saveNextRoundID,
-  setSavedNextRoundAsCurrentRound,
-  updateMultiplierSetRoundId,
   setWinners,
   getEndResults,
-  createHistory,
   setAllNextRoundPlayersWithRoundId,
   getPlayersWaitingForNextRound,
 } = require("./src/utils/playgamedboperations");
@@ -241,7 +230,6 @@ async function fetchMultipliersBatch() {
 
     if (currentMultiplierBatch.length === 0) {
       // Handle the case when there are no more multipliers in the database
-      // console.log("No more multipliers available in the database.");
       return;
     }
 
