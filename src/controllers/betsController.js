@@ -12,6 +12,10 @@ const Playerbet = require("../models/PlayerBet");
 const Player = require("../models/Player");
 const BetTransaction = require("../models/BetTransactions");
 const History = require("../models/history");
+const {
+  updatePlayerAc,
+  handleKaribuBonusAndBalance,
+} = require("../utils/playerAccountHandler");
 
 const {
   getRoundFromDatabase,
@@ -20,10 +24,6 @@ const {
 
 const betsResolvers = {
   createPlayerbet: async (args, req) => {
-    // Check player AC balanc
-    let lessbonusamount = 0;
-    const currentDate = new Date();
-
     try {
       const account = await Account.findOne({
         user: args.playerbetInput.userId,
@@ -34,15 +34,18 @@ const betsResolvers = {
       ) {
         throw new Error("Insufficient account account balance");
       }
+
+      await handleKaribuBonusAndBalance(account, args);
       // Check if player has bonus then deduct the bonus
       // Subtract the player account balance
-      account.balance =
-        parseFloat(account?.balance) -
-        parseFloat(args.playerbetInput.betAmount);
-      account.totalbetamount =
-        parseFloat(account?.totalbetamount) +
-        parseFloat(args.playerbetInput.betAmount);
-      await account.save();
+
+      // account.balance =
+      //   parseFloat(account?.balance) -
+      //   parseFloat(args.playerbetInput.betAmount);
+      // account.totalbetamount =
+      //   parseFloat(account?.totalbetamount) +
+      //   parseFloat(args.playerbetInput.betAmount);
+      // await account.save();
 
       //  Add the house balance
       const houseAccount = await Account.findById("6523f69762c8841fb3313ade");
