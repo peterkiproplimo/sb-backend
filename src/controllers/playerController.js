@@ -12,6 +12,7 @@ const User = require("../models/User");
 const Player = require("../models/Player");
 const Admin = require("../models/admins");
 const OTP = require("../models/verifier");
+const PlayerBet = require("../models/PlayerBet");
 const playerResolvers = {
   createPlayer: (args, req) => {
     const phoneNumber = formatKenyanPhoneNumber(args.userInput.phone);
@@ -36,8 +37,8 @@ const playerResolvers = {
         if (
           !otp ||
           parseInt(new Date().toISOString().split("T")[1].substr(3, 2)) -
-            parseInt(otp.createdAt.toISOString().split("T")[1].substr(3, 2)) >
-            10
+          parseInt(otp.createdAt.toISOString().split("T")[1].substr(3, 2)) >
+          10
         ) {
           throw new Error("Invalid OTP!!!");
         }
@@ -260,8 +261,8 @@ const playerResolvers = {
     if (
       !otp ||
       parseInt(new Date().toISOString().split("T")[1].substr(3, 2)) -
-        parseInt(otp.createdAt.toISOString().split("T")[1].substr(3, 2)) >
-        10
+      parseInt(otp.createdAt.toISOString().split("T")[1].substr(3, 2)) >
+      10
     ) {
       throw new Error("Invalid OTP!!!");
     } else {
@@ -295,6 +296,77 @@ const playerResolvers = {
         .catch((err) => console.log(err.message));
     }
   },
+
+
+  // bY Machina
+  getSinglePlayer: async (args, req) => {    
+    return await Player.findById(args.playerId)
+      .then(async (player) => {
+        
+        if (!player) {
+          throw new Error("User NOT found!!");
+        }
+        const account = await Account.findOne({ user: player.id });
+        return {account, player}
+      }).then(async (result) => {
+        const bets = await PlayerBet.find({ userId: result.player.id }).sort({ createdAt: -1 });
+        return {
+          player: result.player,
+          account: result.account,
+          bets,
+        }
+      })
+  },
+  // suspendPlayer: (args, req) => {
+  //   return User.findById(args.userId)
+  //     .then((user) => {
+  //       if (!user) {
+  //         throw new Error("User NOT found!!");
+  //       }
+  //       user.status = false
+  //       return user.save();
+  //     })
+  //     .then(async (result) => {
+  //       console.log(123);
+  //       const ipAddress = req.socket.remoteAddress;
+  //       const log = new AdminLog({
+  //         ip: ipAddress,
+  //         description: `Deleted a user ${args.username}`, //this will be changed to the authenticated user creating the logs
+  //         user: result.id,
+  //       });
+
+  //       await log.save();
+  //       return {
+  //         status: "success",
+  //         message: `Deleted user ${args.username}`,
+  //       };
+  //     });
+  // },
+  // activatePlayer: (args, req) => {
+  //   return User.findById(args.userId)
+  //     .then((user) => {
+  //       if (!user) {
+  //         throw new Error("User NOT found!!");
+  //       }
+  //       user.status = true
+  //       return user.save();
+  //     })
+  //     .then(async (result) => {
+  //       console.log(123);
+  //       const ipAddress = req.socket.remoteAddress;
+  //       const log = new AdminLog({
+  //         ip: ipAddress,
+  //         description: `Deleted a user ${args.username}`, //this will be changed to the authenticated user creating the logs
+  //         user: result.id,
+  //       });
+
+  //       await log.save();
+  //       return {
+  //         status: "success",
+  //         message: `Deleted user ${args.username}`,
+  //       };
+  //     });
+  // },
 };
 
 const generateOtp = async (user, phone, type) => {

@@ -31,6 +31,11 @@ updatedAt:String
 bets: [Playerbet]
 }
 
+type SinglePlayer {
+  player: Player
+  account: Account
+  bets: [Playerbet]
+}
 
 type Admin {
 _id: ID!
@@ -523,6 +528,7 @@ type RootQuery{
   Dashboard: DashboardData
 
   
+  getSinglePlayer(playerId: String!): SinglePlayer
   getAccounts(page: Int, limit: Int): [Account!]!
   getFAQs: [FAQ!]!
   getPolicy: Policy
