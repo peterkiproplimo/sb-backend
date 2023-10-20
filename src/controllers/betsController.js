@@ -162,7 +162,7 @@ const betsResolvers = {
   getAllPlayers: async () => {
     try {
       // Fetch all players from your data source (e.g., MongoDB)
-      const players = await Player.find().exec();
+      const players = await Player.find().populate("account").populate("bets").sort({ createdAt: -1 });
       return players;
     } catch (error) {
       throw new Error("Error fetching players: " + error.message);

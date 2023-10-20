@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const MONGO_URI =
-  "mongodb+srv://Safaribust:ffFnYOKKFVSEWis6@cluster0.yuiecha.mongodb.net/?retryWrites=true&w=majority";
+  "mongodb+srv://Safaribust:VNZ38oRtKrVxd9Wu@cluster0.yuiecha.mongodb.net/?retryWrites=true&w=majority";
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 
