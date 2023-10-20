@@ -35,6 +35,7 @@ type SinglePlayer {
   player: Player
   account: Account
   bets: [Playerbet]
+  transactions: [Transaction]
 }
 
 type Admin {
