@@ -55,12 +55,17 @@ function generateFakePlayersAndBets(numPlayers) {
       updatedAt: faker.date.recent(),
     };
 
+    const fakebetAmount = parseFloat(faker.finance.amount(1, 1000, 2));
+    const fakePoint = parseFloat(faker.finance.amount(1, 20, 2));
+    const fakePossibleWin = parseFloat(
+      (fakebetAmount * fakePoint).toFixed(2) // Calculate and round to 2 decimal places
+    );
     const fakeBet = {
       win: false,
       busted: true,
       _id: faker.string.uuid(24),
-      betAmount: parseFloat(faker.finance.amount(1, 1000, 2)),
-      point: parseFloat(faker.finance.amount(1, 20, 2)),
+      betAmount: fakebetAmount,
+      point: fakePoint,
       userId: {
         playerbets: [],
         _id: faker.string.uuid(24),
@@ -78,9 +83,7 @@ function generateFakePlayersAndBets(numPlayers) {
         __v: 0,
       },
       round: faker.string.uuid(24),
-      possibleWin: parseFloat(
-        (fakeBet.betAmount * fakeBet.point).toFixed(2) // Calculate and round to 2 decimal places
-      ),
+      possibleWin: fakePossibleWin,
       createdAt: faker.date.past({ years: 1 }),
       updatedAt: faker.date.recent(),
       __v: 0,
