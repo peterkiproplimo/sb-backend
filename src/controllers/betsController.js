@@ -130,11 +130,40 @@ const betsResolvers = {
     }
   },
 
-  getAllPlayers: async () => {
+  getAllPlayers: async (args, req) => {
     try {
-      // Fetch all players from your data source (e.g., MongoDB)
-      const players = await Player.find().populate("account").populate("bets").sort({ createdAt: -1 });
-      return players;
+      const pageNumber = parseInt(args.page) || 1;
+      const itemsPerPage = parseInt(args.per_page) || 10;
+      // Create a query object based on search and filter criteria
+      const query = {};
+      if (args.username != "") {
+        query.username = new RegExp(args.username, 'i'); // Case-insensitive search
+      }
+      if (args.active != "") {
+        query.active = args.active == "0"? true: false;
+      }
+
+      // pagination
+      // total_pages
+      // current_page
+      // total
+      // per_page
+      // Calculate skip and limit values for pagination
+      const skip = (pageNumber - 1) * itemsPerPage;
+      const limit = itemsPerPage;
+
+      const totalItems = await Player.countDocuments(query);
+      const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+      // Fetch players from your data source (e.g., MongoDB)
+      const players = await Player.find(query).skip(skip).limit(limit)/*.populate("account").populate("bets")*/.sort({ createdAt: -1 });
+      return{
+        players: players,
+        current_page: pageNumber,
+        total_pages: totalPages,
+        total: totalItems,
+        per_page: itemsPerPage
+      };
     } catch (error) {
       throw new Error("Error fetching players: " + error.message);
     }
@@ -412,11 +441,10 @@ const betsResolvers = {
     const ipAddress = req.socket.remoteAddress;
     const log = new Logs({
       ip: ipAddress,
-      description: `User ${args.betInput.win ? "won " : "lost"} ${
-        args.betInput.win
+      description: `User ${args.betInput.win ? "won " : "lost"} ${args.betInput.win
           ? parseFloat(+args.betInput.amount).toFixed(2)
           : parseFloat(+args.betInput.betAmount).toFixed(2)
-      }`,
+        }`,
       user: args.betInput.user,
       round: args.betInput.round,
       won: args.betInput.win,

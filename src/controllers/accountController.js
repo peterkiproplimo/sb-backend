@@ -208,10 +208,13 @@ const accountResolvers = {
   // get all the accounts in descending order default to page1 and 15 records per page
   getAccounts: async ({page=1, limit=25}) => await Account.find().sort({ createdAt: -1 }).skip((page-1)*limit).limit(limit).populate("user"),
   updateBalance: (args, req) =>{
+    if (!req.isAuth) {
+      throw new Error("Unauthenticated");
+    }
     try {
        return Account.findById(args.accountId).populate("user").then(async (account)=>{
         if (!account) {
-          throw new Error("Player not found");
+          throw new Error("Account not found");
       }
       // account.balance = parseFloat(account.balance) + args.amount     //uncomment if balance update is by addition 
       account.balance = parseFloat(args.amount) //this get the new updated balance
@@ -219,12 +222,15 @@ const accountResolvers = {
         const ipAddress = req.socket.remoteAddress;
         const log = new Logs({
           ip: ipAddress,
-          description: `${account.username} balance updated`,
-          user: account.username,
+          description: `${account.user.username} balance updated to ${account.balance}`,
+          user: req.user._id,
         });
     
       log.save();
-      return account;
+      return {
+        status: "success",
+        message: `${account.user.username} balance updated to ${account.balance}`,
+      };
       })
     } catch (error) {
       throw new Error("Balance update failed, Please try again later")
