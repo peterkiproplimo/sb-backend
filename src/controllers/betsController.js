@@ -58,10 +58,11 @@ const betsResolvers = {
       let currentpossibleWin =
         args.playerbetInput.betAmount * args.playerbetInput.point;
       const winamount = currentpossibleWin - args.playerbetInput.betAmount;
-      const withholdingtax = (20 / 100) * winamount;
+      const withholdingtax = ((20 / 100) * winamount).toFixed(2);
       const finalwinamount = winamount - withholdingtax;
-      let possibleWin =
-        parseFloat(args.playerbetInput.betAmount) + finalwinamount;
+      let possibleWin = (
+        parseFloat(args.playerbetInput.betAmount) + finalwinamount
+      ).toFixed(2);
 
       const bet = new Playerbet({
         betAmount: args.playerbetInput.betAmount,

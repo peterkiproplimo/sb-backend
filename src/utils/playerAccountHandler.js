@@ -31,8 +31,9 @@ async function updatePlayerAc(account, transaction) {
       });
       await log.save();
     } else {
-      account.balance =
-        parseFloat(account?.balance) + parseFloat(transaction.amount);
+      account.balance = (
+        parseFloat(account?.balance) + parseFloat(transaction.amount)
+      ).toFixed(2);
       await account.save();
 
       const log = new Logs({
@@ -55,13 +56,15 @@ async function handleKaribuBonusAndBalance(account, args) {
     account.karibubonus >= parseFloat(args.playerbetInput.betAmount) &&
     currentDate <= account.bonusexpirydate
   ) {
-    account.karibubonus =
+    account.karibubonus = (
       parseFloat(account?.karibubonus) -
-      parseFloat(args.playerbetInput.betAmount);
+      parseFloat(args.playerbetInput.betAmount)
+    ).toFixed(2);
 
-    account.totalbetamount =
+    account.totalbetamount = (
       parseFloat(account?.totalbetamount) +
-      parseFloat(args.playerbetInput.betAmount);
+      parseFloat(args.playerbetInput.betAmount)
+    ).toFixed(2);
     await account.save();
   } else if (
     account.karibubonus > 0 &&
@@ -70,21 +73,25 @@ async function handleKaribuBonusAndBalance(account, args) {
   ) {
     lessbonusamount = account.karibubonus;
     account.karibubonus = 0;
-    account.balance =
+    account.balance = (
       parseFloat(account?.balance) -
       parseFloat(args.playerbetInput.betAmount) +
-      lessbonusamount;
+      lessbonusamount
+    ).toFixed(2);
     account.bonusredeemed = true;
-    account.totalbetamount =
+    account.totalbetamount = (
       parseFloat(account?.totalbetamount) +
-      parseFloat(args.playerbetInput.betAmount);
+      parseFloat(args.playerbetInput.betAmount)
+    ).toFixed(2);
     await account.save();
   } else {
-    account.balance =
-      parseFloat(account?.balance) - parseFloat(args.playerbetInput.betAmount);
-    account.totalbetamount =
+    account.balance = (
+      parseFloat(account?.balance) - parseFloat(args.playerbetInput.betAmount)
+    ).toFixed(2);
+    account.totalbetamount = (
       parseFloat(account?.totalbetamount) +
-      parseFloat(args.playerbetInput.betAmount);
+      parseFloat(args.playerbetInput.betAmount)
+    ).toFixed(2);
     await account.save();
   }
 }

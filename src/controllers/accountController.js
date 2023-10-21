@@ -163,6 +163,7 @@ const accountResolvers = {
   accountBalance: async (args, req) => {
     const account = await Account.findOne({ user: args.userId });
     const user = await Player.findById(args.userId);
+
     return {
       _id: account?.id,
       balance: account?.balance,
@@ -203,7 +204,6 @@ const accountResolvers = {
     };
   },
 
-
   /* admin accounts tab methods start here*/
   // get all the accounts in descending order default to page1 and 15 records per page
   getAccounts: async ({page=1, limit=25}) => await Account.find().sort({ createdAt: -1 }).skip((page-1)*limit).limit(limit).populate("user"),
@@ -233,7 +233,7 @@ const accountResolvers = {
       };
       })
     } catch (error) {
-      throw new Error("Balance update failed, Please try again later")
+      throw new Error("Balance update failed, Please try again later");
     }
   },
   suspendAccount: (args, req) => {
@@ -242,7 +242,7 @@ const accountResolvers = {
         if (!account) {
           throw new Error("Account NOT found!!");
         }
-        account.active = false
+        account.active = false;
         return account.save();
       })
       .then(async (result) => {
@@ -266,7 +266,7 @@ const accountResolvers = {
         if (!account) {
           throw new Error("Account NOT found!!");
         }
-        account.status = true
+        account.status = true;
         return account.save();
       })
       .then(async (result) => {
