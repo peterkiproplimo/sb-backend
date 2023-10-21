@@ -78,7 +78,9 @@ function generateFakePlayersAndBets(numPlayers) {
         __v: 0,
       },
       round: faker.string.uuid(24),
-      possibleWin: parseFloat(faker.finance.amount(1, 10000, 2)),
+      possibleWin: parseFloat(
+        (fakeBet.betAmount * fakeBet.point).toFixed(2) // Calculate and round to 2 decimal places
+      ),
       createdAt: faker.date.past({ years: 1 }),
       updatedAt: faker.date.recent(),
       __v: 0,
