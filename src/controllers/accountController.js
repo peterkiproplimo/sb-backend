@@ -166,11 +166,10 @@ const accountResolvers = {
 
     return {
       _id: account?.id,
-      balance: (account?.balance).toFixed(2),
+      balance: account?.balance,
       karibubonus: account?.karibubonus,
-      totalbalance: (
-        parseFloat(account?.balance) + parseFloat(account?.karibubonus)
-      ).toFixed(2),
+      totalbalance:
+        parseFloat(account?.balance) + parseFloat(account?.karibubonus),
       user: user,
       createdAt: new Date(account?._doc?.createdAt).toISOString(),
       updatedAt: new Date(account?._doc?.updatedAt).toISOString(),
