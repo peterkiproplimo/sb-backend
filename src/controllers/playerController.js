@@ -13,6 +13,7 @@ const Player = require("../models/Player");
 const Admin = require("../models/admins");
 const OTP = require("../models/verifier");
 const PlayerBet = require("../models/PlayerBet");
+const Transactions = require("../models/transactions");
 const playerResolvers = {
   createPlayer: (args, req) => {
     const phoneNumber = formatKenyanPhoneNumber(args.userInput.phone);
@@ -310,9 +311,11 @@ const playerResolvers = {
         return {account, player}
       }).then(async (result) => {
         const bets = await PlayerBet.find({ userId: result.player.id }).sort({ createdAt: -1 });
+        const transactions = await Transactions.find({ user: result.player.id }).sort({ createdAt: -1 });
         return {
           player: result.player,
           account: result.account,
+          transactions,
           bets,
         }
       })
