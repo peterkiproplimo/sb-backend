@@ -163,12 +163,14 @@ const accountResolvers = {
   accountBalance: async (args, req) => {
     const account = await Account.findOne({ user: args.userId });
     const user = await Player.findById(args.userId);
+
     return {
       _id: account?.id,
-      balance: account?.balance,
+      balance: (account?.balance).toFixed(2),
       karibubonus: account?.karibubonus,
-      totalbalance:
-        parseFloat(account?.balance) + parseFloat(account?.karibubonus),
+      totalbalance: (
+        parseFloat(account?.balance) + parseFloat(account?.karibubonus)
+      ).toFixed(2),
       user: user,
       createdAt: new Date(account?._doc?.createdAt).toISOString(),
       updatedAt: new Date(account?._doc?.updatedAt).toISOString(),
@@ -203,31 +205,37 @@ const accountResolvers = {
     };
   },
 
-
   /* admin accounts tab methods start here*/
   // get all the accounts in descending order default to page1 and 15 records per page
-  getAccounts: async ({page=1, limit=25}) => await Account.find().sort({ createdAt: -1 }).skip((page-1)*limit).limit(limit).populate("user"),
-  updateBalance: (args, req) =>{
+  getAccounts: async ({ page = 1, limit = 25 }) =>
+    await Account.find()
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .populate("user"),
+  updateBalance: (args, req) => {
     try {
-       return Account.findById(args.accountId).populate("user").then(async (account)=>{
-        if (!account) {
-          throw new Error("Player not found");
-      }
-      // account.balance = parseFloat(account.balance) + args.amount     //uncomment if balance update is by addition 
-      account.balance = parseFloat(args.amount) //this get the new updated balance
-        await account.save()
-        const ipAddress = req.socket.remoteAddress;
-        const log = new Logs({
-          ip: ipAddress,
-          description: `${account.username} balance updated`,
-          user: account.username,
+      return Account.findById(args.accountId)
+        .populate("user")
+        .then(async (account) => {
+          if (!account) {
+            throw new Error("Player not found");
+          }
+          // account.balance = parseFloat(account.balance) + args.amount     //uncomment if balance update is by addition
+          account.balance = parseFloat(args.amount); //this get the new updated balance
+          await account.save();
+          const ipAddress = req.socket.remoteAddress;
+          const log = new Logs({
+            ip: ipAddress,
+            description: `${account.username} balance updated`,
+            user: account.username,
+          });
+
+          log.save();
+          return account;
         });
-    
-      log.save();
-      return account;
-      })
     } catch (error) {
-      throw new Error("Balance update failed, Please try again later")
+      throw new Error("Balance update failed, Please try again later");
     }
   },
   suspendAccount: (args, req) => {
@@ -236,7 +244,7 @@ const accountResolvers = {
         if (!account) {
           throw new Error("Account NOT found!!");
         }
-        account.active = false
+        account.active = false;
         return account.save();
       })
       .then(async (result) => {
@@ -260,7 +268,7 @@ const accountResolvers = {
         if (!account) {
           throw new Error("Account NOT found!!");
         }
-        account.status = true
+        account.status = true;
         return account.save();
       })
       .then(async (result) => {
