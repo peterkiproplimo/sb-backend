@@ -341,14 +341,14 @@ async function waitCount() {
 
       if (nextMultiplier) {
         // Update all the players with the curent game id
-        const setro = await setAllNextRoundPlayersWithRoundId(nextMultiplier);
+        await setAllNextRoundPlayersWithRoundId(nextMultiplier);
         // Start the timer with the next multiplier
 
-        if (setro) {
-          await runMultiplierTimer(nextMultiplier);
-        } else {
-          await runMultiplierTimer(nextMultiplier);
-        }
+        // if (setro) {
+        await runMultiplierTimer(nextMultiplier);
+        // } else {
+        //   await runMultiplierTimer(nextMultiplier);
+        // }
       } else {
         // Handle the case when there are no more multipliers
         console.log("No more multipliers available.");
