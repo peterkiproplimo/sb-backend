@@ -67,6 +67,11 @@ const utilsResolvers = {
 
     const phone = formatKenyanPhoneNumber(args.phone);
 
+    console.log(args);
+    // const player = Player.findOne({
+    //   $or: [{ username: args.username }, { phone: phone }],
+    // });
+
     const player = Player.findOne({
       $or: [{ username: args.username }, { phone: phone }],
     });
@@ -276,50 +281,51 @@ const utilsResolvers = {
     try {
       const faq = new FAQ({
         question: args.faqInput.question,
-        answer: args.faqInput.answer
+        answer: args.faqInput.answer,
       });
       faq.save();
-      
-          const ipAddress = req.socket.remoteAddress;
-          const log = new AdminLog({
-            ip: ipAddress,
-            description: `Created FAQ "${args.question}"`, //this will be changed to the authenticated user creating the logs
-            user: faq.id,
-          });
-  
-          await log.save();
-          return {
-            status: "success",
-            message: "FAQ Added",
-          };
+
+      const ipAddress = req.socket.remoteAddress;
+      const log = new AdminLog({
+        ip: ipAddress,
+        description: `Created FAQ "${args.question}"`, //this will be changed to the authenticated user creating the logs
+        user: faq.id,
+      });
+
+      await log.save();
+      return {
+        status: "success",
+        message: "FAQ Added",
+      };
     } catch (error) {
       throw new Error(error);
     }
   },
   updateFAQ: async (args, req) => {
     try {
-      return FAQ.findById(args.faqId).then((faq) => {
-        if (!faq) {
-          throw new Error("FAQ NOT found!!");
-        }
-        faq.question= args.faqInput.question,
-        faq.answer= args.faqInput.answer
-        return faq.save();
-      })
-      .then(async (result) => {
-        const ipAddress = req.socket.remoteAddress;
-        const log = new AdminLog({
-          ip: ipAddress,
-          description: `Updated FAQ ${args.question}`, //this will be changed to the authenticated user creating the logs
-          user: result.id,
+      return FAQ.findById(args.faqId)
+        .then((faq) => {
+          if (!faq) {
+            throw new Error("FAQ NOT found!!");
+          }
+          (faq.question = args.faqInput.question),
+            (faq.answer = args.faqInput.answer);
+          return faq.save();
+        })
+        .then(async (result) => {
+          const ipAddress = req.socket.remoteAddress;
+          const log = new AdminLog({
+            ip: ipAddress,
+            description: `Updated FAQ ${args.question}`, //this will be changed to the authenticated user creating the logs
+            user: result.id,
+          });
+
+          await log.save();
+          return {
+            status: "success",
+            message: "Updated Question",
+          };
         });
-  
-        await log.save();
-        return {
-          status: "success",
-          message: "Updated Question",
-        };
-      });
     } catch (error) {
       throw new Error(error);
     }
@@ -329,7 +335,7 @@ const utilsResolvers = {
       if (!faq) {
         throw new Error("FAQ NOT found!!");
       }
-      
+
       faq.remove();
 
       const ipAddress = req.socket.remoteAddress;
@@ -350,61 +356,63 @@ const utilsResolvers = {
   // Privacy policy
   getPolicy: async () => await PrivacyPolicy.findOne(),
   updatePolicy: async (args, req) => {
-    return PrivacyPolicy.findOne().then((policy) => {
-      if (!policy) {
-        const policy = new PrivacyPolicy({
-          policy: args.policy,
+    return PrivacyPolicy.findOne()
+      .then((policy) => {
+        if (!policy) {
+          const policy = new PrivacyPolicy({
+            policy: args.policy,
+          });
+          policy.save();
+        } else {
+          policy.policy = args.policy;
+          policy.save();
+        }
+      })
+      .then(async () => {
+        const ipAddress = req.socket.remoteAddress;
+        const log = new AdminLog({
+          ip: ipAddress,
+          description: `Privacy Policy Updated`, //this will be changed to the authenticated user creating the logs
+          user: "652ea3242449fe35b70c4e9c",
         });
-        policy.save();
-      }else{
-      policy.policy = args.policy
-      policy.save();
-      }
-    })
-    .then(async () => {
-      const ipAddress = req.socket.remoteAddress;
-      const log = new AdminLog({
-        ip: ipAddress,
-        description: `Privacy Policy Updated`, //this will be changed to the authenticated user creating the logs
-        user: "652ea3242449fe35b70c4e9c",
-      });
 
-      await log.save();
-      return {
-        status: "success",
-        message: "Updated Policy",
-      };
-    });
+        await log.save();
+        return {
+          status: "success",
+          message: "Updated Policy",
+        };
+      });
   },
 
   // T&C
   getTerms: async () => await TermsConditions.findOne(),
   updateTerms: async (args, req) => {
-    return await TermsConditions.findOne().then((terms) => {
-      if (!terms) {
-        const policy = new PrivacyPolicy({
-          terms: args.terms,
+    return await TermsConditions.findOne()
+      .then((terms) => {
+        if (!terms) {
+          const policy = new PrivacyPolicy({
+            terms: args.terms,
+          });
+          terms.save();
+        } else {
+          terms.terms = args.terms;
+          terms.save();
+        }
+      })
+      .then(async () => {
+        const ipAddress = req.socket.remoteAddress;
+        const log = new AdminLog({
+          ip: ipAddress,
+          description: `Terms & Conditions Updated`, //this will be changed to the authenticated user creating the logs
+          user: "652ea3242449fe35b70c4e9c",
         });
-        terms.save();
-      }else{
-      terms.terms = args.terms
-      terms.save();
-      }
-    })
-    .then(async () => {
-      const ipAddress = req.socket.remoteAddress;
-      const log = new AdminLog({
-        ip: ipAddress,
-        description: `Terms & Conditions Updated`, //this will be changed to the authenticated user creating the logs
-        user: "652ea3242449fe35b70c4e9c",
-      });
 
-      await log.save();
-      return {
-        status: "success",
-        message: "Updated Terms & Conditions",
-      };
-    });
+        await log.save();
+        return {
+          status: "success",
+          message: "Updated Terms & Conditions",
+        };
+      });
   },
 };
 
