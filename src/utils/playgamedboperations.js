@@ -378,7 +378,7 @@ async function setAllNextRoundPlayersWithRoundId(nextMultiplier) {
     const db = await connectToDatabase();
 
     // Update all documents where bustpoint is <= bustboint
-    const result = await db.collection("playerbets").updateMany(
+    await db.collection("playerbets").updateMany(
       { played: 0, roundid: nextMultiplier._id }, // Filter criteria
       { $set: { roundid: nextMultiplier._id, played: 1 } } // Update operation
     );
@@ -387,13 +387,13 @@ async function setAllNextRoundPlayersWithRoundId(nextMultiplier) {
     //   { roundid: nextMultiplier._id }, // Filter criteria
     //   { $set: { played: 1 } } // Update operation
     // );
-    if (result.modifiedCount > 0) {
-      // Fetch the updated documents if needed
-      return true;
-    } else {
-      // console.log("No winners found.");
-      return false;
-    }
+    // if (result.modifiedCount > 0) {
+    // Fetch the updated documents if needed
+    return true;
+    // } else {
+    //   // console.log("No winners found.");
+    //   return false;
+    // }
   } catch (error) {
     console.error("Error checking bets:", error);
     throw error; // Rethrow the error to handle it at a higher level if needed
