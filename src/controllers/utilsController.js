@@ -63,18 +63,18 @@ const utilsResolvers = {
   },
 
   generateOtp: async (args, req) => {
-    // const user = await Player.findOne({ username: args.username });
+    const player = await Player.findOne({ username: args.username });
 
     const phone = formatKenyanPhoneNumber(args.phone);
 
-    console.log(args);
+    // console.log(args);
     // const player = Player.findOne({
     //   $or: [{ username: args.username }, { phone: phone }],
     // });
 
-    const player = Player.findOne({
-      $or: [{ username: args.username }, { phone: phone }],
-    });
+    // const player = Player.findOne({
+    //   $or: [{ username: args.username }, { phone: phone }],
+    // });
 
     if (player) {
       throw new Error("Player already exists!!!");

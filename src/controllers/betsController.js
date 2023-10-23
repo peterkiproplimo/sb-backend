@@ -39,14 +39,6 @@ const betsResolvers = {
       // Check if player has bonus then deduct the bonus
       // Subtract the player account balance
 
-      // account.balance =
-      //   parseFloat(account?.balance) -
-      //   parseFloat(args.playerbetInput.betAmount);
-      // account.totalbetamount =
-      //   parseFloat(account?.totalbetamount) +
-      //   parseFloat(args.playerbetInput.betAmount);
-      // await account.save();
-
       //  Add the house balance
       const houseAccount = await Account.findById("6523f69762c8841fb3313ade");
       houseAccount.balance =
@@ -138,10 +130,10 @@ const betsResolvers = {
       // Create a query object based on search and filter criteria
       const query = {};
       if (args.username != "") {
-        query.username = new RegExp(args.username, 'i'); // Case-insensitive search
+        query.username = new RegExp(args.username, "i"); // Case-insensitive search
       }
       if (args.active != "") {
-        query.active = args.active == "0"? true: false;
+        query.active = args.active == "0" ? true : false;
       }
 
       // pagination
@@ -157,13 +149,16 @@ const betsResolvers = {
       const totalPages = Math.ceil(totalItems / itemsPerPage);
 
       // Fetch players from your data source (e.g., MongoDB)
-      const players = await Player.find(query).skip(skip).limit(limit)/*.populate("account").populate("bets")*/.sort({ createdAt: -1 });
-      return{
+      const players = await Player.find(query)
+        .skip(skip)
+        .limit(limit) /*.populate("account").populate("bets")*/
+        .sort({ createdAt: -1 });
+      return {
         players: players,
         current_page: pageNumber,
         total_pages: totalPages,
         total: totalItems,
-        per_page: itemsPerPage
+        per_page: itemsPerPage,
       };
     } catch (error) {
       throw new Error("Error fetching players: " + error.message);
@@ -442,10 +437,11 @@ const betsResolvers = {
     const ipAddress = req.socket.remoteAddress;
     const log = new Logs({
       ip: ipAddress,
-      description: `User ${args.betInput.win ? "won " : "lost"} ${args.betInput.win
+      description: `User ${args.betInput.win ? "won " : "lost"} ${
+        args.betInput.win
           ? parseFloat(+args.betInput.amount).toFixed(2)
           : parseFloat(+args.betInput.betAmount).toFixed(2)
-        }`,
+      }`,
       user: args.betInput.user,
       round: args.betInput.round,
       won: args.betInput.win,
