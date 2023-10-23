@@ -570,25 +570,25 @@ const adminResolvers = {
 
   /// Suspending a player from the system
 
-  suspendPlayer: async (args, req) => {
-    let filter = { username: args.username };
-    let update = { active: false };
-    const user = await Admin.findOneAndUpdate(filter, update);
-    const ipAddress = req.socket.remoteAddress;
-    const log = new AdminLog({
-      ip: ipAddress,
-      description: `${args.initiator} suspended ${user.username}`,
-      user: user.id,
-    });
+  // suspendPlayer: async (args, req) => {
+  //   let filter = { username: args.username };
+  //   let update = { active: false };
+  //   const user = await Admin.findOneAndUpdate(filter, update);
+  //   const ipAddress = req.socket.remoteAddress;
+  //   const log = new AdminLog({
+  //     ip: ipAddress,
+  //     description: `${args.initiator} suspended ${user.username}`,
+  //     user: user.id,
+  //   });
 
-    await log.save();
-    return {
-      ...user._doc,
-      _id: user.id,
-      createdAt: new Date(user._doc.createdAt).toISOString(),
-      updatedAt: new Date(user._doc.updatedAt).toISOString(),
-    };
-  },
+  //   await log.save();
+  //   return {
+  //     ...user._doc,
+  //     _id: user.id,
+  //     createdAt: new Date(user._doc.createdAt).toISOString(),
+  //     updatedAt: new Date(user._doc.updatedAt).toISOString(),
+  //   };
+  // },
 
   // Suspend an account
 

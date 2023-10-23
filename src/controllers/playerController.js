@@ -320,31 +320,38 @@ const playerResolvers = {
         }
       })
   },
-  // suspendPlayer: (args, req) => {
-  //   return User.findById(args.userId)
-  //     .then((user) => {
-  //       if (!user) {
-  //         throw new Error("User NOT found!!");
-  //       }
-  //       user.status = false
-  //       return user.save();
-  //     })
-  //     .then(async (result) => {
-  //       console.log(123);
-  //       const ipAddress = req.socket.remoteAddress;
-  //       const log = new AdminLog({
-  //         ip: ipAddress,
-  //         description: `Deleted a user ${args.username}`, //this will be changed to the authenticated user creating the logs
-  //         user: result.id,
-  //       });
+  suspendPlayer: (args, req) => {
+    if (!req.isAuth) {
+      throw new Error("Unauthenticated");
+    }
+    var name;
+    var message;
+    return Player.findById(args.playerId)
+      .then((player) => {
+        if (!player) {
+          throw new Error("Player NOT found!!");
+        }
+        name = player.username
+        message = player.active? `Suspended player ${name}`: `Activated player ${name}`
+        player.active = !player.active
+        return player.save();
+      })
+      .then(async (result) => {
+        console.log(123);
+        const ipAddress = req.socket.remoteAddress;
+        const log = new AdminLog({
+          ip: ipAddress,
+          description: message, //this will be changed to the authenticated user creating the logs
+          user: req.user,
+        });
 
-  //       await log.save();
-  //       return {
-  //         status: "success",
-  //         message: `Deleted user ${args.username}`,
-  //       };
-  //     });
-  // },
+        await log.save();
+        return {
+          status: "success",
+          message: message,
+        };
+      });
+  },
   // activatePlayer: (args, req) => {
   //   return User.findById(args.userId)
   //     .then((user) => {

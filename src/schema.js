@@ -469,6 +469,14 @@ type Terms {
   terms: String
 }
 
+type PlayersData{
+  players: [Player]!,
+  current_page: Int,
+  total_pages: Int,
+  total: Int,
+  per_page: Int
+}
+
 
 
 type RootQuery{
@@ -525,7 +533,7 @@ type RootQuery{
   accountBalanceUpdate(userId:String!, amount:String!):Account
   transactionDetails(trans_id:String!):Account
   calculateBalance:AccountBalance
-  getAllPlayers: [Player]!
+  getAllPlayers(username: String, active: String, page: Int, per_page: Int): PlayersData!
   Dashboard: DashboardData
 
   
@@ -554,7 +562,7 @@ type RootMutation{
   transactionStatus(reference:String!):Transaction
   depositTest(phone:String!, amount:Float!, userId:String!):Account
   depositManual(phone:String!, userId:String!):Account
-  suspendPlayer(username:String,initiator:String!):User!
+  
   activatePlayer(username:String,initiator:String!):User!
   changeType(username:String, type:String, initiator:String!):Admin!
   changeAdminPassword(username:String, password:String,initiator:String!):User!
@@ -566,6 +574,7 @@ type RootMutation{
   createChat(chatInput: ChatInput!): Chat!
   logoutPlayer(username:String!):Player!
 
+  suspendPlayer(playerId:String!):Response!
 
   adminLogin(username: String!, password: String!): adminAuthData!
   createUser(userInput: CreateUserInput): User!
@@ -575,7 +584,7 @@ type RootMutation{
   suspendUser(userId: String!): Response!
   activateUser(userId: String!): Response!
 
-  updateBalance(accountId: String!, amount: Float): Account!
+  updateBalance(accountId: String!, amount: Float): Response!
   restoreAccount(accountId: String!): Response!
   suspendAccount(accountId: String!): Response!
 
