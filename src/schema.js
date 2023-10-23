@@ -185,7 +185,7 @@ token: String
 type:String
 username:String!
 online:Boolean
-phone:String!
+phone:String
 dataToken:String
 tokenExpiration: Int
 otp:String
