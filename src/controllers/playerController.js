@@ -38,8 +38,8 @@ const playerResolvers = {
         if (
           !otp ||
           parseInt(new Date().toISOString().split("T")[1].substr(3, 2)) -
-          parseInt(otp.createdAt.toISOString().split("T")[1].substr(3, 2)) >
-          10
+            parseInt(otp.createdAt.toISOString().split("T")[1].substr(3, 2)) >
+            10
         ) {
           throw new Error("Invalid OTP!!!");
         }
@@ -248,7 +248,7 @@ const playerResolvers = {
   changePassword: async (args, req) => {
     const user = await Player.findOne({ username: args.username });
     if (!user) {
-      throw new Error("User does'nt exist.");
+      throw new Error("Player does'nt exist.");
     }
 
     const otp = await OTP.findOne({
@@ -262,8 +262,8 @@ const playerResolvers = {
     if (
       !otp ||
       parseInt(new Date().toISOString().split("T")[1].substr(3, 2)) -
-      parseInt(otp.createdAt.toISOString().split("T")[1].substr(3, 2)) >
-      10
+        parseInt(otp.createdAt.toISOString().split("T")[1].substr(3, 2)) >
+        10
     ) {
       throw new Error("Invalid OTP!!!");
     } else {
@@ -298,27 +298,30 @@ const playerResolvers = {
     }
   },
 
-
   // bY Machina
-  getSinglePlayer: async (args, req) => {    
+  getSinglePlayer: async (args, req) => {
     return await Player.findById(args.playerId)
       .then(async (player) => {
-        
         if (!player) {
           throw new Error("User NOT found!!");
         }
         const account = await Account.findOne({ user: player.id });
-        return {account, player}
-      }).then(async (result) => {
-        const bets = await PlayerBet.find({ userId: result.player.id }).sort({ createdAt: -1 });
-        const transactions = await Transactions.find({ user: result.player.id }).sort({ createdAt: -1 });
+        return { account, player };
+      })
+      .then(async (result) => {
+        const bets = await PlayerBet.find({ userId: result.player.id }).sort({
+          createdAt: -1,
+        });
+        const transactions = await Transactions.find({
+          user: result.player.id,
+        }).sort({ createdAt: -1 });
         return {
           player: result.player,
           account: result.account,
           transactions,
           bets,
-        }
-      })
+        };
+      });
   },
   suspendPlayer: (args, req) => {
     if (!req.isAuth) {
@@ -331,9 +334,11 @@ const playerResolvers = {
         if (!player) {
           throw new Error("Player NOT found!!");
         }
-        name = player.username
-        message = player.active? `Suspended player ${name}`: `Activated player ${name}`
-        player.active = !player.active
+        name = player.username;
+        message = player.active
+          ? `Suspended player ${name}`
+          : `Activated player ${name}`;
+        player.active = !player.active;
         return player.save();
       })
       .then(async (result) => {

@@ -7,12 +7,7 @@ const Account = require("../models/Account");
 const History = require("../models/history");
 const BetTransaction = require("../models/BetTransactions");
 
-const {
-  generateFakePlayers,
-  generateFakePlayersAndBets,
-  getFakePlayers,
-  setFakePlayers,
-} = require("../utils/fakePlayerUtils");
+const { getFakePlayers, setFakePlayers } = require("../utils/fakePlayerUtils");
 
 async function checkBetsForWinsAndLosses(multipliers, gamestatus, multvalue) {
   try {

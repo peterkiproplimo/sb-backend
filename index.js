@@ -418,6 +418,10 @@ setInterval(async () => {
   const livechat = await getLiveChat();
 
   io.emit("livechat", livechat);
+
+  // Send online players/ playing players
+
+  const liveplayers = await getLiveOrOnlinePlayers();
 }, 300);
 
 module.exports = { io };

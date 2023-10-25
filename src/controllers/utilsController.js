@@ -76,9 +76,9 @@ const utilsResolvers = {
     //   $or: [{ username: args.username }, { phone: phone }],
     // });
 
-    if (player) {
-      throw new Error("Player already exists!!!");
-    }
+    // if (player) {
+    //   throw new Error("Player already exists!!!");
+    // }
 
     console.log("This is my phone number", args.phone);
     const otp = otpGenerator.generate(5, {
