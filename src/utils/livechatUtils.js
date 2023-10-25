@@ -28,9 +28,9 @@ async function fetchPlayersData() {
   };
   const todayUserCount = Logs.countDocuments(criteria, (err, count) => {
     if (err) {
-      console.error("Error counting logs:", err);
+      // console.error("Error counting logs:", err);
     } else {
-      console.log("Count of login logs today:", count);
+      // console.log("Count of login logs today:", count);
     }
   });
 

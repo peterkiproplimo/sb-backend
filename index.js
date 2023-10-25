@@ -428,7 +428,7 @@ setInterval(async () => {
 
   const liveplayers = await fetchPlayersData();
 
-  io.emit("onlineorplaying", livechat);
+  io.emit("onlineorplaying", liveplayers);
 }, 300);
 
 module.exports = { io };
