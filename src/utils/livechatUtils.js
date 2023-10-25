@@ -14,6 +14,30 @@ async function getLiveChat() {
   return chatsWithDetails;
 }
 
+async function fetchPlayersData() {
+  const playerCount = await Player.countDocuments();
+  // const onlineUserCount = await Player.countDocuments({ online: true });
+  const today = new Date();
+  // Set the time to midnight (00:00:00)
+  today.setHours(0, 0, 0, 0);
+
+  // Define the criteria for the query
+  const criteria = {
+    action: "login",
+    createdAt: { $gte: today },
+  };
+  const todayUserCount = Logs.countDocuments(criteria, (err, count) => {
+    if (err) {
+      console.error("Error counting logs:", err);
+    } else {
+      console.log("Count of login logs today:", count);
+    }
+  });
+
+  return { playing: playerCount, onlineToday: todayUserCount }; // Replace with actual data
+}
+
 module.exports = {
   getLiveChat,
+  fetchPlayersData,
 };

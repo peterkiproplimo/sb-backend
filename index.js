@@ -35,7 +35,7 @@ const {
   setMultipliers,
 } = require("./src/utils/gameroundUtils");
 
-const { getLiveChat } = require("./src/utils/livechatUtils");
+const { getLiveChat, fetchPlayersData } = require("./src/utils/livechatUtils");
 const {
   generateFakePlayersAndBets,
   setFakePlayers,
@@ -426,7 +426,9 @@ setInterval(async () => {
 
   // Send online players/ playing players
 
-  // const liveplayers = await getLiveOrOnlinePlayers();
+  const liveplayers = await fetchPlayersData();
+
+  io.emit("onlineorplaying", livechat);
 }, 300);
 
 module.exports = { io };
