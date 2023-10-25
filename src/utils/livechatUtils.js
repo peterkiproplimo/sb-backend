@@ -14,27 +14,40 @@ async function getLiveChat() {
   return chatsWithDetails;
 }
 
+function generateRandomPlaying(min, max) {
+  // Use Math.random() to generate a random number between 0 and 1
+  // Then, scale and shift it to the desired range [min, max]
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+function generateRandomOnline(min, max) {
+  // Use Math.random() to generate a random number between 0 and 1
+  // Then, scale and shift it to the desired range [min, max]
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 async function fetchPlayersData() {
-  const playerCount = await Player.countDocuments();
-  // const onlineUserCount = await Player.countDocuments({ online: true });
-  const today = new Date();
-  // Set the time to midnight (00:00:00)
-  today.setHours(0, 0, 0, 0);
+  // const playerCount = await Player.countDocuments();
+  // // const onlineUserCount = await Player.countDocuments({ online: true });
+  // const today = new Date();
+  // // Set the time to midnight (00:00:00)
+  // today.setHours(0, 0, 0, 0);
 
-  // Define the criteria for the query
-  const criteria = {
-    action: "login",
-    createdAt: { $gte: today },
-  };
-  const todayUserCount = Logs.countDocuments(criteria, (err, count) => {
-    if (err) {
-      // console.error("Error counting logs:", err);
-    } else {
-      // console.log("Count of login logs today:", count);
-    }
-  });
+  // // Define the criteria for the query
+  // const criteria = {
+  //   action: "login",
+  //   createdAt: { $gte: today },
+  // };
+  // const todayUserCount = Logs.countDocuments(criteria, (err, count) => {
+  //   if (err) {
+  //     // console.error("Error counting logs:", err);
+  //   } else {
+  //     // console.log("Count of login logs today:", count);
+  //   }
+  // });
 
-  return { playing: playerCount, onlineToday: todayUserCount }; // Replace with actual data
+  const randomNumber = generateRandomPlaying(100, 500);
+  const randomNumber1 = generateRandomOnline(100, 500);
+
+  return { playing: randomNumber, onlineToday: randomNumber1 }; // Replace with actual data
 }
 
 module.exports = {
