@@ -427,6 +427,7 @@ setInterval(async () => {
   // Send online players/ playing players
 
   const onlineorplaying = await fetchPlayersData();
+  console.log("check", onlineorplaying);
 
   io.emit("onlineorplaying", onlineorplaying);
 }, 300);
