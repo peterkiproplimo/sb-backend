@@ -1,7 +1,1 @@
-const root= {
- 
-
-
-
-  }
-  
+const root = {};

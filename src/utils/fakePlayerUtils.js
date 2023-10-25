@@ -1,5 +1,42 @@
 const { faker } = require("@faker-js/faker");
+const Player = require("../models/Player");
+const fs = require("fs");
+const kenyannames = require("./keyannames.json");
 
+function saveFakePlayers() {
+  // const usernamesData = JSON.parse(kenyannames);
+
+  kenyannames.forEach((username) => {
+    const fakePlayerData = {
+      type: "fake",
+      username,
+      password: faker.internet.password(),
+      phone: generatePhoneNumber(),
+      otp: "QWVK4",
+      // Add other fields from the generateFakePlayers function as needed
+    };
+
+    const player = new Player(fakePlayerData);
+
+    player.save((err, savedPlayer) => {
+      if (err) {
+        console.error(`Error saving player ${username}: ${err}`);
+      } else {
+        console.log(`Player ${savedPlayer.username} saved to the database.`);
+      }
+    });
+  });
+}
+
+function deletePlayersByUsernames(usernames) {
+  Player.deleteMany({ username: { $in: usernames } }, (err) => {
+    if (err) {
+      console.error(`Error deleting players: ${err}`);
+    } else {
+      console.log("Players deleted successfully.");
+    }
+  });
+}
 let fakePlayers = [];
 function generatePhoneNumber() {
   // Generates a random 10-digit phone number
@@ -30,8 +67,70 @@ function generateFakePlayers(numPlayers) {
   return fakePlayers;
 }
 
+function generateFakePlayersAndBets(kenyannames) {
+  const fakePlayersAndBets = [];
+
+  const maxUsernameLength = 10;
+
+  for (const username of kenyannames) {
+    // Trim the username to the desired length
+    const trimmedUsername = username.substr(0, maxUsernameLength);
+
+    const fakePlayer = {
+      type: "regular",
+      username: trimmedUsername,
+      active: true,
+      phone: generatePhoneNumber(),
+      online: false,
+      password: faker.internet.password(),
+      dataToken: faker.random.uuid(),
+      label: faker.random.number({ min: 1, max: 10 }).toString(),
+      firstDeposit: parseFloat(faker.finance.amount(0, 1000, 2)),
+      createdAt: faker.date.past({ years: 1 }),
+      updatedAt: faker.date.recent(),
+    };
+
+    const fakebetAmount = parseFloat(faker.finance.amount(1, 1000, 2));
+    const fakePoint = parseFloat(faker.finance.amount(1, 20, 2));
+    const fakePossibleWin = parseFloat((fakebetAmount * fakePoint).toFixed(2));
+
+    const fakeBet = {
+      win: false,
+      busted: true,
+      _id: faker.random.uuid(),
+      betAmount: fakebetAmount,
+      point: fakePoint,
+      userId: {
+        playerbets: [],
+        _id: faker.random.uuid(),
+        type: "regular",
+        username: fakePlayer.username,
+        active: true,
+        phone: fakePlayer.phone,
+        online: fakePlayer.online,
+        password: fakePlayer.password,
+        dataToken: fakePlayer.dataToken,
+        label: fakePlayer.label,
+        firstDeposit: fakePlayer.firstDeposit,
+        createdAt: fakePlayer.createdAt,
+        updatedAt: fakePlayer.updatedAt,
+        __v: 0,
+      },
+      round: faker.random.uuid(),
+      possibleWin: fakePossibleWin,
+      createdAt: faker.date.past({ years: 1 }),
+      updatedAt: faker.date.recent(),
+      __v: 0,
+    };
+
+    fakePlayersAndBets.push({ ...fakeBet });
+  }
+
+  return fakePlayersAndBets;
+}
+
 // Function to generate fake players and bets
-function generateFakePlayersAndBets(numPlayers) {
+function generateFakePlayersAndBetsBackub(numPlayers) {
   const fakePlayersAndBets = [];
 
   const maxUsernameLength = 10;
@@ -107,4 +206,6 @@ module.exports = {
   generateFakePlayersAndBets,
   getFakePlayers,
   setFakePlayers,
+  saveFakePlayers,
+  deletePlayersByUsernames,
 };

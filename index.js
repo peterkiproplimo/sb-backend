@@ -40,6 +40,8 @@ const {
   generateFakePlayersAndBets,
   setFakePlayers,
   getFakePlayers,
+  saveFakePlayers,
+  deletePlayersByUsernames,
 } = require("./src/utils/fakePlayerUtils");
 const {
   checkBetsForWinsAndLosses,
@@ -291,7 +293,10 @@ async function runMultiplierTimer(multiplier) {
 
       // Generate fake players for the next round
       const numPlayersToGenerate = 20;
-      const fakePlayers = generateFakePlayersAndBets(numPlayersToGenerate);
+      const kenyannames = require("./src/utils/keyannames.json");
+      // const fakePlayersAndBets = generateFakePlayersAndBets(kenyannames);
+
+      const fakePlayers = generateFakePlayersAndBets(kenyannames);
       setFakePlayers(fakePlayers);
 
       setTimeout(async () => {
@@ -367,8 +372,8 @@ async function startGame() {
 
 server.listen(3002, async () => {
   await connectToDatabase();
-  await startGame();
-  getMultiplierValue();
+  // await startGame();
+  // getMultiplierValue();
 
   console.log(`listening on 3002`);
 });
@@ -421,7 +426,7 @@ setInterval(async () => {
 
   // Send online players/ playing players
 
-  const liveplayers = await getLiveOrOnlinePlayers();
+  // const liveplayers = await getLiveOrOnlinePlayers();
 }, 300);
 
 module.exports = { io };
