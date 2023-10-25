@@ -1,6 +1,6 @@
 const Chat = require("../models/Chat");
 const Player = require("../models/Player");
-
+const Logs = require("../models/logs");
 async function getLiveChat() {
   const latestChats = await Chat.find({})
     .sort({ createdAt: -1 }) // Sort by createdAt in descending order (most recent first)
