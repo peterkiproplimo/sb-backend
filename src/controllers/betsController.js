@@ -29,11 +29,12 @@ const betsResolvers = {
         user: args.playerbetInput.userId,
       });
       if (+account.balance < 0) {
-        throw new Error("Insufficient account account balance");
+        throw new Error("Insufficient account balance");
       }
       if (account.balance < parseFloat(args.playerbetInput.betAmount)) {
-        throw new Error("Insufficient account account balance");
+        throw new Error("Insufficient account balance");
       }
+
       await handleKaribuBonusAndBalance(account, args);
       // Check if player has bonus then deduct the bonus
       // Subtract the player account balance

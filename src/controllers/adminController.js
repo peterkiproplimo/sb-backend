@@ -194,6 +194,7 @@ async function fetchWalletsTotalData() {
   });
   return { grandTotal: totalmoney }; // Replace with actual data
 }
+
 async function fetchHouseWinsData() {
   const today = new Date();
   let mytotalmoney = 0;

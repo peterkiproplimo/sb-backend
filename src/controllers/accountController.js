@@ -6,7 +6,72 @@ const Bet = require("../models/Bet");
 const Transaction = require("../models/transactions");
 const Logs = require("../models/logs");
 const Player = require("../models/Player");
+const Playerbet = require("../models/PlayerBet");
 
+async function fetchTotalWinsForPlayer(playerId) {
+  let totalWins = 0;
+
+  // Define the criteria for the query to filter records for the specified player and wins
+  const criteria = {
+    win: true, // Filter for wins only
+    userId: playerId, // Filter for the specified player
+  };
+
+  const pipeline = [
+    { $match: criteria },
+    {
+      $group: {
+        _id: null,
+        totalWins: { $sum: 1 }, // Count the number of wins
+      },
+    },
+  ];
+
+  // Use Mongoose's aggregation framework to calculate the total wins
+  await Playerbet.aggregate(pipeline, (err, result) => {
+    if (err) {
+      console.error("Error calculating total wins:", err);
+    } else {
+      totalWins = result.length > 0 ? result[0].totalWins : 0;
+      console.log("Total wins for the player:", totalWins);
+    }
+  });
+
+  // Return the total wins for the player
+  return totalWins;
+}
+async function fetchTotalLosesForPlayer(playerId) {
+  let totalLoses = 0;
+
+  // Define the criteria for the query to filter records for the specified player and wins
+  const criteria = {
+    win: false, // Filter for wins only
+    userId: playerId, // Filter for the specified player
+  };
+
+  const pipeline = [
+    { $match: criteria },
+    {
+      $group: {
+        _id: null,
+        totalWins: { $sum: 1 }, // Count the number of wins
+      },
+    },
+  ];
+
+  // Use Mongoose's aggregation framework to calculate the total wins
+  await Playerbet.aggregate(pipeline, (err, result) => {
+    if (err) {
+      console.error("Error calculating total wins:", err);
+    } else {
+      totalLoses = result.length > 0 ? result[0].totalWins : 0;
+      console.log("Total wins for the player:", totalLoses);
+    }
+  });
+
+  // Return the total wins for the player
+  return totalLoses;
+}
 const accountResolvers = {
   calculateBalance: async (args, req) => {
     const trans = await Transaction.find({ type: "Deposit" }).sort({
@@ -177,6 +242,30 @@ const accountResolvers = {
     };
   },
 
+  accountSummary: async (args, req) => {
+    const account = await Account.findOne({ user: args.userId });
+    const user = await Player.findById(args.userId);
+
+    const loses = await fetchTotalLosesForPlayer(args.userId);
+    const wins = await fetchTotalWinsForPlayer(args.userId);
+
+    return {
+      _id: account?.id,
+      balance: account?.balance,
+      karibubonus: account?.karibubonus,
+      totalbalance:
+        parseFloat(account?.balance) + parseFloat(account?.karibubonus),
+      user: user,
+      winnings: wins,
+      loses: loses,
+      deposits: 0,
+      withdrawals: 0,
+      createdAt: new Date(account?._doc?.createdAt).toISOString(),
+      updatedAt: new Date(account?._doc?.updatedAt).toISOString(),
+      active: account?.active,
+    };
+  },
+
   //    Save a particular user's transaction
 
   createTransaction: async (args, req) => {
@@ -206,32 +295,39 @@ const accountResolvers = {
 
   /* admin accounts tab methods start here*/
   // get all the accounts in descending order default to page1 and 15 records per page
-  getAccounts: async ({page=1, limit=25}) => await Account.find().sort({ createdAt: -1 }).skip((page-1)*limit).limit(limit).populate("user"),
-  updateBalance: (args, req) =>{
+  getAccounts: async ({ page = 1, limit = 25 }) =>
+    await Account.find()
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .populate("user"),
+  updateBalance: (args, req) => {
     if (!req.isAuth) {
       throw new Error("Unauthenticated");
     }
     try {
-       return Account.findById(args.accountId).populate("user").then(async (account)=>{
-        if (!account) {
-          throw new Error("Account not found");
-      }
-      // account.balance = parseFloat(account.balance) + args.amount     //uncomment if balance update is by addition 
-      account.balance = parseFloat(args.amount) //this get the new updated balance
-        await account.save()
-        const ipAddress = req.socket.remoteAddress;
-        const log = new Logs({
-          ip: ipAddress,
-          description: `${account.user.username} balance updated to ${account.balance}`,
-          user: req.user._id,
+      return Account.findById(args.accountId)
+        .populate("user")
+        .then(async (account) => {
+          if (!account) {
+            throw new Error("Account not found");
+          }
+          // account.balance = parseFloat(account.balance) + args.amount     //uncomment if balance update is by addition
+          account.balance = parseFloat(args.amount); //this get the new updated balance
+          await account.save();
+          const ipAddress = req.socket.remoteAddress;
+          const log = new Logs({
+            ip: ipAddress,
+            description: `${account.user.username} balance updated to ${account.balance}`,
+            user: req.user._id,
+          });
+
+          log.save();
+          return {
+            status: "success",
+            message: `${account.user.username} balance updated to ${account.balance}`,
+          };
         });
-    
-      log.save();
-      return {
-        status: "success",
-        message: `${account.user.username} balance updated to ${account.balance}`,
-      };
-      })
     } catch (error) {
       throw new Error("Balance update failed, Please try again later");
     }

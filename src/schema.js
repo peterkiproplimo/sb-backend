@@ -108,6 +108,10 @@ totalbalance:Float
 active:Boolean!
 user:Player
 phone:String
+deposits:Float
+withdrawals:Float
+winnings:Float
+loses:Float
 createdAt:String!
 updatedAt:String!
 }
@@ -487,6 +491,7 @@ type RootQuery{
   login(loginInput:LoginInput): AuthData!
   adminLogin(loginInput:LoginInput): AuthData!
   accountBalance(userId:String):Account!
+  accountSummary(userId:String):Account!
   transactions(userId:String):[Transaction!]!
   bets(userId:String):[Bet!]!
   historyBets(userId:String):[Playerbet!]!
