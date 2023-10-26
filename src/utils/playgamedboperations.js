@@ -6,12 +6,11 @@ const { ObjectId } = require("mongodb");
 const Account = require("../models/Account");
 const History = require("../models/history");
 const BetTransaction = require("../models/BetTransactions");
-
+const Game = require("../models/Game");
 const { getFakePlayers, setFakePlayers } = require("../utils/fakePlayerUtils");
 
 async function checkBetsForWinsAndLosses(multipliers, gamestatus, multvalue) {
   try {
-    await connectToDatabase();
     // Fetch all player bets from the "Playerbets" collection
     // const bets = await db.collection("playerbets").find().toArray();
     const bets = await Playerbet.find({
@@ -65,9 +64,8 @@ async function checkBetsForWinsAndLosses(multipliers, gamestatus, multvalue) {
 
 async function getPlayersWaitingForNextRound(gamestatus, multvalue) {
   try {
-    await connectToDatabase();
     // Fetch all player bets from the "Playerbets" collection
-    // const bets = await db.collection("playerbets").find().toArray();
+
     const bets = await Playerbet.find({ played: 0, completed: 0 });
 
     // Use populate to include player details for each bet
@@ -115,7 +113,6 @@ async function getPlayersWaitingForNextRound(gamestatus, multvalue) {
 
 async function getEndResults(nextMultiplier, gamestatus) {
   try {
-    await connectToDatabase();
     // Fetch all player bets from the "Playerbets" collection
     const bets = await Playerbet.find({
       roundid: nextMultiplier._id,
@@ -210,13 +207,32 @@ async function setGameHasBeenPlayed(multiplier) {
       { $set: { played: 1 } }
     );
 
-    historybets = await createHistory(multiplier);
-    return historybets;
+    // historybets = await createHistory(multiplier);
+    // return historybets;
   } catch (error) {
     console.error("Error updating played field:", error);
   }
 }
+async function createHistory(multiplier) {
+  const history = new History({
+    hash: multiplier.seedeed,
+    point: multiplier.bustpoint,
+    round: multiplier._id,
+  });
+  await history.save();
 
+  const historybets = await History.find().sort({ createdAt: -1 }).limit(10);
+  // console.log(historybets);
+  return historybets;
+}
+
+async function getHistory(multiplier) {
+  const historybets = await Game.find({ played: 1 })
+    .sort({ createdAt: -1 })
+    .limit(10);
+  // console.log(historybets);
+  return historybets;
+}
 // Get the next round from the database
 async function getRoundFromDatabase() {
   const { db } = await connectToDatabase();
@@ -265,7 +281,7 @@ async function getCurrentRoundFromDatabase() {
 
 //  Save the next round
 async function saveNextRoundID(randomID) {
-  const { client, db } = await connectToDatabase();
+  const { db } = await connectToDatabase();
   const collection = db.collection("rounds");
 
   const filter = { _id: ObjectId("650c09f928c9ea52fe0460eb") };
@@ -281,7 +297,7 @@ async function saveNextRoundID(randomID) {
 
 // Save the current round
 async function setSavedNextRoundAsCurrentRound(currentRound) {
-  const { client, db } = await connectToDatabase();
+  const { db } = await connectToDatabase();
   const collection = db.collection("rounds");
 
   const filter = { _id: ObjectId("650c14608d91665b395e22f9") };
@@ -311,26 +327,11 @@ async function updateMultiplierSetRoundId(multiplier, gameround) {
   }
 }
 
-async function createHistory(multiplier) {
-  const history = new History({
-    hash: multiplier.seedeed,
-    point: multiplier.bustpoint,
-    round: multiplier._id,
-  });
-  await history.save();
-
-  const historybets = await History.find().sort({ createdAt: -1 }).limit(10);
-  // console.log(historybets);
-  return historybets;
-}
-
 //  Update winners as the multiplier continues
 async function setWinners(bustboint, multipliers) {
   try {
-    const db = await connectToDatabase();
-
     // Update all documents where bustpoint is <= bustboint
-    const result = await db.collection("playerbets").updateMany(
+    const result = await Playerbet.updateMany(
       { point: { $lte: bustboint }, roundid: multipliers._id }, // Filter criteria
       { $set: { win: true } } // Update operation
     );
@@ -355,7 +356,7 @@ async function setWinners(bustboint, multipliers) {
     if (result.modifiedCount > 0) {
       // Fetch the updated documents if needed
 
-      const winners = await db.collection("playerbets").find().toArray();
+      const winners = await Playerbet.find().toArray();
 
       return winners;
     } else {
@@ -370,10 +371,10 @@ async function setWinners(bustboint, multipliers) {
 
 async function setAllNextRoundPlayersWithRoundId(nextMultiplier) {
   try {
-    const db = await connectToDatabase();
+    // const db = await connectToDatabase();
 
     // Update all documents where bustpoint is <= bustboint
-    const result = await db.collection("playerbets").updateMany(
+    await Playerbet.updateMany(
       { played: 0 }, // Filter criteria
       { $set: { roundid: nextMultiplier._id, played: 1 } } // Update operation
     );
@@ -408,4 +409,5 @@ module.exports = {
   createHistory,
   setAllNextRoundPlayersWithRoundId,
   getPlayersWaitingForNextRound,
+  getHistory,
 };

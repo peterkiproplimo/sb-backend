@@ -50,6 +50,7 @@ const {
   getEndResults,
   setAllNextRoundPlayersWithRoundId,
   getPlayersWaitingForNextRound,
+  getHistory,
 } = require("./src/utils/playgamedboperations");
 
 const { updatePlayerAc } = require("./src/utils/playerAccountHandler");
@@ -283,18 +284,17 @@ async function runMultiplierTimer(multiplier) {
       setemitNextRound(false);
 
       // Update winners/ losers
+      console.log("Get end Results");
       const playerBets = await getEndResults(multiplier, "endresults");
 
       io.emit("livedata", playerBets);
 
-      const historybets = await setGameHasBeenPlayed(multiplier);
-
-      io.emit("historybets", historybets);
+      console.log("Update game has been played");
+      await setGameHasBeenPlayed(multiplier);
 
       // Generate fake players for the next round
-      const numPlayersToGenerate = 20;
+
       const kenyannames = require("./src/utils/keyannames.json");
-      // const fakePlayersAndBets = generateFakePlayersAndBets(kenyannames);
 
       const fakePlayers = generateFakePlayersAndBets(kenyannames);
       setFakePlayers(fakePlayers);
@@ -345,13 +345,14 @@ async function waitCount() {
       const nextMultiplier = await getNextMultiplier();
 
       if (nextMultiplier) {
+        console.log("Update players");
         // Update all the players with the curent game id
-        const setro = await setAllNextRoundPlayersWithRoundId(nextMultiplier);
+        // const setro = await setAllNextRoundPlayersWithRoundId(nextMultiplier);
         // Start the timer with the next multiplier
 
-        if (setro) {
-          await runMultiplierTimer(nextMultiplier);
-        }
+        // if (setro) {
+        await runMultiplierTimer(nextMultiplier);
+        // }
         // else {
         //   await runMultiplierTimer(nextMultiplier);
         // }
@@ -422,20 +423,25 @@ setInterval(async () => {
   //  Function to perform the live chat
 }, 1500);
 
-setInterval(async () => {
-  // Send online players/ playing players
+//  Get online / playing players
+// setInterval(async () => {
+//   const onlineorplaying = await fetchPlayersData();
 
-  const onlineorplaying = await fetchPlayersData();
-  // console.log("check", onlineorplaying);
+//   io.emit("onlineorplaying", onlineorplaying);
+// }, 5000);
 
-  io.emit("onlineorplaying", onlineorplaying);
-}, 5000);
+// //  Get live chat
+// setInterval(async () => {
+//   const livechat = await getLiveChat();
 
-setInterval(async () => {
-  // Send online players/ playing players
-  const livechat = await getLiveChat();
+//   io.emit("livechat", livechat);
+// }, 300);
 
-  io.emit("livechat", livechat);
-}, 300);
+// //  For history
+// setInterval(async () => {
+//   const historybets = await getHistory();
+
+//   io.emit("historybets", historybets);
+// }, 5000);
 
 module.exports = { io };
