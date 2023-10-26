@@ -49,6 +49,47 @@ async function fetchTotalWinsForPlayer(playerId) {
   return totalWins;
 }
 
+async function fetchTotalDeposits(playerId) {
+  let totalWins = 0;
+
+  // Define the criteria for the query to filter records for the specified player and wins
+  const criteria = {
+    type: "Deposit", // Filter for wins only
+    user: playerId, // Filter for the specified player
+  };
+
+  const pipeline = [
+    { $match: criteria },
+    {
+      $group: {
+        _id: null,
+        totalAmount: {
+          $sum: {
+            $cond: [
+              { $ifNull: ["$amount", false] },
+              { $toDouble: "$amount" },
+              0, // Default value for non-numeric values
+            ],
+          },
+        },
+      },
+    },
+  ];
+
+  // Use Mongoose's aggregation framework to calculate the total wins
+  await Transaction.aggregate(pipeline, (err, result) => {
+    if (err) {
+      console.error("Error calculating total wins:", err);
+    } else {
+      totalWins = result.length > 0 ? result[0].totalWinAmount : 0;
+      console.log("Total wins for the player:", totalWins);
+    }
+  });
+
+  // Return the total wins for the player
+  return totalWins;
+}
+
 async function fetchTotalLosesForPlayer(playerId) {
   let totalLoses = 0;
 
@@ -265,6 +306,7 @@ const accountResolvers = {
 
     const loses = await fetchTotalLosesForPlayer(args.userId);
     const wins = await fetchTotalWinsForPlayer(args.userId);
+    const deposits = await fetchTotalDeposits(args.userId);
 
     return {
       _id: account?.id,
@@ -275,7 +317,7 @@ const accountResolvers = {
       user: user,
       winnings: wins,
       loses: loses,
-      deposits: 0,
+      deposits: deposits,
       withdrawals: 0,
       createdAt: new Date(account?._doc?.createdAt).toISOString(),
       updatedAt: new Date(account?._doc?.updatedAt).toISOString(),
