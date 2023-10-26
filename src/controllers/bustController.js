@@ -140,7 +140,7 @@ async function generateAndSaveGameResults() {
         });
       }
     }
-
+    console.log(results);
     if (results.length > 0) {
       await Game.create(results); // Insert the results into the "Game" collection
       console.log("Game results saved to MongoDB");

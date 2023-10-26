@@ -251,6 +251,7 @@ async function getNextMultiplier() {
   if (batchIndex < currentMultiplierBatch.length) {
     const nextMultiplier = currentMultiplierBatch[batchIndex];
 
+    console.log(nextMultiplier);
     setMultipliers(nextMultiplier);
     batchIndex++;
     return nextMultiplier;
@@ -344,18 +345,18 @@ async function waitCount() {
 
       const nextMultiplier = await getNextMultiplier();
 
+      console.log("Next multiplier", nextMultiplier);
       if (nextMultiplier) {
         console.log("Update players");
         // Update all the players with the curent game id
-        // const setro = await setAllNextRoundPlayersWithRoundId(nextMultiplier);
+        const setro = await setAllNextRoundPlayersWithRoundId(nextMultiplier);
         // Start the timer with the next multiplier
 
-        // if (setro) {
-        await runMultiplierTimer(nextMultiplier);
-        // }
-        // else {
-        //   await runMultiplierTimer(nextMultiplier);
-        // }
+        if (setro) {
+          await runMultiplierTimer(nextMultiplier);
+        } else {
+          await runMultiplierTimer(nextMultiplier);
+        }
       } else {
         // Handle the case when there are no more multipliers
         console.log("No more multipliers available.");
@@ -424,24 +425,24 @@ setInterval(async () => {
 }, 1500);
 
 //  Get online / playing players
-// setInterval(async () => {
-//   const onlineorplaying = await fetchPlayersData();
+setInterval(async () => {
+  const onlineorplaying = await fetchPlayersData();
 
-//   io.emit("onlineorplaying", onlineorplaying);
-// }, 5000);
+  io.emit("onlineorplaying", onlineorplaying);
+}, 5000);
 
-// //  Get live chat
-// setInterval(async () => {
-//   const livechat = await getLiveChat();
+//  Get live chat
+setInterval(async () => {
+  const livechat = await getLiveChat();
 
-//   io.emit("livechat", livechat);
-// }, 300);
+  io.emit("livechat", livechat);
+}, 300);
 
-// //  For history
-// setInterval(async () => {
-//   const historybets = await getHistory();
+//  For history
+setInterval(async () => {
+  const historybets = await getHistory();
 
-//   io.emit("historybets", historybets);
-// }, 5000);
+  io.emit("historybets", historybets);
+}, 5000);
 
 module.exports = { io };
