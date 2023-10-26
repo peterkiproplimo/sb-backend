@@ -443,6 +443,6 @@ setInterval(async () => {
   const historybets = await getHistory();
 
   io.emit("historybets", historybets);
-}, 5000);
+}, 300);
 
 module.exports = { io };

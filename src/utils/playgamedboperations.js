@@ -207,7 +207,7 @@ async function setGameHasBeenPlayed(multiplier) {
       { $set: { played: 1 } }
     );
 
-    // historybets = await createHistory(multiplier);
+    historybets = await createHistory(multiplier);
     // return historybets;
   } catch (error) {
     console.error("Error updating played field:", error);
@@ -226,10 +226,9 @@ async function createHistory(multiplier) {
   return historybets;
 }
 
-async function getHistory(multiplier) {
-  const historybets = await Game.find({ played: 1 })
-    .sort({ createdAt: -1 })
-    .limit(10);
+async function getHistory() {
+  const historybets = await History.find().sort({ createdAt: -1 }).limit(10);
+  // console.log(historybets);
   // console.log(historybets);
   return historybets;
 }
@@ -379,17 +378,8 @@ async function setAllNextRoundPlayersWithRoundId(nextMultiplier) {
       { $set: { roundid: nextMultiplier._id, played: 1 } } // Update operation
     );
 
-    // const result = await db.collection("playerbets").updateMany(
-    //   { roundid: nextMultiplier._id }, // Filter criteria
-    //   { $set: { played: 1 } } // Update operation
-    // );
-    // if (result.modifiedCount > 0) {
     // Fetch the updated documents if needed
     return true;
-    // } else {
-    // console.log("No winners found.");
-    // return false;
-    // }
   } catch (error) {
     console.error("Error checking bets:", error);
     throw error; // Rethrow the error to handle it at a higher level if needed
