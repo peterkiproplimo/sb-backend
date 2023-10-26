@@ -420,7 +420,7 @@ setInterval(async () => {
   }
 
   //  Function to perform the live chat
-}, 300);
+}, 1500);
 
 setInterval(async () => {
   // Send online players/ playing players
@@ -429,7 +429,7 @@ setInterval(async () => {
   // console.log("check", onlineorplaying);
 
   io.emit("onlineorplaying", onlineorplaying);
-}, 3000);
+}, 5000);
 
 setInterval(async () => {
   // Send online players/ playing players
