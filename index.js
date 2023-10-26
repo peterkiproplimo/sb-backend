@@ -248,10 +248,11 @@ async function getNextMultiplier() {
   //  Save next round in database
   io.emit("nextround", nextGameroundID);
   setemitOngoingRound(true);
+  setemitEndRound(false);
+  setemitNextRound(false);
   if (batchIndex < currentMultiplierBatch.length) {
     const nextMultiplier = currentMultiplierBatch[batchIndex];
 
-    console.log(nextMultiplier);
     setMultipliers(nextMultiplier);
     batchIndex++;
     return nextMultiplier;
