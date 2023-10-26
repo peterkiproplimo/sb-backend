@@ -42,11 +42,11 @@ const transactionSchema = new Schema(
       required: false,
     },
     balance: {
-      type: String,
+      type: Float,
       required: false,
     },
     floatBalance: {
-      type: String,
+      type: Float,
       required: false,
     },
     username: {
@@ -58,7 +58,7 @@ const transactionSchema = new Schema(
       required: false,
     },
     amount: {
-      type: String,
+      type: Float,
       required: true,
     },
     status: {
