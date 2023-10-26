@@ -285,9 +285,9 @@ async function runMultiplierTimer(multiplier) {
 
       // Update winners/ losers
       console.log("Get end Results");
-      const playerBets = await getEndResults(multiplier, "endresults");
+      // const playerBets = await getEndResults(multiplier, "endresults");
 
-      io.emit("livedata", playerBets);
+      // io.emit("livedata", playerBets);
 
       console.log("Update game has been played");
       await setGameHasBeenPlayed(multiplier);
