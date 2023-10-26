@@ -213,6 +213,7 @@ async function setGameHasBeenPlayed(multiplier) {
     console.error("Error updating played field:", error);
   }
 }
+
 async function createHistory(multiplier) {
   const history = new History({
     hash: multiplier.seedeed,
