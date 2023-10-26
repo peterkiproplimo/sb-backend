@@ -22,7 +22,15 @@ async function fetchTotalWinsForPlayer(playerId) {
     {
       $group: {
         _id: null,
-        totalWins: { $sum: 1 }, // Count the number of wins
+        totalAmount: {
+          $sum: {
+            $cond: [
+              { $ifNull: ["$possibleWin", false] },
+              { $toDouble: "$possibleWin" },
+              0, // Default value for non-numeric values
+            ],
+          },
+        },
       },
     },
   ];
@@ -32,7 +40,7 @@ async function fetchTotalWinsForPlayer(playerId) {
     if (err) {
       console.error("Error calculating total wins:", err);
     } else {
-      totalWins = result.length > 0 ? result[0].totalWins : 0;
+      totalWins = result.length > 0 ? result[0].totalWinAmount : 0;
       console.log("Total wins for the player:", totalWins);
     }
   });
@@ -40,6 +48,7 @@ async function fetchTotalWinsForPlayer(playerId) {
   // Return the total wins for the player
   return totalWins;
 }
+
 async function fetchTotalLosesForPlayer(playerId) {
   let totalLoses = 0;
 
@@ -54,7 +63,15 @@ async function fetchTotalLosesForPlayer(playerId) {
     {
       $group: {
         _id: null,
-        totalWins: { $sum: 1 }, // Count the number of wins
+        totalAmount: {
+          $sum: {
+            $cond: [
+              { $ifNull: ["$betAmount", false] },
+              { $toDouble: "$betAmount" },
+              0, // Default value for non-numeric values
+            ],
+          },
+        },
       },
     },
   ];
@@ -64,7 +81,7 @@ async function fetchTotalLosesForPlayer(playerId) {
     if (err) {
       console.error("Error calculating total wins:", err);
     } else {
-      totalLoses = result.length > 0 ? result[0].totalWins : 0;
+      totalLoses = result.length > 0 ? result[0].totalAmount : 0;
       console.log("Total wins for the player:", totalLoses);
     }
   });

@@ -420,16 +420,22 @@ setInterval(async () => {
   }
 
   //  Function to perform the live chat
-  const livechat = await getLiveChat();
+}, 300);
 
-  io.emit("livechat", livechat);
-
+setInterval(async () => {
   // Send online players/ playing players
 
   const onlineorplaying = await fetchPlayersData();
   // console.log("check", onlineorplaying);
 
   io.emit("onlineorplaying", onlineorplaying);
+}, 3000);
+
+setInterval(async () => {
+  // Send online players/ playing players
+  const livechat = await getLiveChat();
+
+  io.emit("livechat", livechat);
 }, 300);
 
 module.exports = { io };
