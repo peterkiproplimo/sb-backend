@@ -159,12 +159,7 @@ const accountResolvers = {
       await accnt.save();
       await user.save();
     }
-    return {
-      // ...tran?._doc,
-      _id: tran?.id,
-      createdAt: new Date(trans?._doc?.createdAt).toISOString(),
-      updatedAt: new Date(trans?._doc?.updatedAt).toISOString(),
-    };
+    return;
   },
 
   accountBalanceUpdate: async (args, req) => {
