@@ -160,7 +160,7 @@ const accountResolvers = {
       await user.save();
     }
     return {
-      ...tran?._doc,
+      // ...tran?._doc,
       _id: tran?.id,
       createdAt: new Date(trans?._doc?.createdAt).toISOString(),
       updatedAt: new Date(trans?._doc?.updatedAt).toISOString(),
