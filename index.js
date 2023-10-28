@@ -355,8 +355,6 @@ async function waitCount() {
 
         if (setro) {
           await runMultiplierTimer(nextMultiplier);
-        } else {
-          await runMultiplierTimer(nextMultiplier);
         }
       } else {
         // Handle the case when there are no more multipliers
