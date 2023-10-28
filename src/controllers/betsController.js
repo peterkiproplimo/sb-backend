@@ -135,6 +135,7 @@ const betsResolvers = {
       if (args.active != "") {
         query.active = args.active == "0" ? true : false;
       }
+      query.type="regular"
 
       // pagination
       // total_pages
