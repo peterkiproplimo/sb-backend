@@ -232,6 +232,7 @@ async function fetchMultipliersBatch() {
     currentMultiplierBatch = await Game.find({ played: 0 }).limit(100);
 
     if (currentMultiplierBatch.length === 0) {
+      console.log("no multipliers");
       // Handle the case when there are no more multipliers in the database
       return;
     }
@@ -373,8 +374,8 @@ async function startGame() {
 
 server.listen(3002, async () => {
   await connectToDatabase();
-  // await startGame();
-  // getMultiplierValue();
+  await startGame();
+  getMultiplierValue();
 
   console.log(`listening on 3002`);
 });
