@@ -44,8 +44,8 @@ async function fetchPlayersData() {
   //   }
   // });
 
-  const randomNumber = generateRandomPlaying(100, 500);
-  const randomNumber1 = generateRandomOnline(100, 500);
+  const randomNumber = generateRandomPlaying(100, 200);
+  const randomNumber1 = generateRandomOnline(200, 300);
 
   return { playing: randomNumber, onlineToday: randomNumber1 }; // Replace with actual data
 }
