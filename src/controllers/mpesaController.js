@@ -178,7 +178,7 @@ const mpesaResolvers = {
               PartyB: shortcode,
               PhoneNumber: parseInt(args.phone),
               CallBackURL:
-                "https://sb-backend-cpe5.onrender.com/mpesa-callback",
+                "https://safaribust-backend.onrender.com/mpesa-callback",
               AccountReference: parseInt(args.phone),
               TransactionDesc: "Deposit to SAFARIBUST Account",
             })
@@ -384,8 +384,9 @@ const mpesaResolvers = {
               PartyB: parseInt(args.phone),
               Remarks: `Withdrawal: ${args.username}-${args.phone}`,
               QueueTimeOutURL:
-                "https://sb-backend-cpe5.onrender.com/mpesa-result",
-              ResultURL: "https://sb-backend-cpe5.onrender.com/mpesa-timeout",
+                "https://safaribust-backend.onrender.com/mpesa-result",
+              ResultURL:
+                "https://safaribust-backend.onrender.com/mpesa-timeout",
               Occassion: `Withdrawal: ${args.username}-${args.phone}`,
             })
           )
