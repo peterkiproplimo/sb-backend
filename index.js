@@ -229,7 +229,7 @@ setemitEndRound(false);
 async function fetchMultipliersBatch() {
   try {
     // Fetch a batch of 100 multipliers and store them in currentMultiplierBatch
-    currentMultiplierBatch = await Game.find({ played: 0 }).limit(1000);
+    currentMultiplierBatch = await Game.find({ played: 0 }).limit(100);
 
     if (currentMultiplierBatch.length === 0) {
       console.log("no multipliers");
