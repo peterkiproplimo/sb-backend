@@ -223,7 +223,7 @@ let currentRound = null;
 setemitNextRound(false);
 setemitOngoingRound(false);
 setemitEndRound(false);
-// fetchMultipliersBatch();
+fetchMultipliersBatch();
 
 //  Fetch batch multipliers from the database
 async function fetchMultipliersBatch() {
