@@ -123,7 +123,7 @@ async function getEndResults(nextMultiplier, gamestatus) {
 
     let winAmount = 0;
     let loseAmount = 0;
-    const houseAccount = await Account.findById("6523f69762c8841fb3313ade");
+    const houseAccount = await Account.findById("6549edb45d7a310028988145");
     // Iterate through the bets and update the "win" field based on the condition
     for (const bet of bets) {
       await Playerbet.updateOne({ _id: bet._id }, { $set: { completed: 1 } });

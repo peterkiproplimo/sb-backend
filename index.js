@@ -223,7 +223,7 @@ let currentRound = null;
 setemitNextRound(false);
 setemitOngoingRound(false);
 setemitEndRound(false);
-fetchMultipliersBatch();
+// fetchMultipliersBatch();
 
 //  Fetch batch multipliers from the database
 async function fetchMultipliersBatch() {
@@ -374,8 +374,8 @@ async function startGame() {
 
 server.listen(3002, async () => {
   await connectToDatabase();
-  await startGame();
-  getMultiplierValue();
+  // await startGame();
+  // getMultiplierValue();
 
   console.log(`listening on 3002`);
 });
@@ -444,5 +444,7 @@ setInterval(async () => {
 
   io.emit("historybets", historybets);
 }, 300);
+
+saveFakePlayers();
 
 module.exports = { io };

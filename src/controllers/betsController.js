@@ -40,7 +40,7 @@ const betsResolvers = {
       // Subtract the player account balance
 
       //  Add the house balance
-      const houseAccount = await Account.findById("6523f69762c8841fb3313ade");
+      const houseAccount = await Account.findById("6549edb45d7a310028988145");
       houseAccount.balance =
         parseFloat(houseAccount?.balance) +
         parseFloat(args.playerbetInput.betAmount);
@@ -135,7 +135,7 @@ const betsResolvers = {
       if (args.active != "") {
         query.active = args.active == "0" ? true : false;
       }
-      query.type="regular"
+      query.type = "regular";
 
       // pagination
       // total_pages
@@ -432,7 +432,7 @@ const betsResolvers = {
     const results = await bet.save();
 
     const houseAccount = await house.findOne({
-      user: "62fb898a4a4d42002392750d",
+      user: "6549edb45d7a310028988145",
     });
 
     const ipAddress = req.socket.remoteAddress;

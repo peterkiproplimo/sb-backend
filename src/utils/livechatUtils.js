@@ -19,11 +19,13 @@ function generateRandomPlaying(min, max) {
   // Then, scale and shift it to the desired range [min, max]
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
+
 function generateRandomOnline(min, max) {
   // Use Math.random() to generate a random number between 0 and 1
   // Then, scale and shift it to the desired range [min, max]
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
+
 async function fetchPlayersData() {
   // const playerCount = await Player.countDocuments();
   // // const onlineUserCount = await Player.countDocuments({ online: true });
