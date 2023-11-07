@@ -128,7 +128,7 @@ async function generateAndSaveGameResults() {
     await connectToDatabase();
     const results = [];
 
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < 10; i++) {
       const inputString = crypto.randomBytes(32).toString("hex");
       const saltedHash = gameResult(inputString);
 
@@ -140,15 +140,15 @@ async function generateAndSaveGameResults() {
         });
       }
     }
-    console.log(results);
+    // console.log(results);
     if (results.length > 0) {
       await Game.create(results); // Insert the results into the "Game" collection
-      console.log("Game results saved to MongoDB");
+      // console.log("Game results saved to MongoDB");
     } else {
       console.log("No eligible results to save.");
     }
 
-    console.log("Connection to MongoDB closed");
+    // console.log("Connection to MongoDB closed");
   } catch (error) {
     console.error("Error:", error);
   }
@@ -190,6 +190,8 @@ async function exportToExcel() {
 
 // exportToExcel();
 
-// generateAndSaveGameResults();
+setInterval(async () => {
+  generateAndSaveGameResults();
+}, 2000);
 
 module.exports = bustResolvers;
