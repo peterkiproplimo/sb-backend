@@ -3,9 +3,15 @@ const mongoose = require("mongoose");
 const userSchema = new mongoose.Schema(
   {
     type: String,
-    username: String,
+    username: {
+      type: String,
+      unique: true, // Set 'unique' to true for the username field
+    },
     active: Boolean,
-    phone: String,
+    phone: {
+      type: String,
+      unique: true, // Set 'unique' to true for the username field
+    },
     online: Boolean,
     password: String,
     dataToken: String,
