@@ -128,7 +128,7 @@ async function generateAndSaveGameResults() {
     await connectToDatabase();
     const results = [];
 
-    for (let i = 0; i < 10000; i++) {
+    for (let i = 0; i < 100; i++) {
       const inputString = crypto.randomBytes(32).toString("hex");
       const saltedHash = gameResult(inputString);
 
@@ -190,6 +190,6 @@ async function exportToExcel() {
 
 // exportToExcel();
 
-//  generateAndSaveGameResults();
+// generateAndSaveGameResults();
 
 module.exports = bustResolvers;
