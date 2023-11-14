@@ -341,8 +341,8 @@ const mpesaResolvers = {
     const ipAddress = req.socket.remoteAddress;
 
     try {
-      const consumer_key = "gA2VYetg7GO5FjudxZCpIk7DGJCbKwGz";
-      const consumer_secret = "SKdWCAxxcOFrmx8h";
+      const consumer_key = "qhygNtCpa5tAMxAf3sjvvxXvHTtJkoAf";
+      const consumer_secret = "gN9j1ZYPz4PBcOjr";
       const url =
         "https://api.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials";
       const authString = `${consumer_key}:${consumer_secret}`;
@@ -358,12 +358,9 @@ const mpesaResolvers = {
       });
       if (data.access_token) {
         const timestamp = formatDate();
-        const shortcode = 182781;
+        const shortcode = 3034427;
         const passkey =
-          "dxgf3qG1VqA64+H7cS6bZX9am7dQhN1In37AYxuSofEXSDxDpSE9xeWwdfeKllrGJkvRhuzYPm0XB697PriCGdUHb/DxMZ6W0kMH8Sx2vHQRAZRAtx7HBIFL+u7i3tG81hXW2C+mvpFGvKpr+2GZ4rQvIvIeiQ5eCM201NmTn1+3CJHEieGXyc7duYseZ1vwINUK0HJTyA8K7JFM/grsq5oCwmghrXOl/ATluoKHLmMakDfBafu3Bv3nG8cdlqs83QSLBJD9RqImhLeUOl1u53Xon/jRAKZ2FiW7LhuJ1McVJz6Ck5u9sM9c0A43kzivvEbATqno+y+8GuxHyktaHQ==";
-        // const password = Buffer.from(
-        //   shortcode + passkey + timestamp
-        // ).toString("base64");
+          "BCZcLvkd0lJU+AkbjLcbesMIdn4viqoI9B9jhiTMs2yJlxWAiLTeNm/ftOXz9rlgWdqHlMOW1JirTs/yGpH/yad/BECGKjCtrC0Wi0sj7e1vgoutLBgzXaUrNkSPQxE9aPAuw1Of4DROwy1eYtby+M0Ir/3qFDEWprkn/RRdsLGfaIv5leWGOa1SIbv0vdY13gBQAT1h2kiMWbyHZKgzcO90mZ5GerfUJk/ID4s/3DF+XkOe0Zmfg/1hX8va36SI67gY2OOlf60fYp5Ss2p1ISlE6qgudSd76Qxk3xTf9QhdoJmGPFt5Izq828h90+T139kINIkoOikMPcKYrvbCXA==";
 
         let req = unirest(
           "POST",
@@ -384,9 +381,8 @@ const mpesaResolvers = {
               PartyB: parseInt(args.phone),
               Remarks: `Withdrawal: ${args.username}-${args.phone}`,
               QueueTimeOutURL:
-                "https://safaribust-backend.onrender.com/mpesa-result",
-              ResultURL:
                 "https://safaribust-backend.onrender.com/mpesa-timeout",
+              ResultURL: "https://safaribust-backend.onrender.com/mpesa-result",
               Occassion: `Withdrawal: ${args.username}-${args.phone}`,
             })
           )
