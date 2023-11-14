@@ -469,6 +469,6 @@ setInterval(async () => {
   io.emit("historybets", historybets);
 }, 300);
 
-// saveFakePlayers();
+saveFakePlayers();
 
 module.exports = { io };

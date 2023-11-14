@@ -275,6 +275,8 @@ const playerResolvers = {
         .hash(args.password, 12)
         .then((hashedPass) => {
           user.password = hashedPass;
+          user.online = false;
+
           return user.save();
         })
         .then(async (usr) => {
