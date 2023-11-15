@@ -132,7 +132,7 @@ async function generateAndSaveGameResults() {
       const inputString = crypto.randomBytes(32).toString("hex");
       const saltedHash = gameResult(inputString);
 
-      if (saltedHash.bustpoint <= 100) {
+      if (saltedHash.bustpoint <= 10000) {
         results.push({
           bustpoint: saltedHash.bustpoint,
           seedeed: inputString,
@@ -190,8 +190,8 @@ async function exportToExcel() {
 
 // exportToExcel();
 
-setInterval(async () => {
-  generateAndSaveGameResults();
-}, 2000);
+// setInterval(async () => {
+// generateAndSaveGameResults();
+// }, 2000);
 
 module.exports = bustResolvers;
