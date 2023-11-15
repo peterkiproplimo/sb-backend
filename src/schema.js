@@ -325,7 +325,7 @@ type Playerbet {
 _id: ID!
 betAmount: Float!
 point: Float!
-userId: Player!
+userId: Player
 round: String
 withholdingtax:Float
 winamount:Float
@@ -475,11 +475,23 @@ type Terms {
 
 type PlayersData{
   players: [Player]!,
+  paginationInfo: PaginationInfo
+}
+
+type BetsData{
+  playerBets: [Playerbet]!,
+  paginationInfo: PaginationInfo
+}
+type TransactionsData{
+  transactions: [Transaction]!,
+  paginationInfo: PaginationInfo
+}
+type PaginationInfo{
   current_page: Int,
   total_pages: Int,
-  total: Int,
+  total_items: Int,
   per_page: Int
-}
+},
 
 
 
@@ -495,9 +507,9 @@ type RootQuery{
   transactions(userId:String):[Transaction!]!
   bets(userId:String):[Bet!]!
   historyBets(userId:String):[Playerbet!]!
-  allBets:[Playerbet!]!
+  allBets(searchTerm: String, win:String, page: Int, per_page: Int):BetsData!
   filteredBets:[Bet!]!
-  allTransactions:[Transaction!]!
+  allTransactions(searchTerm: String, page: Int, per_page: Int):TransactionsData!
   logs:[Logs!]!
   deductAccountBalance(userId:String, amount:String, backend:Boolean, dataToken:String!):Account!
   adminrefundAccount(userId:String, amount:String, backend:Boolean, initiator:String!):Account!

@@ -189,21 +189,87 @@ const accountResolvers = {
     });
   },
 
-  allTransactions: async (args, req) => {
-    const trans = await Transaction.find()
-      .sort({ createdAt: -1 })
-      .populate("user")
-      .populate("account");
-    // const user = await Player.findById(trans.user);
-    return trans.map((trans) => {
-      return {
-        ...trans?._doc,
-        _id: trans?.id,
+  // allTransactions: async (args, req) => {
+  //   const trans = await Transaction.find()
+  //     .sort({ createdAt: -1 })
+  //     .populate("user")
+  //     .populate("account"); 
+  //   // const user = await Player.findById(trans.user);
+  //   return trans.map((trans) => {
+  //     return {
+  //       ...trans?._doc,
+  //       _id: trans?.id,
 
-        createdAt: new Date(trans?._doc?.createdAt).toISOString(),
-        updatedAt: new Date(trans?._doc?.updatedAt).toISOString(),
+  //       createdAt: new Date(trans?._doc?.createdAt).toISOString(),
+  //       updatedAt: new Date(trans?._doc?.updatedAt).toISOString(),
+  //     };
+  //   });
+  // },
+
+  allTransactions: async (args, req) => {
+    try {
+      let transactions;
+      const searchTerm = args.searchTerm;
+      // Apply pagination
+      const page = parseInt(args.page) || 1;
+      const pageSize = parseInt(args.per_page) || 10;
+
+      // Check if input object is provided
+      if (searchTerm == "" || !searchTerm) {
+        // If no input is provided, return all records with pagination
+        transactions = await Transaction.find()
+          .populate("user").populate("account")
+          .skip((page - 1) * pageSize)
+          .limit(pageSize)
+          .sort({ createdAt: -1 })
+          .lean();
+      } else {
+        // Use a regular expression to perform a case-insensitive search
+        const regex = new RegExp(searchTerm, "i");
+
+        // Find the player by username
+        const player = await Player.findOne({ username: { $in: [regex] } }).exec();
+        // console.log(player)
+
+        // Define the filter criteria based on the search term and user ID
+        const filter = {
+          $or: [
+            { phone: { $in: [regex] } },
+            { trans_id: { $in: [regex] } },
+            // { createdAt: { $regex: regex } },
+            { userId: player ? player._id : null },
+            // Add more fields as needed
+          ],
+        };
+
+        // Perform the search with filter      // Use lean() to convert the documents to plain JavaScript objects
+        transactions = await Transaction.find(filter)
+          .populate("user").populate("account")
+          .skip((page - 1) * pageSize)
+          .limit(pageSize)
+          .sort({ createdAt: -1 })
+          .lean();
+      }
+
+      // console.log(bets);
+
+      // Calculate pagination metadata
+      const totalItems = await Transaction.countDocuments();
+      const totalPages = Math.ceil(totalItems / pageSize);
+
+      return {
+        transactions: transactions,
+        paginationInfo: {
+          total_pages: totalPages,
+          current_page: page,
+          total_items: totalItems,
+          per_page: pageSize,
+        },
       };
-    });
+    } catch (error) {
+      console.log(error);
+      throw new Error("Error fetching player bets", "INTERNAL_SERVER_ERROR");
+    }
   },
 
   /// Get all the bets that the user has won / lost

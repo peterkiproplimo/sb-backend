@@ -21,6 +21,7 @@ const {
   getRoundFromDatabase,
   getCurrentRoundFromDatabase,
 } = require("../utils/playgamedboperations");
+const PlayerBet = require("../models/PlayerBet");
 
 const betsResolvers = {
   createPlayerbet: async (args, req) => {
@@ -156,10 +157,12 @@ const betsResolvers = {
         .sort({ createdAt: -1 });
       return {
         players: players,
-        current_page: pageNumber,
-        total_pages: totalPages,
-        total: totalItems,
-        per_page: itemsPerPage,
+        paginationInfo: {
+          current_page: pageNumber,
+          total_pages: totalPages,
+          total_items: totalItems,
+          per_page: itemsPerPage,
+        }
       };
     } catch (error) {
       throw new Error("Error fetching players: " + error.message);
@@ -335,20 +338,84 @@ const betsResolvers = {
 
   //  Get all the bets
 
+  // allBets: async (args, req) => {
+  //   const bets = await Playerbet.find()
+  //     .sort({ createdAt: -1 })
+  //     .populate("userId");
+  //   console.log(bets);
+  //   return bets.map((bet) => {
+  //     return {
+  //       ...bet?._doc,
+  //       _id: bet?.id,
+  //       // user: singleUser.bind(this, bet?._doc?.user),
+  //       createdAt: new Date(bet?._doc?.createdAt).toISOString(),
+  //       updatedAt: new Date(bet?._doc?.updatedAt).toISOString(),
+  //     };
+  //   });
+  // },
   allBets: async (args, req) => {
-    const bets = await Playerbet.find()
-      .sort({ createdAt: -1 })
-      .populate("userId");
-    console.log(bets);
-    return bets.map((bet) => {
+    try {
+      let bets;
+      const searchTerm = args.searchTerm;
+      // Apply pagination
+      const page = parseInt(args.page) || 1;
+      const pageSize = parseInt(args.per_page) || 10;
+
+      // Check if input object is provided
+      if (searchTerm == "" || !searchTerm) {
+        // If no input is provided, return all records with pagination
+        bets = await PlayerBet.find()
+          .populate("userId")
+          .skip((page - 1) * pageSize)
+          .limit(pageSize)
+          .sort({ createdAt: -1 })
+          .lean();
+      } else {
+        // Use a regular expression to perform a case-insensitive search
+        const regex = new RegExp(searchTerm, "i");
+
+        // Find the player by username
+        const player = await Player.findOne({ username: { $in: [regex] } }).exec();
+        // console.log(player)
+
+        // Define the filter criteria based on the search term and user ID
+        const filter = {
+          $or: [
+            { win:  args.win == "0" ? true : false},
+            // { createdAt: { $regex: regex } },
+            { userId: player ? player._id : null },
+            // Add more fields as needed
+          ],
+        };
+
+        // Perform the search with filter      // Use lean() to convert the documents to plain JavaScript objects
+        bets = await PlayerBet.find(filter)
+          .populate("userId")
+          .skip((page - 1) * pageSize)
+          .limit(pageSize)
+          .sort({ createdAt: -1 })
+          .lean();
+      }
+
+      // console.log(bets);
+
+      // Calculate pagination metadata
+      const totalItems = await PlayerBet.countDocuments();
+      const totalPages = Math.ceil(totalItems / pageSize);
+
       return {
-        ...bet?._doc,
-        _id: bet?.id,
-        // user: singleUser.bind(this, bet?._doc?.user),
-        createdAt: new Date(bet?._doc?.createdAt).toISOString(),
-        updatedAt: new Date(bet?._doc?.updatedAt).toISOString(),
+        playerBets: bets,
+        paginationInfo: {
+          total_pages: totalPages,
+          current_page: page,
+          total_items: totalItems,
+          per_page: pageSize,
+        },
       };
-    });
+    } catch (error) {
+      console.log(error);
+      throw new Error("Error fetching player bets", "INTERNAL_SERVER_ERROR");
+    }
   },
 
   //  Get bets where win is true
@@ -438,11 +505,10 @@ const betsResolvers = {
     const ipAddress = req.socket.remoteAddress;
     const log = new Logs({
       ip: ipAddress,
-      description: `User ${args.betInput.win ? "won " : "lost"} ${
-        args.betInput.win
+      description: `User ${args.betInput.win ? "won " : "lost"} ${args.betInput.win
           ? parseFloat(+args.betInput.amount).toFixed(2)
           : parseFloat(+args.betInput.betAmount).toFixed(2)
-      }`,
+        }`,
       user: args.betInput.user,
       round: args.betInput.round,
       won: args.betInput.win,
