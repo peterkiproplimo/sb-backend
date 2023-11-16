@@ -139,7 +139,9 @@ async function getEndResults(nextMultiplier, gamestatus) {
         const account = await Account.findOne({
           user: bet.userId,
         });
-
+        
+console.log(account);
+        
         account.balance =
           parseFloat(account?.balance) + parseFloat(bet.possibleWin);
 
