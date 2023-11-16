@@ -311,7 +311,7 @@ async function runMultiplierTimer(multiplier) {
       setemitNextRound(false);
 
       // Update winners/ losers
-      console.log("Get end Results");
+      // console.log("Get end Results");
       const playerBets = await getEndResults(multiplier, "endresults");
 
       io.emit("livedata", playerBets);
@@ -373,7 +373,7 @@ async function waitCount() {
 
       // console.log("Next multiplier", nextMultiplier);
       if (nextMultiplier) {
-        console.log("Update players");
+        // console.log("Update players");
         // Update all the players with the curent game id
         const setro = await setAllNextRoundPlayersWithRoundId(nextMultiplier);
         // Start the timer with the next multiplier
@@ -383,7 +383,7 @@ async function waitCount() {
         }
       } else {
         // Handle the case when there are no more multipliers
-        console.log("No more multipliers available.");
+       // console.log("No more multipliers available.");
       }
     }
   }, decrementInterval);
