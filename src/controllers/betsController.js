@@ -41,7 +41,7 @@ const betsResolvers = {
       // Subtract the player account balance
 
       //  Add the house balance
-      const houseAccount = await Account.findById("6549edb45d7a310028988145");
+      const houseAccount = await Account.findById("6555e4028e89bb00288767eb");
       houseAccount.balance =
         parseFloat(houseAccount?.balance) +
         parseFloat(args.playerbetInput.betAmount);
