@@ -387,14 +387,27 @@ const mpesaResolvers = {
             })
           )
           .end(async (res) => {
-            console.log(res);
-
+            console.log(res.body);
             if (res.error) throw new Error(res.error);
             let filter = { user: args.userId };
             let update = {
               balance: parseFloat(account?.balance) - parseFloat(args.amount),
             };
             await Account.findOneAndUpdate(filter, update);
+
+            const trans = new Transaction({
+              type: "Widthraw",
+              MerchantRequestID: res.body.ConversationID,
+              CheckoutRequestID: res.body.OriginatorConversationID,
+              trans_time: timestamp,
+              amount: parseInt(args.amount),
+              phone: args.phone,
+              user: args.userId,
+              account: account,
+            });
+
+            await trans.save();
+
             const log = new Logs({
               ip: ipAddress,
               description: `Withdrawn ${args.amount} - Account Name:${args.phone}`,
