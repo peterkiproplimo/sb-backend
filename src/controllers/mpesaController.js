@@ -394,6 +394,22 @@ const mpesaResolvers = {
               balance: parseFloat(account?.balance) - parseFloat(args.amount),
             };
             await Account.findOneAndUpdate(filter, update);
+
+            const trans = new Transaction({
+              type: "Widthraw",
+              MerchantRequestID: res.body.ConversationID,
+              CheckoutRequestID: res.body.OriginatorConversationID,
+              trans_time: timestamp,
+              amount: parseInt(args.amount),
+              phone: args.phone,
+              user: args.userId,
+              account: account,
+            });
+            
+            await trans.save();
+            
+ 
+            
             const log = new Logs({
               ip: ipAddress,
               description: `Withdrawn ${args.amount} - Account Name:${args.phone}`,
