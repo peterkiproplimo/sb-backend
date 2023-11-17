@@ -397,8 +397,8 @@ const mpesaResolvers = {
 
             const trans = new Transaction({
               type: "Widthraw",
-              MerchantRequestID: res.body.ConversationID,
-              CheckoutRequestID: res.body.OriginatorConversationID,
+              OriginatorConversationID: res.body.OriginatorConversationID,
+              ConversationID: res.body.ConversationID,
               trans_time: timestamp,
               amount: parseInt(args.amount),
               phone: args.phone,
