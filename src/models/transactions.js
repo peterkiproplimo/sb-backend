@@ -37,6 +37,13 @@ const transactionSchema = new Schema(
       required: false,
     },
 
+    //  For Paybill
+
+    TransID: {
+      type: String,
+      required: false,
+    },
+
     mpesaReceiptNumber: {
       type: String,
       required: false,
