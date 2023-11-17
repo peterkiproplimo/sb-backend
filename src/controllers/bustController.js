@@ -129,7 +129,6 @@ async function deleteGamesWithPlayedZero() {
 
     const deletionResult = await Game.deleteMany({
       bustpoint: { $gt: 20 },
-      played: 0,
     });
 
     console.log(`${deletionResult.deletedCount} games deleted.`);
