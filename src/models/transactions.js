@@ -53,6 +53,10 @@ const transactionSchema = new Schema(
       type: String,
       required: false,
     },
+    ResultDesc: {
+      type: String,
+      required: false,
+    },
     balance: {
       type: Number,
       required: false,
@@ -61,6 +65,7 @@ const transactionSchema = new Schema(
       type: Number,
       required: false,
     },
+
     username: {
       type: String,
       required: false,
