@@ -137,7 +137,7 @@ app.post("/mpesa-callback", async (req, res) => {
     if (mpesaCallbackData.Body.stkCallback.ResultCode == 1032) {
       try {
         // Transaction canceled by the user
-        transaction.status = "cancelled";
+        transaction.status = 2; //cancelled
         await transaction.save();
       } catch (error) {
         console.error("Error updating transaction (cancellation):", error);
@@ -145,7 +145,7 @@ app.post("/mpesa-callback", async (req, res) => {
     } else if (mpesaCallbackData.Body.stkCallback.ResultCode == 0) {
       // Update the transaction with the data from the response body
       try {
-        transaction.status = "successfull";
+        transaction.status = 1; // successfull
         transaction.amount =
           mpesaCallbackData.Body.stkCallback.CallbackMetadata.Item.find(
             (item) => item.Name === "Amount"
@@ -191,15 +191,15 @@ app.post("/mpesa-result", async (req, res) => {
   console.log("Received M-Pesa callback:", mpesaCallbackData);
 
   const transaction = await Transaction.findOne({
-    MerchantRequestID: mpesaCallbackData.Result.OriginatorConversationID,
-    CheckoutRequestID: mpesaCallbackData.Result.ConversationID,
+    OriginatorConversationID: mpesaCallbackData.Result.OriginatorConversationID,
+    ConversationID: mpesaCallbackData.Result.ConversationID,
   });
 
   if (transaction) {
     if (mpesaCallbackData.Result.ResultCode == 1) {
       try {
         // Insuficient balance
-        transaction.status = "failed";
+        transaction.status = 0; //failed
         transaction.ResultDesc = mpesaCallbackData.Result.ResultDesc;
         await transaction.save();
       } catch (error) {
@@ -208,7 +208,7 @@ app.post("/mpesa-result", async (req, res) => {
     } else if (mpesaCallbackData.Result.ResultCode == 0) {
       try {
         // Successfull
-        transaction.status = "success";
+        transaction.status = 1; // success
         transaction.ResultDesc = mpesaCallbackData.Result.ResultDesc;
         await transaction.save();
       } catch (error) {

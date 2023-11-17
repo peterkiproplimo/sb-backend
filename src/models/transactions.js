@@ -74,9 +74,11 @@ const transactionSchema = new Schema(
       required: true,
     },
     status: {
-      type: String,
+      type: Number,
       required: false,
+      default: 0,
     },
+
     user: {
       type: Schema.Types.ObjectId,
       ref: "Player",
