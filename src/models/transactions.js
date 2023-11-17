@@ -17,6 +17,7 @@ const transactionSchema = new Schema(
       type: String,
       required: false,
     },
+    // For Mpesa express
     MerchantRequestID: {
       type: String,
       required: false,
@@ -25,6 +26,17 @@ const transactionSchema = new Schema(
       type: String,
       required: false,
     },
+
+    // For B2C
+    OriginatorConversationID: {
+      type: String,
+      required: false,
+    },
+    ConversationID: {
+      type: String,
+      required: false,
+    },
+
     mpesaReceiptNumber: {
       type: String,
       required: false,

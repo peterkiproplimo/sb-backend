@@ -185,11 +185,37 @@ app.post("/mpesa-callback", async (req, res) => {
   res.json({ result: "Callback received and processed successfully" });
 });
 
-app.post("/mpesa-result", (req, res) => {
+app.post("/mpesa-result", async (req, res) => {
   // Handle the incoming M-Pesa callback data here
   const mpesaCallbackData = req.body;
   console.log("Received M-Pesa callback:", mpesaCallbackData);
 
+  const transaction = await Transaction.findOne({
+    MerchantRequestID: mpesaCallbackData.Result.OriginatorConversationID,
+    CheckoutRequestID: mpesaCallbackData.Result.ConversationID,
+  });
+
+  if (transaction) {
+    if (mpesaCallbackData.Result.ResultCode == 1) {
+      try {
+        // Insuficient balance
+        transaction.status = "failed";
+        transaction.ResultDesc = mpesaCallbackData.Result.ResultDesc;
+        await transaction.save();
+      } catch (error) {
+        console.error("Error updating transaction (cancellation):", error);
+      }
+    } else if (mpesaCallbackData.Result.ResultCode == 0) {
+      try {
+        // Successfull
+        transaction.status = "success";
+        transaction.ResultDesc = mpesaCallbackData.Result.ResultDesc;
+        await transaction.save();
+      } catch (error) {
+        console.error("Error updating transaction (cancellation):", error);
+      }
+    }
+  }
   // Perform any necessary processing based on the callback data
   // ...
 
@@ -371,7 +397,7 @@ async function waitCount() {
         }
       } else {
         // Handle the case when there are no more multipliers
-       // console.log("No more multipliers available.");
+        // console.log("No more multipliers available.");
       }
     }
   }, decrementInterval);
@@ -386,13 +412,8 @@ async function startGame() {
 
 server.listen(3002, async () => {
   await connectToDatabase();
-<<<<<<< HEAD
   await startGame();
   getMultiplierValue();
-=======
-   await startGame();
-   getMultiplierValue();
->>>>>>> 30e887052af020eed73045cd7bbac2f4aa44480b
 
   console.log(`listening on 3002`);
 });
