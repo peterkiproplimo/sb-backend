@@ -170,6 +170,13 @@ app.post("/mpesa-callback", async (req, res) => {
 
         console.log(playeraccount);
         updatePlayerAc(playeraccount, transaction);
+        const currentbalance = await Account.findOne({
+          user: transaction.user,
+        });
+
+        balance = currentbalance.balance;
+
+        io.emit(currentbalance.user, balance);
       } catch (error) {
         console.error("Error updating transaction (success):", error);
       }
