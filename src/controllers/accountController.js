@@ -189,23 +189,6 @@ const accountResolvers = {
     });
   },
 
-  // allTransactions: async (args, req) => {
-  //   const trans = await Transaction.find()
-  //     .sort({ createdAt: -1 })
-  //     .populate("user")
-  //     .populate("account"); 
-  //   // const user = await Player.findById(trans.user);
-  //   return trans.map((trans) => {
-  //     return {
-  //       ...trans?._doc,
-  //       _id: trans?.id,
-
-  //       createdAt: new Date(trans?._doc?.createdAt).toISOString(),
-  //       updatedAt: new Date(trans?._doc?.updatedAt).toISOString(),
-  //     };
-  //   });
-  // },
-
   allTransactions: async (args, req) => {
     try {
       let transactions;
@@ -218,7 +201,8 @@ const accountResolvers = {
       if (searchTerm == "" || !searchTerm) {
         // If no input is provided, return all records with pagination
         transactions = await Transaction.find()
-          .populate("user").populate("account")
+          .populate("user")
+          .populate("account")
           .skip((page - 1) * pageSize)
           .limit(pageSize)
           .sort({ createdAt: -1 })
@@ -228,7 +212,9 @@ const accountResolvers = {
         const regex = new RegExp(searchTerm, "i");
 
         // Find the player by username
-        const player = await Player.findOne({ username: { $in: [regex] } }).exec();
+        const player = await Player.findOne({
+          username: { $in: [regex] },
+        }).exec();
         // console.log(player)
 
         // Define the filter criteria based on the search term and user ID
@@ -244,7 +230,8 @@ const accountResolvers = {
 
         // Perform the search with filter      // Use lean() to convert the documents to plain JavaScript objects
         transactions = await Transaction.find(filter)
-          .populate("user").populate("account")
+          .populate("user")
+          .populate("account")
           .skip((page - 1) * pageSize)
           .limit(pageSize)
           .sort({ createdAt: -1 })

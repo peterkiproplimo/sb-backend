@@ -202,10 +202,6 @@ app.post("/confirmcompletedtrans", (req, res) => {
   const mpesaCallbackData = req.body;
   console.log("Received M-Pesa callback:", mpesaCallbackData);
 
-  // Perform any necessary processing based on the callback data
-  // ...
-
-  // Respond to the M-Pesa API with an appropriate response (e.g., a success message)
   res.json({ result: "Callback received and processed successfully" });
 });
 
@@ -214,10 +210,6 @@ app.post("/validatecompletedtrans", (req, res) => {
   const mpesaCallbackData = req.body;
   console.log("Received M-Pesa callback:", mpesaCallbackData);
 
-  // Perform any necessary processing based on the callback data
-  // ...
-
-  // Respond to the M-Pesa API with an appropriate response (e.g., a success message)
   res.json({ result: "Callback received and processed successfully" });
 });
 
@@ -226,10 +218,6 @@ app.post("/mpesa-timeout", (req, res) => {
   const mpesaCallbackData = req.body;
   console.log("Received M-Pesa callback:", mpesaCallbackData);
 
-  // Perform any necessary processing based on the callback data
-  // ...
-
-  // Respond to the M-Pesa API with an appropriate response (e.g., a success message)
   res.json({ result: "Callback received and processed successfully" });
 });
 
@@ -410,6 +398,7 @@ function setMultiplierValue(value) {
   BET_MULTIPLIERVALUE = value;
   return getMultiplierValue();
 }
+
 function getMultiplierValue() {
   return BET_MULTIPLIERVALUE;
 }
