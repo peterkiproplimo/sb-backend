@@ -123,7 +123,7 @@ async function getEndResults(nextMultiplier, gamestatus) {
 
     let winAmount = 0;
     let loseAmount = 0;
-    const houseAccount = await Account.findById("6549edb45d7a310028988145");
+    const houseAccount = await Account.findById("6555e4028e89bb00288767eb");
     // Iterate through the bets and update the "win" field based on the condition
     for (const bet of bets) {
       await Playerbet.updateOne({ _id: bet._id }, { $set: { completed: 1 } });
@@ -139,7 +139,9 @@ async function getEndResults(nextMultiplier, gamestatus) {
         const account = await Account.findOne({
           user: bet.userId,
         });
-
+        
+console.log(account);
+        
         account.balance =
           parseFloat(account?.balance) + parseFloat(bet.possibleWin);
 
