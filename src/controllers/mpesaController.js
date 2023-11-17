@@ -387,7 +387,7 @@ const mpesaResolvers = {
             })
           )
           .end(async (res) => {
-            console.log(res);
+            console.log(res.body);
             if (res.error) throw new Error(res.error);
             let filter = { user: args.userId };
             let update = {
