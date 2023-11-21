@@ -419,8 +419,8 @@ async function startGame() {
 
 server.listen(3002, async () => {
   await connectToDatabase();
-  await startGame();
-  getMultiplierValue();
+  // await startGame();
+  // getMultiplierValue();
 
   console.log(`listening on 3002`);
 });

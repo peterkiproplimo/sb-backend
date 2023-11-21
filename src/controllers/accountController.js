@@ -7,7 +7,7 @@ const Transaction = require("../models/transactions");
 const Logs = require("../models/logs");
 const Player = require("../models/Player");
 const Playerbet = require("../models/PlayerBet");
-
+const jwt = require("jsonwebtoken");
 async function fetchTotalWinsForPlayer(playerId) {
   let totalWins = 0;
 
@@ -332,20 +332,30 @@ const accountResolvers = {
   //    Get the user account balance
 
   accountBalance: async (args, req) => {
-    const account = await Account.findOne({ user: args.userId });
-    const user = await Player.findById(args.userId);
+    jwt.verify(
+      token.split(" ")[1],
+      process.env.SECRET_KEY,
+      async (err, decoded) => {
+        if (err) {
+          throw new Error("Unauthorized: Invalid token");
+        } else {
+          const account = await Account.findOne({ user: args.userId });
+          const user = await Player.findById(args.userId);
 
-    return {
-      _id: account?.id,
-      balance: account?.balance,
-      karibubonus: account?.karibubonus,
-      totalbalance:
-        parseFloat(account?.balance) + parseFloat(account?.karibubonus),
-      user: user,
-      createdAt: new Date(account?._doc?.createdAt).toISOString(),
-      updatedAt: new Date(account?._doc?.updatedAt).toISOString(),
-      active: account?.active,
-    };
+          return {
+            _id: account?.id,
+            balance: account?.balance,
+            karibubonus: account?.karibubonus,
+            totalbalance:
+              parseFloat(account?.balance) + parseFloat(account?.karibubonus),
+            user: user,
+            createdAt: new Date(account?._doc?.createdAt).toISOString(),
+            updatedAt: new Date(account?._doc?.updatedAt).toISOString(),
+            active: account?.active,
+          };
+        }
+      }
+    );
   },
 
   accountSummary: async (args, req) => {
