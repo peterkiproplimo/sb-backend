@@ -269,6 +269,14 @@ type HouseLosses {
   monthlyTotal: Float
 }
 
+type totalearned {
+  totalearned: Float
+}
+
+type totalpaid {
+  totalpaid: Float
+}
+
 type DashboardData {
   houseRevenue: HouseRevenue
   houseLose: HouseLosesToday
@@ -280,6 +288,10 @@ type DashboardData {
   houseLosses: HouseLosses
 }
 
+type affiliateProgram {
+  earned: totalearned
+  paid: totalpaid
+}
 
 input PlayerInput {
 username:String!
@@ -552,6 +564,7 @@ type RootQuery{
   calculateBalance:AccountBalance
   getAllPlayers(username: String, active: String, page: Int, per_page: Int): PlayersData!
   Dashboard: DashboardData
+  affiliate(userId:String): affiliateProgram
 
   
   getSinglePlayer(playerId: String!): SinglePlayer

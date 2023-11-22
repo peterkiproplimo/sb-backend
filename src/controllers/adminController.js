@@ -318,6 +318,17 @@ const adminResolvers = {
       houseLosses: houseLossesData,
     };
   },
+
+  affiliate: async ({ userId }) => {
+    // Your logic to fetch and return the data for the dashboard
+    // const totalearned = fetchTotalEarned();
+    // const totalpaid = fetchTotalPaid();
+
+    return {
+      earned: 100,
+      paid: 100,
+    };
+  },
   // Get the number of winners  in a particular month
   winnersPerMonth: async () => {
     const bets = await Bet.aggregate([
