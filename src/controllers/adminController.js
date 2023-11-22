@@ -295,6 +295,25 @@ async function fetchHouseLossesData() {
   // Return the total for the current month
   return { monthlyTotal: mytotalmoney }; // Replace with actual data
 }
+
+async function fetchTotalEarned() {
+  const today = new Date();
+
+  // Set the time to midnight (00:00:00)
+
+  // Return the total for the current month
+  return { totalearned: 100 }; // Replace with actual data
+}
+
+async function fetchTotalPaid() {
+  const today = new Date();
+
+  // Set the time to midnight (00:00:00)
+
+  // Return the total for the current month
+  return { totalpaid: 0 }; // Replace with actual data
+}
+
 const adminResolvers = {
   Dashboard: () => {
     // Your logic to fetch and return the data for the dashboard
@@ -321,12 +340,12 @@ const adminResolvers = {
 
   affiliate: async ({ userId }) => {
     // Your logic to fetch and return the data for the dashboard
-    // const totalearned = fetchTotalEarned();
-    // const totalpaid = fetchTotalPaid();
+    const totalearned = fetchTotalEarned();
+    const totalpaid = fetchTotalPaid();
 
     return {
-      earned: 100,
-      paid: 100,
+      earned: totalearned,
+      paid: totalpaid,
     };
   },
   // Get the number of winners  in a particular month
