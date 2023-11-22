@@ -296,16 +296,41 @@ async function fetchHouseLossesData() {
   return { monthlyTotal: mytotalmoney }; // Replace with actual data
 }
 
-async function fetchTotalEarned() {
-  const today = new Date();
+async function fetchTotalEarned(userId) {
+  try {
+    const result = await Playerbet.aggregate([
+      {
+        $match: {
+          userId: mongoose.Types.ObjectId(userId), // Assuming userId is in ObjectId format
+          win: true, // Filter records where win is true
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalEarned: { $sum: { $subtract: ["$winamount", "$betAmount"] } },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          totalEarned: 1,
+        },
+      },
+    ]).exec();
 
-  // Set the time to midnight (00:00:00)
-
-  // Return the total for the current month
-  return { totalearned: 100 }; // Replace with actual data
+    if (result && result.length > 0) {
+      return { totalearned: result[0].totalEarned };
+    } else {
+      return { totalearned: 0 };
+    }
+  } catch (error) {
+    console.error("Error:", error);
+    throw error; // Handle or rethrow the error as needed
+  }
 }
 
-async function fetchTotalPaid() {
+async function fetchTotalPaid(userId) {
   const today = new Date();
 
   // Set the time to midnight (00:00:00)
@@ -339,9 +364,8 @@ const adminResolvers = {
   },
 
   affiliate: async ({ userId }) => {
-    // Your logic to fetch and return the data for the dashboard
-    const totalearned = fetchTotalEarned();
-    const totalpaid = fetchTotalPaid();
+    const totalearned = fetchTotalEarned(userId);
+    const totalpaid = fetchTotalPaid(userId);
 
     return {
       earned: totalearned,
