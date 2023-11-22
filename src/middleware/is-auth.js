@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const User = require("../models/User");
+const User = require("../models/Player");
 
 module.exports = async (req, res, next) => {
   const authHeader = req.get("Authorization");
@@ -22,7 +22,7 @@ module.exports = async (req, res, next) => {
   }
   if (!decodedToken) {
     req.isAuth = false;
-    return next(); 
+    return next();
   }
   // check if iser in db
   const user = await User.findById(decodedToken.userId);

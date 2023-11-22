@@ -63,8 +63,8 @@ const corsOptions = {
 };
 
 app.use(express.json());
-// app.use(isAuth);
-app.use(authenticateToken);
+app.use(isAuth);
+// app.use(authenticateToken);
 app.use((req, res, next) => {
   const allowedOrigins = [
     "https://safaribust.techsavanna.technology",
