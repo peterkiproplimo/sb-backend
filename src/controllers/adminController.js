@@ -17,6 +17,7 @@ const permissions = require("../../permissions.json");
 const Player = require("../models/Player");
 const User = require("../models/User");
 const Playerbet = require("../models/PlayerBet");
+const Transaction = require("../models/transactions");
 
 const connectToDatabase = require("../../config/database");
 const { AggregationCursor } = require("mongoose");
