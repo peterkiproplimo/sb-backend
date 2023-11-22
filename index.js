@@ -11,6 +11,7 @@ const schema = require("./src/schema");
 const resolvers = require("./src/resolvers");
 //import the midleware to check for every incoming request if user is authenticated
 const isAuth = require("./src/middleware/is-auth");
+const authenticateToken = require("./src/utils/authenticationHandler");
 const house = require("./src/models/house");
 const Game = require("./src/models/Game");
 const Account = require("./src/models/Account");
@@ -62,7 +63,8 @@ const corsOptions = {
 };
 
 app.use(express.json());
-app.use(isAuth);
+// app.use(isAuth);
+app.use(authenticateToken);
 app.use((req, res, next) => {
   const allowedOrigins = [
     "https://safaribust.techsavanna.technology",
@@ -223,8 +225,6 @@ app.post("/mpesa-result", async (req, res) => {
       }
     }
   }
-  // Perform any necessary processing based on the callback data
-  // ...
 
   // Respond to the M-Pesa API with an appropriate response (e.g., a success message)
   res.json({ result: "Callback received and processed successfully" });
