@@ -331,12 +331,37 @@ async function fetchTotalEarned(userId) {
 }
 
 async function fetchTotalPaid(userId) {
-  const today = new Date();
+  try {
+    const result = await Transaction.aggregate([
+      {
+        $match: {
+          user: mongoose.Types.ObjectId(userId), // Match transactions for a specific user
+          type: 1, // Filter transactions of type 1
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalPaid: { $sum: "$amount" },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          totalPaid: 1,
+        },
+      },
+    ]).exec();
 
-  // Set the time to midnight (00:00:00)
-
-  // Return the total for the current month
-  return { totalpaid: 0 }; // Replace with actual data
+    if (result && result.length > 0) {
+      return { totalpaid: result[0].totalPaid };
+    } else {
+      return { totalpaid: 0 }; // If no transactions of type 1 found for the user
+    }
+  } catch (error) {
+    console.error("Error:", error);
+    throw error; // Handle or rethrow the error as needed
+  }
 }
 
 const adminResolvers = {
