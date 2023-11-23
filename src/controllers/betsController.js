@@ -26,98 +26,84 @@ const PlayerBet = require("../models/PlayerBet");
 
 const betsResolvers = {
   createPlayerbet: async (args, req) => {
-    try {
-      const token = req.headers.authorization;
+    const currentUser = req.user;
 
-      if (!token) {
-        throw new Error("Unauthorized: Missing token");
+    if (!currentUser) {
+      throw new Error("Unauthorized: Missing token");
+    }
+
+    try {
+      // Verify the token
+
+      const account = await Account.findOne({
+        user: args.playerbetInput.userId,
+      });
+      if (+account.balance < 0) {
+        throw new Error("Insufficient account balance");
+      }
+      if (account.balance < parseFloat(args.playerbetInput.betAmount)) {
+        throw new Error("Insufficient account balance");
       }
 
-      // Verify the token
-      jwt.verify(
-        token.split(" ")[1],
-        process.env.SECRET_KEY,
-        async (err, decoded) => {
-          if (err) {
-            return res
-              .status(401)
-              .json({ message: "Unauthorized: Invalid token" });
-          } else {
-            const account = await Account.findOne({
-              user: args.playerbetInput.userId,
-            });
-            if (+account.balance < 0) {
-              throw new Error("Insufficient account balance");
-            }
-            if (account.balance < parseFloat(args.playerbetInput.betAmount)) {
-              throw new Error("Insufficient account balance");
-            }
+      await handleKaribuBonusAndBalance(account, args);
+      // Check if player has bonus then deduct the bonus
+      // Subtract the player account balance
 
-            await handleKaribuBonusAndBalance(account, args);
-            // Check if player has bonus then deduct the bonus
-            // Subtract the player account balance
+      //  Add the house balance
+      const houseAccount = await Account.findById("6555e4028e89bb00288767eb");
+      houseAccount.balance =
+        parseFloat(houseAccount?.balance) +
+        parseFloat(args.playerbetInput.betAmount);
+      await houseAccount.save();
 
-            //  Add the house balance
-            const houseAccount = await Account.findById(
-              "6555e4028e89bb00288767eb"
-            );
-            houseAccount.balance =
-              parseFloat(houseAccount?.balance) +
-              parseFloat(args.playerbetInput.betAmount);
-            await houseAccount.save();
+      //  Get the possible win
+      let currentpossibleWin =
+        args.playerbetInput.betAmount * args.playerbetInput.point;
+      const winamount = currentpossibleWin - args.playerbetInput.betAmount;
+      const withholdingtax = ((20 / 100) * winamount).toFixed(2);
+      const finalwinamount = winamount - withholdingtax;
+      let possibleWin = (
+        parseFloat(args.playerbetInput.betAmount) + finalwinamount
+      ).toFixed(2);
 
-            //  Get the possible win
-            let currentpossibleWin =
-              args.playerbetInput.betAmount * args.playerbetInput.point;
-            const winamount =
-              currentpossibleWin - args.playerbetInput.betAmount;
-            const withholdingtax = ((20 / 100) * winamount).toFixed(2);
-            const finalwinamount = winamount - withholdingtax;
-            let possibleWin = (
-              parseFloat(args.playerbetInput.betAmount) + finalwinamount
-            ).toFixed(2);
+      const bet = new Playerbet({
+        betAmount: args.playerbetInput.betAmount,
+        point: args.playerbetInput.point,
+        userId: args.playerbetInput.userId,
+        played: 0,
+        completed: 0,
+        possibleWin: possibleWin,
+        win: false,
+        winamount: winamount,
+        withholdingtax: withholdingtax,
+      });
 
-            const bet = new Playerbet({
-              betAmount: args.playerbetInput.betAmount,
-              point: args.playerbetInput.point,
-              userId: args.playerbetInput.userId,
-              played: 0,
-              completed: 0,
-              possibleWin: possibleWin,
-              win: false,
-              winamount: winamount,
-              withholdingtax: withholdingtax,
-            });
+      const results = await bet.save();
 
-            const results = await bet.save();
+      const betrans = new BetTransaction({
+        type: "bet",
+        usertype: "player",
+        amount: args.playerbetInput.betAmount,
+        account: account,
+      });
 
-            const betrans = new BetTransaction({
-              type: "bet",
-              usertype: "player",
-              amount: args.playerbetInput.betAmount,
-              account: account,
-            });
+      await betrans.save();
 
-            await betrans.save();
+      const user = await Player.findById(args.playerbetInput.userId);
 
-            const user = await Player.findById(args.playerbetInput.userId);
+      // Format and return the result
+      const createdBet = {
+        ...results._doc,
+        _id: results._id.toString(),
+        userId: user,
+        createdAt: new Date(results._doc.createdAt).toISOString(),
+        updatedAt: new Date(results._doc.updatedAt).toISOString(),
+        Player: {
+          _id: user._id.toString(), // Include the _id of the associated Player
+        },
+      };
 
-            // Format and return the result
-            const createdBet = {
-              ...results._doc,
-              _id: results._id.toString(),
-              userId: user,
-              createdAt: new Date(results._doc.createdAt).toISOString(),
-              updatedAt: new Date(results._doc.updatedAt).toISOString(),
-              Player: {
-                _id: user._id.toString(), // Include the _id of the associated Player
-              },
-            };
-
-            return createdBet;
-          }
-        }
-      );
+      return createdBet;
     } catch (err) {
       console.log(err);
     }
