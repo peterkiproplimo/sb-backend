@@ -332,30 +332,39 @@ const accountResolvers = {
   //    Get the user account balance
 
   accountBalance: async (args, req) => {
-    jwt.verify(
-      token.split(" ")[1],
-      process.env.SECRET_KEY,
-      async (err, decoded) => {
-        if (err) {
-          throw new Error("Unauthorized: Invalid token");
-        } else {
-          const account = await Account.findOne({ user: args.userId });
-          const user = await Player.findById(args.userId);
+    try {
+      const token = req.headers.authorization;
 
-          return {
-            _id: account?.id,
-            balance: account?.balance,
-            karibubonus: account?.karibubonus,
-            totalbalance:
-              parseFloat(account?.balance) + parseFloat(account?.karibubonus),
-            user: user,
-            createdAt: new Date(account?._doc?.createdAt).toISOString(),
-            updatedAt: new Date(account?._doc?.updatedAt).toISOString(),
-            active: account?.active,
-          };
-        }
+      if (!token) {
+        throw new Error("Unauthorized: Missing token");
       }
-    );
+      jwt.verify(
+        token.split(" ")[1],
+        process.env.SECRET_KEY,
+        async (err, decoded) => {
+          if (err) {
+            throw new Error("Unauthorized: Invalid token");
+          } else {
+            const account = await Account.findOne({ user: args.userId });
+            const user = await Player.findById(args.userId);
+
+            return {
+              _id: account?.id,
+              balance: account?.balance,
+              karibubonus: account?.karibubonus,
+              totalbalance:
+                parseFloat(account?.balance) + parseFloat(account?.karibubonus),
+              user: user,
+              createdAt: new Date(account?._doc?.createdAt).toISOString(),
+              updatedAt: new Date(account?._doc?.updatedAt).toISOString(),
+              active: account?.active,
+            };
+          }
+        }
+      );
+    } catch (err) {
+      console.log(err);
+    }
   },
 
   accountSummary: async (args, req) => {
