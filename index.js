@@ -94,13 +94,10 @@ const server = new ApolloServer({
   }),
 });
 
-// server.applyMiddleware({ app });
-
 app.use(express.json());
-// app.use(isAuth);
+
 app.use(authenticateJWT); // Apply the middleware to authenticate JWT for all incoming requests
 
-// app.use(authenticateToken);
 app.use((req, res, next) => {
   const allowedOrigins = [
     "https://safaribust.techsavanna.technology",
@@ -428,9 +425,7 @@ async function waitCount() {
 
       const nextMultiplier = await getNextMultiplier();
 
-      // console.log("Next multiplier", nextMultiplier);
       if (nextMultiplier) {
-        // console.log("Update players");
         // Update all the players with the curent game id
         const setro = await setAllNextRoundPlayersWithRoundId(nextMultiplier);
         // Start the timer with the next multiplier
@@ -452,14 +447,6 @@ async function startGame() {
 }
 
 //  Start server and Game
-
-// httpServer.listen(3002, async () => {
-//   await connectToDatabase();
-//   // await startGame();
-//   // getMultiplierValue();
-
-//   console.log(`listening on 3002`);
-// });
 
 async function startApolloServer() {
   await server.start();

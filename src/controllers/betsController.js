@@ -14,14 +14,9 @@ const Player = require("../models/Player");
 const BetTransaction = require("../models/BetTransactions");
 const History = require("../models/history");
 const {
-  updatePlayerAc,
   handleKaribuBonusAndBalance,
 } = require("../utils/playerAccountHandler");
 
-const {
-  getRoundFromDatabase,
-  getCurrentRoundFromDatabase,
-} = require("../utils/playgamedboperations");
 const PlayerBet = require("../models/PlayerBet");
 
 const betsResolvers = {
