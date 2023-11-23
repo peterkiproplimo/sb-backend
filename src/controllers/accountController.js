@@ -343,7 +343,10 @@ const accountResolvers = {
         process.env.SECRET_KEY,
         async (err, decoded) => {
           if (err) {
-            throw new Error("Unauthorized: Invalid token");
+            // throw new Error("Unauthorized: Invalid token");
+            return res
+              .status(401)
+              .json({ message: "Unauthorized: Invalid token" });
           } else {
             const account = await Account.findOne({ user: args.userId });
             const user = await Player.findById(args.userId);
