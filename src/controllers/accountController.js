@@ -421,10 +421,12 @@ const accountResolvers = {
       .skip((page - 1) * limit)
       .limit(limit)
       .populate("user"),
+
   updateBalance: (args, req) => {
-    if (!req.isAuth) {
-      throw new Error("Unauthenticated");
-    }
+    // if (!req.isAuth) {
+    //   throw new Error("Unauthenticated");
+    // }
+    // console.log(args.accountId)
     try {
       return Account.findById(args.accountId)
         .populate("user")
@@ -432,6 +434,7 @@ const accountResolvers = {
           if (!account) {
             throw new Error("Account not found");
           }
+          console.log(account._id)
           // account.balance = parseFloat(account.balance) + args.amount     //uncomment if balance update is by addition
           account.balance = parseFloat(args.amount); //this get the new updated balance
           await account.save();
@@ -443,6 +446,7 @@ const accountResolvers = {
           });
 
           log.save();
+          console.log(account)
           return {
             status: "success",
             message: `${account.user.username} balance updated to ${account.balance}`,

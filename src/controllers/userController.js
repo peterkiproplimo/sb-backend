@@ -40,7 +40,72 @@ const userResolvers = {
   },
   // users methods
   getUser: async ({ userId }) => await User.findById(userId),
-  getUsers: async () => await User.find().sort({ createdAt: -1 }),
+  // getUsers: async () => await User.find().sort({ createdAt: -1 }),
+  getUsers: async (args, req) => {
+    try {
+      let users;
+      const searchTerm = args.searchTerm;
+      const status = parseInt(args.status) || "";
+      // Apply pagination
+      const page = parseInt(args.page) || 1;
+      const pageSize = parseInt(args.per_page) || 10;
+
+      // Check if input object is provided
+      if (searchTerm == "" || !searchTerm) {
+        // If no input is provided, return all records with pagination
+        users = await User.find()
+          .skip((page - 1) * pageSize)
+          .limit(pageSize)
+          .sort({ createdAt: -1 })
+          .lean();
+      } else {
+        // Use a regular expression to perform a case-insensitive search
+        const regex = new RegExp(searchTerm, "i");
+
+        // Find the player by username
+        const player = await User.findOne({ username: { $in: [regex] } }).exec();
+        // console.log(player)
+
+        // Define the filter criteria based on the search term and user ID
+        const filter = {
+          $or: [
+            { status:  status},
+            { username: { $in: [regex] } },
+            { phoneNumber: { $in: [regex] } },
+            { role: { $in: [regex] } },
+            // Add more fields as needed
+          ],
+        };
+
+        // Perform the search with filter      // Use lean() to convert the documents to plain JavaScript objects
+        users = await PlayerBet.find(filter)
+          .skip((page - 1) * pageSize)
+          .limit(pageSize)
+          .sort({ createdAt: -1 })
+          .lean();
+      }
+
+      // console.log(bets);
+
+      // Calculate pagination metadata
+      const totalItems = await User.countDocuments();
+      const totalPages = Math.ceil(totalItems / pageSize);
+
+      return {
+        users: users,
+        paginationInfo: {
+          total_pages: totalPages,
+          current_page: page,
+          total_items: totalItems,
+          per_page: pageSize,
+        },
+      };
+    } catch (error) {
+      console.log(error);
+      throw new Error("Error fetching users", "INTERNAL_SERVER_ERROR");
+    }
+  },
+
   createUser: (args, req) => {
     const phoneNumber = formatKenyanPhoneNumber(args.userInput.phoneNumber);
     return User.findOne({
@@ -48,6 +113,10 @@ const userResolvers = {
     })
       .then((user) => {
         if (user) {
+          // return {
+          //   status: "error",
+          //   message: `${args.userInput.username} already exists`,
+          // };
           throw new Error("User already exists!!!");
         }
         return bcrypt.hash(args.userInput.password, 12);
@@ -71,6 +140,10 @@ const userResolvers = {
         });
 
         await log.save();
+        return {
+          status: "success",
+          message: `${args.userInput.username} role created`,
+        };
         return result;
       });
   },

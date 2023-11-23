@@ -7,7 +7,6 @@ type User {
   status:Boolean!
   deleted:Boolean!
   password: String!
-  tokenValidity:String
   username:String!
   role:String
   createdAt:String
@@ -387,7 +386,7 @@ input UpdateUserInput {
 
 input CreateRoleInput {
   name: String!
-  permissions: [ID!]
+  description: String!
 }
 
 
@@ -429,7 +428,9 @@ amount:Float
 type Role {
   _id: ID!
   name: String!
-  permissions: [Permission!]!
+  description: String
+  createdAt:String!
+  updatedAt:String!
 }
 
 type Permission {
@@ -486,6 +487,10 @@ type TransactionsData{
   transactions: [Transaction]!,
   paginationInfo: PaginationInfo
 }
+type UsersData{
+  users: [User]!
+  paginationInfo: PaginationInfo
+}
 type PaginationInfo{
   current_page: Int,
   total_pages: Int,
@@ -496,7 +501,7 @@ type PaginationInfo{
 
 
 type RootQuery{
-  getUsers: [User!]!
+  getUsers(searchTerm: String, status: String, page: Int, per_page: Int): UsersData!
   getUser(userId: String): User!
   aPlayer(username:String!):Player!
   admins: [Admin!]!
@@ -586,7 +591,7 @@ type RootMutation{
   editAdminUserPhone(username:String, phone:String, initiator:String!):User!
   editAdminUser(username:String, initiator:String!, phone:String, type:String!):Admin!
   createPlayerbet(playerbetInput: PlayerbetInput!): Playerbet
-  createRole(roleInput : CreateRoleInput): Role
+  createRole(roleInput : CreateRoleInput): Response
   withdrawTest(userId: String!, amount: Float!, phone: String!): Account
   createChat(chatInput: ChatInput!): Chat!
   logoutPlayer(username:String!):Player!
@@ -594,7 +599,7 @@ type RootMutation{
   suspendPlayer(playerId:String!):Response!
 
   adminLogin(username: String!, password: String!): adminAuthData!
-  createUser(userInput: CreateUserInput): User!
+  createUser(userInput: CreateUserInput): Response!
   updateUser(userInput: UpdateUserInput): User!
   deleteUser(userId: String!): Response!
   restoreUser(userId: String!): Response!

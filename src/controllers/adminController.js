@@ -976,23 +976,22 @@ const adminResolvers = {
   createRole: async (args, req) => {
     console.log(args.roleInput);
     try {
-      // Fetch the selected permissions by their IDs
-      const selectedPermissions = await Permission.find({
-        _id: { $in: args.roleInput.permissions },
-      });
-
+      
       const role = new Role({
         name: args.roleInput.name,
-        permissions: selectedPermissions,
+        description: args.roleInput.description,
       });
 
       await role.save();
       console.log(
-        `Role "${args.roleInput.name}" created with permissions:`,
-        selectedPermissions
+        `Role "${args.roleInput.name}" created with permissions:`
       );
 
-      return role;
+      return {
+        status: "success",
+        message: `${args.roleInput.name} role created`,
+      };
+
     } catch (error) {
       console.error("Error creating role:", error);
       throw new Error("Failed to create role");
