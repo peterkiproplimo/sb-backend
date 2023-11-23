@@ -331,7 +331,12 @@ const accountResolvers = {
 
   //    Get the user account balance
 
-  accountBalance: async (args, req) => {
+  accountBalance: async (args, req, context) => {
+    const currentUser = context.user;
+
+    if (!currentUser) {
+      throw new Error("Unauthorized: Missing token");
+    }
     try {
       const token = req.headers.authorization;
 

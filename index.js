@@ -5,7 +5,7 @@ const { graphqlHTTP } = require("express-graphql");
 var schedule = require("node-schedule");
 const http = require("http");
 const app = express();
-const server = http.createServer(app);
+const httpServer = http.createServer(app);
 const socketAuth = require("./src/middleware/socketAuth");
 const schema = require("./src/schema");
 const resolvers = require("./src/resolvers");
@@ -16,6 +16,9 @@ const house = require("./src/models/house");
 const Game = require("./src/models/Game");
 const Account = require("./src/models/Account");
 const Transaction = require("./src/models/transactions");
+const jwt = require("jsonwebtoken");
+const { ApolloServer } = require("apollo-server-express");
+
 // Update the path if needed
 const cors = require("cors");
 
@@ -62,8 +65,39 @@ const corsOptions = {
   optionSuccessStatus: 200,
 };
 
+const authenticateJWT = (req, res, next) => {
+  const token = req.headers.authorization?.split(" ")[1];
+
+  if (token) {
+    jwt.verify(token, process.env.SECRET_KEY, (err, decodedToken) => {
+      if (err) {
+        // Handle token verification failure
+        // For example: res.status(401).json({ message: 'Invalid token' });
+        req.user = null;
+      } else {
+        req.user = decodedToken; // Attach user information to the request object
+      }
+      next();
+    });
+  } else {
+    req.user = null;
+    next();
+  }
+};
+
+const server = new ApolloServer({
+  schema,
+  context: ({ req }) => ({
+    user: req.user, // Pass authenticated user from middleware to GraphQL context
+  }),
+});
+
+// server.applyMiddleware({ app });
+
 app.use(express.json());
-app.use(isAuth);
+// app.use(isAuth);
+app.use(authenticateJWT); // Apply the middleware to authenticate JWT for all incoming requests
+
 // app.use(authenticateToken);
 app.use((req, res, next) => {
   const allowedOrigins = [
@@ -116,7 +150,7 @@ app.use(
   })
 );
 
-const io = socketIO(server);
+const io = socketIO(httpServer);
 
 const onConnection = (socket) => {
   connection(io, socket);
@@ -417,12 +451,35 @@ async function startGame() {
 
 //  Start server and Game
 
-server.listen(3002, async () => {
-  await connectToDatabase();
-  await startGame();
-  getMultiplierValue();
+// httpServer.listen(3002, async () => {
+//   await connectToDatabase();
+//   // await startGame();
+//   // getMultiplierValue();
 
-  console.log(`listening on 3002`);
+//   console.log(`listening on 3002`);
+// });
+
+async function startApolloServer() {
+  await server.start();
+
+  // Apply Apollo Server middleware to the app after the server has started
+  server.applyMiddleware({ app });
+
+  // Create an HTTP server with your Express app
+  const httpServer = http.createServer(app);
+
+  // Start the server
+  httpServer.listen(3002, async () => {
+    await connectToDatabase();
+    // await startGame();
+    // getMultiplierValue();
+
+    console.log(`listening on 3002`);
+  });
+}
+
+startApolloServer().catch((err) => {
+  console.error("Error starting Apollo Server:", err);
 });
 
 // Helper functions
