@@ -309,6 +309,11 @@ const betsResolvers = {
 
   // Get the History bets
   historyBets: async (args, req) => {
+    const currentUser = req.user;
+
+    if (!currentUser) {
+      throw new Error("Unauthorized: Missing token");
+    }
     const bets = await Playerbet.find({ userId: args.userId })
       .populate("userId")
       .sort({
