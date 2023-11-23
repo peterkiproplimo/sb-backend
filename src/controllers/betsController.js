@@ -2,6 +2,7 @@ require("dotenv").config();
 
 const moment = require("moment");
 
+const jwt = require("jsonwebtoken");
 const Account = require("../models/Account");
 const Bet = require("../models/Bet");
 const Logs = require("../models/logs");
@@ -13,19 +14,22 @@ const Player = require("../models/Player");
 const BetTransaction = require("../models/BetTransactions");
 const History = require("../models/history");
 const {
-  updatePlayerAc,
   handleKaribuBonusAndBalance,
 } = require("../utils/playerAccountHandler");
 
-const {
-  getRoundFromDatabase,
-  getCurrentRoundFromDatabase,
-} = require("../utils/playgamedboperations");
 const PlayerBet = require("../models/PlayerBet");
 
 const betsResolvers = {
   createPlayerbet: async (args, req) => {
+    const currentUser = req.user;
+
+    if (!currentUser) {
+      throw new Error("Unauthorized: Missing token");
+    }
+
     try {
+      // Verify the token
+
       const account = await Account.findOne({
         user: args.playerbetInput.userId,
       });
@@ -41,7 +45,7 @@ const betsResolvers = {
       // Subtract the player account balance
 
       //  Add the house balance
-      const houseAccount = await Account.findById("6549edb45d7a310028988145");
+      const houseAccount = await Account.findById("6555e4028e89bb00288767eb");
       houseAccount.balance =
         parseFloat(houseAccount?.balance) +
         parseFloat(args.playerbetInput.betAmount);
@@ -162,7 +166,7 @@ const betsResolvers = {
           total_pages: totalPages,
           total_items: totalItems,
           per_page: itemsPerPage,
-        }
+        },
       };
     } catch (error) {
       throw new Error("Error fetching players: " + error.message);
@@ -300,6 +304,11 @@ const betsResolvers = {
 
   // Get the History bets
   historyBets: async (args, req) => {
+    const currentUser = req.user;
+
+    if (!currentUser) {
+      throw new Error("Unauthorized: Missing token");
+    }
     const bets = await Playerbet.find({ userId: args.userId })
       .populate("userId")
       .sort({
@@ -375,13 +384,15 @@ const betsResolvers = {
         const regex = new RegExp(searchTerm, "i");
 
         // Find the player by username
-        const player = await Player.findOne({ username: { $in: [regex] } }).exec();
+        const player = await Player.findOne({
+          username: { $in: [regex] },
+        }).exec();
         // console.log(player)
 
         // Define the filter criteria based on the search term and user ID
         const filter = {
           $or: [
-            { win:  args.win == "0" ? true : false},
+            { win: args.win == "0" ? true : false },
             // { createdAt: { $regex: regex } },
             { userId: player ? player._id : null },
             // Add more fields as needed
@@ -505,10 +516,11 @@ const betsResolvers = {
     const ipAddress = req.socket.remoteAddress;
     const log = new Logs({
       ip: ipAddress,
-      description: `User ${args.betInput.win ? "won " : "lost"} ${args.betInput.win
+      description: `User ${args.betInput.win ? "won " : "lost"} ${
+        args.betInput.win
           ? parseFloat(+args.betInput.amount).toFixed(2)
           : parseFloat(+args.betInput.betAmount).toFixed(2)
-        }`,
+      }`,
       user: args.betInput.user,
       round: args.betInput.round,
       won: args.betInput.win,

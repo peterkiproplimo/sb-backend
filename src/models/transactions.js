@@ -5,7 +5,7 @@ const Schema = mongoose.Schema;
 const transactionSchema = new Schema(
   {
     type: {
-      type: String,
+      type: Number,
       required: true,
     },
     trans_id: {
@@ -17,6 +17,7 @@ const transactionSchema = new Schema(
       type: String,
       required: false,
     },
+    // For Mpesa express
     MerchantRequestID: {
       type: String,
       required: false,
@@ -25,6 +26,24 @@ const transactionSchema = new Schema(
       type: String,
       required: false,
     },
+
+    // For B2C
+    OriginatorConversationID: {
+      type: String,
+      required: false,
+    },
+    ConversationID: {
+      type: String,
+      required: false,
+    },
+
+    //  For Paybill
+
+    TransID: {
+      type: String,
+      required: false,
+    },
+
     mpesaReceiptNumber: {
       type: String,
       required: false,
@@ -41,6 +60,10 @@ const transactionSchema = new Schema(
       type: String,
       required: false,
     },
+    ResultDesc: {
+      type: String,
+      required: false,
+    },
     balance: {
       type: Number,
       required: false,
@@ -49,6 +72,7 @@ const transactionSchema = new Schema(
       type: Number,
       required: false,
     },
+
     username: {
       type: String,
       required: false,
@@ -62,9 +86,11 @@ const transactionSchema = new Schema(
       required: true,
     },
     status: {
-      type: String,
+      type: Number,
       required: false,
+      default: 0,
     },
+
     user: {
       type: Schema.Types.ObjectId,
       ref: "Player",

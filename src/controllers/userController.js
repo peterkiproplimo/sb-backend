@@ -183,8 +183,10 @@ const userResolvers = {
         if (!user) {
           throw new Error("User NOT found!!");
         }
-        user.deleted = true;
-        return user.save();
+        // user.deleted = true;
+        // Disable soft delete enable hard delete
+        return User.deleteOne({ _id: args.userId });
+        // return user.save();
       })
       .then(async (result) => {
         console.log(123);

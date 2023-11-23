@@ -51,8 +51,9 @@ const authResolvers = {
     const token = await jwt.sign(
       { userId: user.id, phone: user.phone },
       process.env.SECRET_KEY,
-      { expiresIn: "7d" }
+      { expiresIn: "1h" } // Set the token to expire in 1 hour
     );
+
     return {
       userId: user.id,
       type: user.type,
@@ -136,6 +137,7 @@ const authResolvers = {
     await log.save();
     return user;
   },
+
   logoutUser: async (args, req) => {
     const user = await User.findOne({ username: args.username });
     if (!user) {

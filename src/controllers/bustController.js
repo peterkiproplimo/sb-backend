@@ -123,6 +123,24 @@ function gameVerifier(seed) {
   return Math.max(1, result / 100);
 }
 
+async function deleteGamesWithPlayedZero() {
+  try {
+    await connectToDatabase();
+
+    const deletionResult = await Game.deleteMany({
+      bustpoint: { $gt: 20 },
+    });
+
+    console.log(`${deletionResult.deletedCount} games deleted.`);
+  } catch (error) {
+    console.error("Error:", error);
+  } finally {
+    // await client.close();
+  }
+}
+
+// Call the function to delete games where played is 0
+// deleteGamesWithPlayedZero();
 async function generateAndSaveGameResults() {
   try {
     await connectToDatabase();
@@ -132,7 +150,7 @@ async function generateAndSaveGameResults() {
       const inputString = crypto.randomBytes(32).toString("hex");
       const saltedHash = gameResult(inputString);
 
-      if (saltedHash.bustpoint <= 100) {
+      if (saltedHash.bustpoint <= 20) {
         results.push({
           bustpoint: saltedHash.bustpoint,
           seedeed: inputString,
@@ -190,6 +208,9 @@ async function exportToExcel() {
 
 // exportToExcel();
 
+// setInterval(async () => {
+// generateAndSaveGameResults();
+// }, 2000);
 setInterval(async () => {
   generateAndSaveGameResults();
 }, 2000);

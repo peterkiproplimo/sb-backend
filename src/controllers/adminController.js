@@ -17,6 +17,7 @@ const permissions = require("../../permissions.json");
 const Player = require("../models/Player");
 const User = require("../models/User");
 const Playerbet = require("../models/PlayerBet");
+const Transaction = require("../models/transactions");
 
 const connectToDatabase = require("../../config/database");
 const { AggregationCursor } = require("mongoose");
@@ -296,6 +297,75 @@ async function fetchHouseLossesData() {
   // Return the total for the current month
   return { monthlyTotal: mytotalmoney }; // Replace with actual data
 }
+
+async function fetchTotalEarned(userId) {
+  try {
+    const result = await Playerbet.aggregate([
+      {
+        $match: {
+          userId: mongoose.Types.ObjectId(userId), // Assuming userId is in ObjectId format
+          win: true, // Filter records where win is true
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalEarned: { $sum: { $subtract: ["$winamount", "$betAmount"] } },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          totalEarned: 1,
+        },
+      },
+    ]).exec();
+
+    if (result && result.length > 0) {
+      return { totalearned: result[0].totalEarned };
+    } else {
+      return { totalearned: 0 };
+    }
+  } catch (error) {
+    console.error("Error:", error);
+    throw error; // Handle or rethrow the error as needed
+  }
+}
+
+async function fetchTotalPaid(userId) {
+  try {
+    const result = await Transaction.aggregate([
+      {
+        $match: {
+          user: mongoose.Types.ObjectId(userId), // Match transactions for a specific user
+          type: 1, // Filter transactions of type 1
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalPaid: { $sum: "$amount" },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          totalPaid: 1,
+        },
+      },
+    ]).exec();
+
+    if (result && result.length > 0) {
+      return { totalpaid: result[0].totalPaid };
+    } else {
+      return { totalpaid: 0 }; // If no transactions of type 1 found for the user
+    }
+  } catch (error) {
+    console.error("Error:", error);
+    throw error; // Handle or rethrow the error as needed
+  }
+}
+
 const adminResolvers = {
   Dashboard: () => {
     // Your logic to fetch and return the data for the dashboard
@@ -317,6 +387,16 @@ const adminResolvers = {
       walletsTotal: walletsTotalData,
       houseWins: houseWinsData,
       houseLosses: houseLossesData,
+    };
+  },
+
+  affiliate: async ({ userId }) => {
+    const totalearned = fetchTotalEarned(userId);
+    const totalpaid = fetchTotalPaid(userId);
+
+    return {
+      earned: totalearned,
+      paid: totalpaid,
     };
   },
   // Get the number of winners  in a particular month

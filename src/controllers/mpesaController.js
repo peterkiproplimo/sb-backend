@@ -15,122 +15,13 @@ const Player = require("../models/Player");
 const Mpesa = require("mpesa-node");
 let unirest = require("unirest");
 
-const mpesaApi = new Mpesa({
-  consumerKey: "ROqiKlEFF9Gb4BmYtTbhPlxk0NYfATg8",
-  consumerSecret: "R8Kd6wFX6ot3L7Th",
-});
-
 const mpesaResolvers = {
-  deposit: async (args, req) => {
-    try {
-      const consumer_key = "ROqiKlEFF9Gb4BmYtTbhPlxk0NYfATg8";
-      const consumer_secret = "R8Kd6wFX6ot3L7Th";
-      const url =
-        "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials";
-      const auth = btoa(`${consumer_key}:${consumer_secret}`);
-      const { data } = await axios.get(url, {
-        headers: { Authorization: "Basic" + " " + auth },
-      });
-      if (data.access_token) {
-        const timestamp = formatDate();
-        const shortcode = 174379;
-        const passkey =
-          "MTc0Mzc5YmZiMjc5ZjlhYTliZGJjZjE1OGU5N2RkNzFhNDY3Y2QyZTBjODkzMDU5YjEwZjc4ZTZiNzJhZGExZWQyYzkxOTIwMTYwMjE2MTY1NjI3";
-        const password = Buffer.from(shortcode + passkey + timestamp).toString(
-          "base64"
-        );
-
-        let unirest = require("unirest");
-        let req = unirest(
-          "POST",
-          "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest"
-        )
-          .headers({
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${data.access_token}`,
-            Host: "api.safaricom.co.ke",
-          })
-          .send(
-            JSON.stringify({
-              BusinessShortCode: shortcode,
-              Password: password,
-              Timestamp: timestamp,
-              TransactionType: "CustomerPayBillOnline",
-              Amount: parseInt(args.amount),
-              PartyA: parseInt(args.phone),
-              PartyB: shortcode,
-              PhoneNumber: parseInt(args.phone),
-              CallBackURL:
-                "https://sb-backend-cpe5.onrender.com/mpesa-callback",
-              AccountReference: parseInt(args.phone),
-              TransactionDesc: "Deposit to SAFARIBUST Account",
-            })
-          )
-          .end((res) => {
-            if (res.error) throw new Error(res.error);
-            var con = mysql.createConnection({
-              host: "173.214.168.54",
-              user: "bustadmin_dbadm",
-              password: ";,bp~AcEX,*a",
-              database: "bustadmin_paydb",
-            });
-            con.connect(function (err) {
-              if (err) throw err;
-              setInterval(() => {
-                con.query(
-                  `SELECT * FROM transaction WHERE bill_ref_number='${args.phone}' ORDER BY trans_time DESC`,
-                  function (err, result) {
-                    if (err) throw err;
-                    let data = [];
-
-                    Object.keys(result).forEach(async function (key) {
-                      var row = result[key];
-                      const transaction = await Transaction.findOne({
-                        trans_id: row.trans_id,
-                      });
-                      data.push(row.trans_id);
-                      if (!transaction) {
-                        const trans = new Transaction({
-                          type: "Deposit",
-                          trans_id: row.trans_id,
-                          bill_ref_number: row.bill_ref_number,
-                          trans_time: row.trans_time,
-                          amount: row.trans_amount,
-                          user: args.userId,
-                        });
-                        await trans.save();
-                        const account = await Account.findOne({
-                          user: args.userId,
-                        });
-                        account.balance =
-                          parseFloat(account?.balance) +
-                          parseFloat(row.trans_amount);
-                        await account.save();
-                        // const ipAddress = req.socket.remoteAddress;
-                        const log = new Logs({
-                          ip: "deposits",
-                          description: `${account?.user?.username} deposited ${args.amount}- Account Name:${account?.user?.username}`,
-                          user: args.userId,
-                        });
-                        await log.save();
-                        con.end(() => console.log("connection closed"));
-                      }
-                      con.end(() => console.log("connection closed"));
-                    });
-                  },
-                  10000
-                );
-              });
-            });
-            con.destroy();
-          });
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  },
-
   depositTest: async (args, req) => {
+    const currentUser = req.user;
+
+    if (!currentUser) {
+      throw new Error("Unauthorized: Missing token");
+    }
     try {
       const consumer_key = "5PEvsVfLvBHx3SaJszsuJvzUEMIC3KGu";
       const consumer_secret = "lnqSApRJLo3ahd20";
@@ -188,7 +79,7 @@ const mpesaResolvers = {
               const account = await Account.findOne({ user: args.userId });
               console.log(res.body);
               const trans = new Transaction({
-                type: "Deposit",
+                type: 1,
                 MerchantRequestID: res.body.MerchantRequestID,
                 CheckoutRequestID: res.body.CheckoutRequestID,
                 trans_time: timestamp,
@@ -224,114 +115,14 @@ const mpesaResolvers = {
       console.log(err);
     }
   },
-  depositTestProd: async (args, req) => {
-    console.log(args);
-    try {
-      const trans = new Transaction({
-        type: "Deposit",
-        trans_id: " row.trans_id",
-        bill_ref_number: "row.bill_ref_number",
-        trans_time: "row.trans_time",
-        amount: args.amount,
-        user: args.userId,
-      });
-      await trans.save();
-
-      const account = await Account.findOne({
-        user: args.userId,
-      });
-
-      if (account.isfirstdebosit && parseFloat(args.amount) >= 100) {
-        account.karibubonus = parseFloat(args.amount) * 2;
-        if (account.karibubonus >= 10000) {
-          account.karibubonus = 10000;
-        }
-        account.isfirstdebosit = false;
-        const currentDate = new Date();
-        const sevenDaysLater = new Date(currentDate);
-        sevenDaysLater.setDate(currentDate.getDate() + 7);
-        const formattedDate = sevenDaysLater.toISOString().replace(/\.000/, "");
-
-        account.bonusexpirydate = formattedDate;
-      }
-
-      account.balance = parseFloat(account?.balance) + parseFloat(args.amount);
-      await account.save();
-      // const ipAddress = req.socket.remoteAddress;
-      const log = new Logs({
-        ip: "deposits",
-        description: `${account?.user?.username} deposited ${args.amount}- Account Name:${account?.user?.username}`,
-        user: args.userId,
-      });
-      await log.save();
-
-      const user = await Player.findById(args.userId);
-      return {
-        _id: account?.id,
-        balance: account?.balance,
-        user: user,
-        createdAt: new Date(account?._doc?.createdAt).toISOString(),
-        updatedAt: new Date(account?._doc?.updatedAt).toISOString(),
-        active: account?.active,
-      };
-    } catch (err) {
-      console.log(err);
-    }
-  },
-
-  depositManual: (args, req) => {
-    var con = mysql.createConnection({
-      host: "173.214.168.54",
-      user: "bustadmin_dbadm",
-      password: ";,bp~AcEX,*a",
-      database: "bustadmin_paydb",
-    });
-    con.connect(function (err) {
-      if (err) throw err;
-
-      con.query(
-        `SELECT * FROM transaction WHERE bill_ref_number='${args.phone}' ORDER BY trans_time DESC`,
-        function (err, result) {
-          if (err) throw err;
-          let data = [];
-
-          Object.keys(result).forEach(async function (key) {
-            var row = result[key];
-            const transaction = await Transaction.findOne({
-              trans_id: row.trans_id,
-            });
-            data.push(row.trans_id);
-            if (!transaction) {
-              const trans = new Transaction({
-                type: "Deposit",
-                trans_id: row.trans_id,
-                bill_ref_number: row.bill_ref_number,
-                trans_time: row.trans_time,
-                amount: row.trans_amount,
-                user: args.userId,
-              });
-              await trans.save();
-              const account = await Account.findOne({ user: args.userId });
-              account.balance =
-                parseFloat(account?.balance) + parseFloat(row.trans_amount);
-              await account.save();
-              // const ipAddress = req.socket.remoteAddress;
-              const log = new Logs({
-                ip: "deposits",
-                description: `${account?.user?.username} deposited ${args.amount}- Account Name:${account?.user?.username}`,
-                user: args.userId,
-              });
-              await log.save();
-            }
-          });
-
-          con.destroy();
-        }
-      );
-    });
-  },
 
   withdraw: async (args, req) => {
+    const currentUser = req.user;
+
+    if (!currentUser) {
+      throw new Error("Unauthorized: Missing token");
+    }
+
     const account = await Account.findOne({ user: args.userId });
 
     if (parseFloat(args.amount) > parseFloat(account.balance)) {
@@ -387,13 +178,27 @@ const mpesaResolvers = {
             })
           )
           .end(async (res) => {
-            console.log(res);
+            console.log(res.body);
             if (res.error) throw new Error(res.error);
             let filter = { user: args.userId };
             let update = {
               balance: parseFloat(account?.balance) - parseFloat(args.amount),
             };
             await Account.findOneAndUpdate(filter, update);
+
+            const trans = new Transaction({
+              type: 2,
+              OriginatorConversationID: res.body.OriginatorConversationID,
+              ConversationID: res.body.ConversationID,
+              trans_time: timestamp,
+              amount: parseInt(args.amount),
+              phone: args.phone,
+              user: args.userId,
+              account: account,
+            });
+
+            await trans.save();
+
             const log = new Logs({
               ip: ipAddress,
               description: `Withdrawn ${args.amount} - Account Name:${args.phone}`,
@@ -402,55 +207,6 @@ const mpesaResolvers = {
             await log.save();
           });
       }
-    } catch (err) {
-      console.log(err);
-    }
-  },
-
-  withdrawTest: async (args, req) => {
-    const account = await Account.findOne({ user: args.userId });
-
-    if (account.karibubonus > 0) {
-      throw new Error("You must wagger your karibu bonus before widthrawal");
-    }
-
-    if (parseFloat(args.amount) > parseFloat(account.balance)) {
-      throw new Error("Insufficient balance in your wallet");
-    }
-
-    const currentDate = new Date();
-
-    if (currentDate >= account.bonusexpirydate) {
-      throw new Error("Your Bonus has expired");
-    }
-
-    try {
-      let filter = { user: args.userId };
-      let update = {
-        balance: parseFloat(account?.balance) - parseFloat(args.amount),
-      };
-
-      await Account.findOneAndUpdate(filter, update);
-
-      const log = new Logs({
-        ip: "ipAddress",
-        description: `Withdrawn ${args.amount} - Account Name:${args.phone}`,
-        user: args.userId,
-      });
-
-      await log.save();
-
-      const currentaccount = await Account.findOne({ user: args.userId });
-
-      const user = await Player.findById(args.userId);
-      return {
-        _id: currentaccount?.id,
-        balance: currentaccount?.balance,
-        user: user,
-        createdAt: new Date(account?._doc?.createdAt).toISOString(),
-        updatedAt: new Date(account?._doc?.updatedAt).toISOString(),
-        active: account?.active,
-      };
     } catch (err) {
       console.log(err);
     }

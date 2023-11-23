@@ -246,6 +246,12 @@ const playerResolvers = {
 
   //  Change player password - DONE
   changePassword: async (args, req) => {
+    const currentUser = req.user;
+
+    if (!currentUser) {
+      throw new Error("Unauthorized: Missing token");
+    }
+
     const user = await Player.findOne({ username: args.username });
     if (!user) {
       throw new Error("Player does'nt exist.");

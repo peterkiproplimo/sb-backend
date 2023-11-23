@@ -5,16 +5,20 @@ const { graphqlHTTP } = require("express-graphql");
 var schedule = require("node-schedule");
 const http = require("http");
 const app = express();
-const server = http.createServer(app);
+const httpServer = http.createServer(app);
 const socketAuth = require("./src/middleware/socketAuth");
 const schema = require("./src/schema");
 const resolvers = require("./src/resolvers");
 //import the midleware to check for every incoming request if user is authenticated
 const isAuth = require("./src/middleware/is-auth");
+const authenticateToken = require("./src/utils/authenticationHandler");
 const house = require("./src/models/house");
 const Game = require("./src/models/Game");
 const Account = require("./src/models/Account");
 const Transaction = require("./src/models/transactions");
+const jwt = require("jsonwebtoken");
+const { ApolloServer } = require("apollo-server-express");
+
 // Update the path if needed
 const cors = require("cors");
 
@@ -61,8 +65,39 @@ const corsOptions = {
   optionSuccessStatus: 200,
 };
 
+const authenticateJWT = (req, res, next) => {
+  const token = req.headers.authorization?.split(" ")[1];
+
+  if (token) {
+    jwt.verify(token, process.env.SECRET_KEY, (err, decodedToken) => {
+      if (err) {
+        console.log("anauthenticated");
+        // Handle token verification failure
+        // For example: res.status(401).json({ message: 'Invalid token' });
+        req.user = null;
+      } else {
+        req.user = decodedToken; // Attach user information to the request object
+        console.log("authenticated", req.user);
+      }
+      next();
+    });
+  } else {
+    req.user = null;
+    next();
+  }
+};
+
+const server = new ApolloServer({
+  schema,
+  context: ({ req }) => ({
+    user: req.user, // Pass authenticated user from middleware to GraphQL context
+  }),
+});
+
 app.use(express.json());
-app.use(isAuth);
+
+app.use(authenticateJWT); // Apply the middleware to authenticate JWT for all incoming requests
+
 app.use((req, res, next) => {
   const allowedOrigins = [
     "https://safaribust.techsavanna.technology",
@@ -114,7 +149,7 @@ app.use(
   })
 );
 
-const io = socketIO(server);
+const io = socketIO(httpServer);
 
 const onConnection = (socket) => {
   connection(io, socket);
@@ -137,7 +172,7 @@ app.post("/mpesa-callback", async (req, res) => {
     if (mpesaCallbackData.Body.stkCallback.ResultCode == 1032) {
       try {
         // Transaction canceled by the user
-        transaction.status = "cancelled";
+        transaction.status = 2; //cancelled
         await transaction.save();
       } catch (error) {
         console.error("Error updating transaction (cancellation):", error);
@@ -145,7 +180,7 @@ app.post("/mpesa-callback", async (req, res) => {
     } else if (mpesaCallbackData.Body.stkCallback.ResultCode == 0) {
       // Update the transaction with the data from the response body
       try {
-        transaction.status = "successfull";
+        transaction.status = 1; // successfull
         transaction.amount =
           mpesaCallbackData.Body.stkCallback.CallbackMetadata.Item.find(
             (item) => item.Name === "Amount"
@@ -170,6 +205,13 @@ app.post("/mpesa-callback", async (req, res) => {
 
         console.log(playeraccount);
         updatePlayerAc(playeraccount, transaction);
+        const currentbalance = await Account.findOne({
+          user: transaction.user,
+        });
+
+        balance = currentbalance.balance;
+
+        io.emit(currentbalance.user, balance);
       } catch (error) {
         console.error("Error updating transaction (success):", error);
       }
@@ -185,13 +227,37 @@ app.post("/mpesa-callback", async (req, res) => {
   res.json({ result: "Callback received and processed successfully" });
 });
 
-app.post("/mpesa-result", (req, res) => {
+app.post("/mpesa-result", async (req, res) => {
   // Handle the incoming M-Pesa callback data here
   const mpesaCallbackData = req.body;
   console.log("Received M-Pesa callback:", mpesaCallbackData);
 
-  // Perform any necessary processing based on the callback data
-  // ...
+  const transaction = await Transaction.findOne({
+    OriginatorConversationID: mpesaCallbackData.Result.OriginatorConversationID,
+    ConversationID: mpesaCallbackData.Result.ConversationID,
+  });
+
+  if (transaction) {
+    if (mpesaCallbackData.Result.ResultCode == 1) {
+      try {
+        // Insuficient balance
+        transaction.status = 0; //failed
+        transaction.ResultDesc = mpesaCallbackData.Result.ResultDesc;
+        await transaction.save();
+      } catch (error) {
+        console.error("Error updating transaction (cancellation):", error);
+      }
+    } else if (mpesaCallbackData.Result.ResultCode == 0) {
+      try {
+        // Successfull
+        transaction.status = 1; // success
+        transaction.ResultDesc = mpesaCallbackData.Result.ResultDesc;
+        await transaction.save();
+      } catch (error) {
+        console.error("Error updating transaction (cancellation):", error);
+      }
+    }
+  }
 
   // Respond to the M-Pesa API with an appropriate response (e.g., a success message)
   res.json({ result: "Callback received and processed successfully" });
@@ -202,10 +268,6 @@ app.post("/confirmcompletedtrans", (req, res) => {
   const mpesaCallbackData = req.body;
   console.log("Received M-Pesa callback:", mpesaCallbackData);
 
-  // Perform any necessary processing based on the callback data
-  // ...
-
-  // Respond to the M-Pesa API with an appropriate response (e.g., a success message)
   res.json({ result: "Callback received and processed successfully" });
 });
 
@@ -214,10 +276,6 @@ app.post("/validatecompletedtrans", (req, res) => {
   const mpesaCallbackData = req.body;
   console.log("Received M-Pesa callback:", mpesaCallbackData);
 
-  // Perform any necessary processing based on the callback data
-  // ...
-
-  // Respond to the M-Pesa API with an appropriate response (e.g., a success message)
   res.json({ result: "Callback received and processed successfully" });
 });
 
@@ -226,10 +284,6 @@ app.post("/mpesa-timeout", (req, res) => {
   const mpesaCallbackData = req.body;
   console.log("Received M-Pesa callback:", mpesaCallbackData);
 
-  // Perform any necessary processing based on the callback data
-  // ...
-
-  // Respond to the M-Pesa API with an appropriate response (e.g., a success message)
   res.json({ result: "Callback received and processed successfully" });
 });
 
@@ -311,7 +365,7 @@ async function runMultiplierTimer(multiplier) {
       setemitNextRound(false);
 
       // Update winners/ losers
-      console.log("Get end Results");
+      // console.log("Get end Results");
       const playerBets = await getEndResults(multiplier, "endresults");
 
       io.emit("livedata", playerBets);
@@ -371,9 +425,7 @@ async function waitCount() {
 
       const nextMultiplier = await getNextMultiplier();
 
-      // console.log("Next multiplier", nextMultiplier);
       if (nextMultiplier) {
-        console.log("Update players");
         // Update all the players with the curent game id
         const setro = await setAllNextRoundPlayersWithRoundId(nextMultiplier);
         // Start the timer with the next multiplier
@@ -383,7 +435,7 @@ async function waitCount() {
         }
       } else {
         // Handle the case when there are no more multipliers
-        console.log("No more multipliers available.");
+        // console.log("No more multipliers available.");
       }
     }
   }, decrementInterval);
@@ -396,12 +448,27 @@ async function startGame() {
 
 //  Start server and Game
 
-server.listen(3002, async () => {
-  await connectToDatabase();
-  // await startGame();
-  // getMultiplierValue();
+async function startApolloServer() {
+  await server.start();
 
-  console.log(`listening on 3002`);
+  // Apply Apollo Server middleware to the app after the server has started
+  server.applyMiddleware({ app });
+
+  // Create an HTTP server with your Express app
+  const httpServer = http.createServer(app);
+
+  // Start the server
+  httpServer.listen(3002, async () => {
+    await connectToDatabase();
+    await startGame();
+    getMultiplierValue();
+
+    console.log(`listening on 3002`);
+  });
+}
+
+startApolloServer().catch((err) => {
+  console.error("Error starting Apollo Server:", err);
 });
 
 // Helper functions
@@ -410,6 +477,7 @@ function setMultiplierValue(value) {
   BET_MULTIPLIERVALUE = value;
   return getMultiplierValue();
 }
+
 function getMultiplierValue() {
   return BET_MULTIPLIERVALUE;
 }
