@@ -7,7 +7,7 @@ var request = require("request");
 //importing mongoose models
 const Logs = require("../models/logs");
 const Account = require("../models/Account");
-const AdminLog = require("../models/adminlogs");
+const AdminLog = require("../models/AdminLogs");
 const User = require("../models/User");
 const Player = require("../models/Player");
 const Admin = require("../models/admins");

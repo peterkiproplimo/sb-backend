@@ -7,6 +7,7 @@ const Transaction = require("../models/transactions");
 const Logs = require("../models/logs");
 const Player = require("../models/Player");
 const Playerbet = require("../models/PlayerBet");
+const AdminLogs = require("../models/AdminLogs");
 
 async function fetchTotalWinsForPlayer(playerId) {
   let totalWins = 0;
@@ -422,31 +423,45 @@ const accountResolvers = {
       .limit(limit)
       .populate("user"),
 
-  updateBalance: (args, req) => {
+  updateBalance: async (args, req) => {
     // if (!req.isAuth) {
     //   throw new Error("Unauthenticated");
     // }
     // console.log(args.accountId)
+    
+    const houseAccount = await Account.findById(
+      "6555e4028e89bb00288767eb"
+    );
     try {
-      return Account.findById(args.accountId)
+      return await Account.findById(args.accountId)
         .populate("user")
         .then(async (account) => {
           if (!account) {
             throw new Error("Account not found");
           }
-          console.log(account._id)
+          // console.log(account._id)
           // account.balance = parseFloat(account.balance) + args.amount     //uncomment if balance update is by addition
+
+          // update the house account first
+          console.log(houseAccount.balance);
+          updateAmount = args.amount - parseFloat(account.balance) //get the balance difference
+          console.log(updateAmount);
+          houseAccount.balance = parseFloat(houseAccount.balance) + updateAmount
+          console.log(houseAccount.balance);
+
           account.balance = parseFloat(args.amount); //this get the new updated balance
+          await houseAccount.save()
           await account.save();
           const ipAddress = req.socket.remoteAddress;
-          const log = new Logs({
+          const log = new AdminLogs({
             ip: ipAddress,
-            description: `${account.user.username} balance updated to ${account.balance}`,
+            action: "Update Balance",
+            description: `${account.user.username} balance updated to ${account.balance} reason: ${args.updateReason}`,
             user: req.user._id,
           });
 
           log.save();
-          console.log(account)
+          // console.log(account)
           return {
             status: "success",
             message: `${account.user.username} balance updated to ${account.balance}`,
@@ -467,7 +482,7 @@ const accountResolvers = {
       })
       .then(async (result) => {
         const ipAddress = req.socket.remoteAddress;
-        const log = new AdminLog({
+        const log = new AdminLogs({
           ip: ipAddress,
           description: `Suspended account for user ${result.user.username}`, //this will be changed to the authenticated user creating the logs
           user: result.id,
@@ -491,7 +506,7 @@ const accountResolvers = {
       })
       .then(async (result) => {
         const ipAddress = req.socket.remoteAddress;
-        const log = new AdminLog({
+        const log = new AdminLogs({
           ip: ipAddress,
           description: `Hold account for user ${result.user.username}`, //this will be changed to the authenticated user creating the logs
           user: result.id,

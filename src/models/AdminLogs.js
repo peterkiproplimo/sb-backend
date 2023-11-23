@@ -8,6 +8,9 @@ const adminlogsSchema = new Schema(
       type: String,
       required: false,
     },
+    action: {
+      type: String,
+    },
     description: {
       type: String,
       required: true,

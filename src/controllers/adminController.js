@@ -8,7 +8,7 @@ const Account = require("../models/Account");
 const Bet = require("../models/Bet");
 const Logs = require("../models/logs");
 const Admin = require("../models/admins");
-const AdminLog = require("../models/adminlogs");
+const AdminLog = require("../models/AdminLogs");
 const house = require("../models/house");
 const Actives = require("../models/activeusers");
 const Role = require("../models/roleModel");
@@ -20,6 +20,7 @@ const Playerbet = require("../models/PlayerBet");
 
 const connectToDatabase = require("../../config/database");
 const { AggregationCursor } = require("mongoose");
+const AdminLogs = require("../models/AdminLogs");
 async function fetchHouseRevenueData() {
   const today = new Date();
   let totalmoney = 0;
@@ -534,22 +535,38 @@ const adminResolvers = {
   },
 
   //  Get all the system logs for the admin
+  getAdminLogs: async (args, req) => {
+    try {
+      const pageNumber = parseInt(args.page) || 1;
+      const itemsPerPage = parseInt(args.per_page) || 10;
+    
+      // Calculate skip and limit values for pagination
+      const skip = (pageNumber - 1) * itemsPerPage;
+      const limit = itemsPerPage;
 
-  systemLogs: async (args, req) => {
-    const logs = await AdminLog.find()
+      const totalItems = await AdminLogs.countDocuments();
+      const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+      // Fetch logs from your data source (e.g., MongoDB)
+      const logs = await AdminLogs.find()
       .populate("user")
-      .sort({ createdAt: -1 })
-      .limit(200);
-    return logs.map((it) => {
+        .skip(skip)
+        .limit(limit) /*.populate("account").populate("bets")*/
+        .sort({ createdAt: -1 });
       return {
-        ...it._doc,
-        _id: it.id,
-        //  user: it._doc.user,
-        createdAt: new Date(it._doc.createdAt).toISOString(),
-        updatedAt: new Date(it._doc.updatedAt).toISOString(),
+        logs: logs,
+        paginationInfo: {
+          current_page: pageNumber,
+          total_pages: totalPages,
+          total_items: totalItems,
+          per_page: itemsPerPage,
+        }
       };
-    });
+    } catch (error) {
+      throw new Error("Error fetching logs: " + error.message);
+    }
   },
+
 
   // Get all the logs from the database
 
@@ -976,7 +993,7 @@ const adminResolvers = {
   createRole: async (args, req) => {
     console.log(args.roleInput);
     try {
-      
+
       const role = new Role({
         name: args.roleInput.name,
         description: args.roleInput.description,

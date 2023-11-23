@@ -208,30 +208,20 @@ type Logs {
 _id:ID!
 ip:String!
 description:String!
-transactionId:String
+action:String
 user:User
-round:Float
-point:Float
-at:Float
-crush:Float
-balance:String
-won:Boolean
 createdAt:String!
 updatedAt:String!
 }
 
 type AdminLogs {
-_id:ID!
-ip:String
-description:String!
-user:User
-round:Float
-point:Float
-at:Float
-crush:Float
-won:Boolean
-createdAt:String!
-updatedAt:String!
+  _id:ID!
+  ip:String!
+  description:String!
+  action:String
+  user:User
+  createdAt:String!
+  updatedAt:String!
 }
 
 type HouseRevenue {
@@ -491,6 +481,10 @@ type UsersData{
   users: [User]!
   paginationInfo: PaginationInfo
 }
+type AdminLogsData{
+  logs: [AdminLogs]!
+  paginationInfo: PaginationInfo
+}
 type PaginationInfo{
   current_page: Int,
   total_pages: Int,
@@ -544,7 +538,6 @@ type RootQuery{
   permissions:[Permission!]!
   roles:[Role!]!
   verifyOtp(otp:String!):OTP
-  systemLogs:[AdminLogs!]!
   customerToTal:CustomerToTal
   taxToTal:CustomerToTal
   userTT(userId:String!):PlayerToTal
@@ -564,6 +557,8 @@ type RootQuery{
   getFAQs: [FAQ!]!
   getPolicy: Policy
   getTerms: Terms
+
+  getAdminLogs(page: Int, per_page: Int): AdminLogsData!
 }
 
 
@@ -606,7 +601,7 @@ type RootMutation{
   suspendUser(userId: String!): Response!
   activateUser(userId: String!): Response!
 
-  updateBalance(accountId: String!, amount: Float): Response!
+  updateBalance(accountId: String!, amount: Float, updateReason: String): Response!
   restoreAccount(accountId: String!): Response!
   suspendAccount(accountId: String!): Response!
 
