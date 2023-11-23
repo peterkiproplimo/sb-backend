@@ -7,12 +7,9 @@ const Transaction = require("../models/transactions");
 const Logs = require("../models/logs");
 const Player = require("../models/Player");
 const Playerbet = require("../models/PlayerBet");
-<<<<<<< HEAD
 const AdminLogs = require("../models/AdminLogs");
-
-=======
 const jwt = require("jsonwebtoken");
->>>>>>> refs/remotes/origin/master
+
 async function fetchTotalWinsForPlayer(playerId) {
   let totalWins = 0;
 
@@ -428,10 +425,8 @@ const accountResolvers = {
     //   throw new Error("Unauthenticated");
     // }
     // console.log(args.accountId)
-    
-    const houseAccount = await Account.findById(
-      "6555e4028e89bb00288767eb"
-    );
+
+    const houseAccount = await Account.findById("6555e4028e89bb00288767eb");
     try {
       return await Account.findById(args.accountId)
         .populate("user")
@@ -444,13 +439,14 @@ const accountResolvers = {
 
           // update the house account first
           console.log(houseAccount.balance);
-          updateAmount = args.amount - parseFloat(account.balance) //get the balance difference
+          updateAmount = args.amount - parseFloat(account.balance); //get the balance difference
           console.log(updateAmount);
-          houseAccount.balance = parseFloat(houseAccount.balance) + updateAmount
+          houseAccount.balance =
+            parseFloat(houseAccount.balance) + updateAmount;
           console.log(houseAccount.balance);
 
           account.balance = parseFloat(args.amount); //this get the new updated balance
-          await houseAccount.save()
+          await houseAccount.save();
           await account.save();
           const ipAddress = req.socket.remoteAddress;
           const log = new AdminLogs({

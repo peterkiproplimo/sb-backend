@@ -71,13 +71,11 @@ const authenticateJWT = (req, res, next) => {
   if (token) {
     jwt.verify(token, process.env.SECRET_KEY, (err, decodedToken) => {
       if (err) {
-        console.log("anauthenticated");
         // Handle token verification failure
         // For example: res.status(401).json({ message: 'Invalid token' });
         req.user = null;
       } else {
         req.user = decodedToken; // Attach user information to the request object
-        console.log("authenticated", req.user);
       }
       next();
     });
