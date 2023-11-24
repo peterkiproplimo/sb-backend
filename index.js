@@ -147,6 +147,8 @@ app.use(
   })
 );
 
+const httpServer = http.createServer(app);
+
 async function startApolloServer() {
   await server.start();
 
@@ -154,7 +156,6 @@ async function startApolloServer() {
   server.applyMiddleware({ app });
 
   // Create an HTTP server with your Express app
-  const httpServer = http.createServer(app);
 
   // Start the server
   httpServer.listen(3002, async () => {
