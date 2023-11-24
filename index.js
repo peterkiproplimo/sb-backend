@@ -218,9 +218,6 @@ app.post("/mpesa-callback", async (req, res) => {
     console.log("Transaction not found in the database.");
   }
 
-  // Perform any necessary processing based on the callback data
-  // ...
-
   // Respond to the M-Pesa API with an appropriate response (e.g., a success message)
   res.json({ result: "Callback received and processed successfully" });
 });
@@ -441,6 +438,7 @@ async function waitCount() {
 
 //  Start the game
 async function startGame() {
+  console.log("game started successfully");
   await waitCount();
 }
 
