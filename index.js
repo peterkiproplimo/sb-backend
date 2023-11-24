@@ -339,6 +339,7 @@ async function getNextMultiplier() {
 }
 
 async function runMultiplierTimer(multiplier) {
+  console.log(multiplier);
   setemitOngoingRound(true);
   setemitEndRound(false);
   setemitNextRound(false);
