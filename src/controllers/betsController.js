@@ -21,11 +21,11 @@ const PlayerBet = require("../models/PlayerBet");
 
 const betsResolvers = {
   createPlayerbet: async (args, req) => {
-    const currentUser = req.user;
+    // const currentUser = req.user;
 
-    if (!currentUser) {
-      throw new Error("Unauthorized: Missing token");
-    }
+    // if (!currentUser) {
+    //   throw new Error("Unauthorized: Missing token");
+    // }
 
     try {
       // Verify the token

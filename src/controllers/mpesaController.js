@@ -17,11 +17,11 @@ let unirest = require("unirest");
 
 const mpesaResolvers = {
   depositTest: async (args, req) => {
-    const currentUser = req.user;
+    // const currentUser = req.user;
 
-    if (!currentUser) {
-      throw new Error("Unauthorized: Missing token");
-    }
+    // if (!currentUser) {
+    //   throw new Error("Unauthorized: Missing token");
+    // }
     try {
       const consumer_key = "5PEvsVfLvBHx3SaJszsuJvzUEMIC3KGu";
       const consumer_secret = "lnqSApRJLo3ahd20";
@@ -117,11 +117,11 @@ const mpesaResolvers = {
   },
 
   withdraw: async (args, req) => {
-    const currentUser = req.user;
+    // const currentUser = req.user;
 
-    if (!currentUser) {
-      throw new Error("Unauthorized: Missing token");
-    }
+    // if (!currentUser) {
+    //   throw new Error("Unauthorized: Missing token");
+    // }
 
     const account = await Account.findOne({ user: args.userId });
 
