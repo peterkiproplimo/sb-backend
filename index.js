@@ -147,6 +147,29 @@ app.use(
   })
 );
 
+async function startApolloServer() {
+  await server.start();
+
+  // Apply Apollo Server middleware to the app after the server has started
+  server.applyMiddleware({ app });
+
+  // Create an HTTP server with your Express app
+  const httpServer = http.createServer(app);
+
+  // Start the server
+  httpServer.listen(3002, async () => {
+    await connectToDatabase();
+    await startGame();
+    getMultiplierValue();
+
+    console.log(`listening on 3002`);
+  });
+}
+
+startApolloServer().catch((err) => {
+  console.error("Error starting Apollo Server:", err);
+});
+
 const io = socketIO(httpServer);
 
 const onConnection = (socket) => {
@@ -339,7 +362,6 @@ async function getNextMultiplier() {
 }
 
 async function runMultiplierTimer(multiplier) {
-  console.log(multiplier);
   setemitOngoingRound(true);
   setemitEndRound(false);
   setemitNextRound(false);
@@ -444,29 +466,6 @@ async function startGame() {
 }
 
 //  Start server and Game
-
-async function startApolloServer() {
-  await server.start();
-
-  // Apply Apollo Server middleware to the app after the server has started
-  server.applyMiddleware({ app });
-
-  // Create an HTTP server with your Express app
-  const httpServer = http.createServer(app);
-
-  // Start the server
-  httpServer.listen(3002, async () => {
-    await connectToDatabase();
-    await startGame();
-    getMultiplierValue();
-
-    console.log(`listening on 3002`);
-  });
-}
-
-startApolloServer().catch((err) => {
-  console.error("Error starting Apollo Server:", err);
-});
 
 // Helper functions
 
