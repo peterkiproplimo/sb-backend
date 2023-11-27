@@ -10,13 +10,13 @@ const socketAuth = require("./src/middleware/socketAuth");
 const schema = require("./src/schema");
 const resolvers = require("./src/resolvers");
 //import the midleware to check for every incoming request if user is authenticated
-const isAuth = require("./src/middleware/is-auth");
-const authenticateToken = require("./src/utils/authenticationHandler");
+const AuthHandler = require("./src/middleware/authHandler");
+// const authenticateToken = require("./src/utils/authenticationHandler"); delete this unused import
 const house = require("./src/models/house");
 const Game = require("./src/models/Game");
 const Account = require("./src/models/Account");
 const Transaction = require("./src/models/transactions");
-const jwt = require("jsonwebtoken");
+const jwt = require("jsonwebtoken");//this is not required 
 const { ApolloServer } = require("apollo-server-express");
 
 // Update the path if needed
@@ -65,25 +65,31 @@ const corsOptions = {
   optionSuccessStatus: 200,
 };
 
-const authenticateJWT = (req, res, next) => {
-  const token = req.headers.authorization?.split(" ")[1];
+// disabled this function 
 
-  if (token) {
-    jwt.verify(token, process.env.SECRET_KEY, (err, decodedToken) => {
-      if (err) {
-        // Handle token verification failure
-        // For example: res.status(401).json({ message: 'Invalid token' });
-        req.user = null;
-      } else {
-        req.user = decodedToken; // Attach user information to the request object
-      }
-      next();
-    });
-  } else {
-    req.user = null;
-    next();
-  }
-};
+// const authenticateJWT = (req, res, next) => {
+//   const token = req.headers.authorization?.split(" ")[1];
+
+//   if (token) {
+//     jwt.verify(token, process.env.SECRET_KEY, (err, decodedToken) => {
+//       console.log(decodedToken)
+//       if (err) {
+//         // Handle token verification failure
+//         // For example: res.status(401).json({ message: 'Invalid token' });
+//         console.log("inbvalid token")
+//         req.user = null;
+//       } else {
+//         req.user = decodedToken; // Attach user information to the request object
+//         console.log(req.user)
+//       }
+//       console.log("next")
+//       next();
+//     });
+//   } else {
+//     req.user = null;
+//     next();
+//   }
+// };
 
 const server = new ApolloServer({
   schema,
@@ -94,7 +100,7 @@ const server = new ApolloServer({
 
 app.use(express.json());
 
-app.use(authenticateJWT); // Apply the middleware to authenticate JWT for all incoming requests
+app.use(AuthHandler); // Apply the middleware to authenticate JWT for all incoming requests
 
 app.use((req, res, next) => {
   const allowedOrigins = [
@@ -160,7 +166,7 @@ async function startApolloServer() {
   // Start the server
   httpServer.listen(3002, async () => {
     await connectToDatabase();
-    await startGame();
+    // await startGame();
     getMultiplierValue();
 
     console.log(`listening on 3002`);

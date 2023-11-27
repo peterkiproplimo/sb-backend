@@ -8,6 +8,7 @@ const Admin = require("../models/admins");
 const Logs = require("../models/logs");
 const AdminLog = require("../models/AdminLogs");
 const User = require("../models/User");
+const { AuthenticationError } = require("apollo-server-express");
 
 const authResolvers = {
   login: async (args, req) => {
@@ -70,52 +71,57 @@ const authResolvers = {
   adminLogin: async (args, req) => {
     console.log(args);
     const user = await User.findOne({
-      username: args.loginInput.username,
-    }).populate("role");
+      username: args.username,
+    });
     if (!user) {
-      throw new Error("Invalid credentials. Please try again!");
+      throw new AuthenticationError("Invalid credentials. Please try again!");
     }
     if (user.active === false) {
-      throw new Error("Account suspended!!!");
+      throw new AuthenticationError("Account suspended!!!");
     }
-    if (user.online === true && user.type === "User") {
-      throw new Error("User already online");
-    }
+    // if (user.online === true && user.type === "User") {
+    //   throw new AuthenticationError("User already online");
+    // }
     const isEqual = await bcrypt.compare(
-      args.loginInput.password,
+      args.password,
       user.password
     );
     if (!isEqual) {
-      throw new Error("Invalid credentials. Please try again!");
+      throw new AuthenticationError("Invalid credentials. Please try again!");
     }
     user.online = true;
     await user.save();
 
-    const ipAddress = req.socket.remoteAddress;
     const log = new AdminLog({
-      ip: ipAddress,
+      ip: req.socket.remoteAddress,
+      action: "User Login",
       description: `${user.username} logged in `,
       user: user._id,
     });
 
     await log.save();
 
+    // const token = await jwt.sign(
+    //   { userId: user.id, phone: user.phone },
+    //   process.env.SECRET_KEY,
+    //   {
+    //     expiresIn: 30,
+    //   }
+    // );
+    const tokenExpiresIn = 60*30; // in seconds
+    const expirationTime = Math.floor(Date.now() / 1000) + tokenExpiresIn;
+
     const token = await jwt.sign(
-      { userId: user.id, phone: user.phone },
-      "thisissupposedtobemysecret",
-      {
-        expiresIn: 60 * 30,
-      }
+      { userId: user.id, phone: user.phone, exp: expirationTime },
+      process.env.SECRET_KEY
     );
+
     return {
       userId: user.id,
-      phone: user.phone,
       username: user.username,
-      type: user.type,
-      token: token,
-
-      online: user.online,
-      tokenExpiration: 15,
+      role: user.role,
+      token,
+      tokenValidity: expirationTime,
     };
   },
 

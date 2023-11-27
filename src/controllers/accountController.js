@@ -421,10 +421,10 @@ const accountResolvers = {
       .populate("user"),
 
   updateBalance: async (args, req) => {
-    // if (!req.isAuth) {
-    //   throw new Error("Unauthenticated");
-    // }
-    // console.log(args.accountId)
+    if (!req.isAuth) {
+      throw new Error("Unauthenticated");
+    }
+    console.log(args.accountId)
 
     const houseAccount = await Account.findById("6555e4028e89bb00288767eb");
     try {
@@ -438,12 +438,12 @@ const accountResolvers = {
           // account.balance = parseFloat(account.balance) + args.amount     //uncomment if balance update is by addition
 
           // update the house account first
-          console.log(houseAccount.balance);
+          // console.log(houseAccount.balance);
           updateAmount = args.amount - parseFloat(account.balance); //get the balance difference
-          console.log(updateAmount);
+          // console.log(updateAmount);
           houseAccount.balance =
             parseFloat(houseAccount.balance) + updateAmount;
-          console.log(houseAccount.balance);
+          // console.log(houseAccount.balance);
 
           account.balance = parseFloat(args.amount); //this get the new updated balance
           await houseAccount.save();
@@ -453,7 +453,7 @@ const accountResolvers = {
             ip: ipAddress,
             action: "Update Balance",
             description: `${account.user.username} balance updated to ${account.balance} reason: ${args.updateReason}`,
-            user: req.user._id,
+            user: req.user.userId,
           });
 
           log.save();
@@ -480,8 +480,9 @@ const accountResolvers = {
         const ipAddress = req.socket.remoteAddress;
         const log = new AdminLogs({
           ip: ipAddress,
+          action: "suspend user account",
           description: `Suspended account for user ${result.user.username}`, //this will be changed to the authenticated user creating the logs
-          user: result.id,
+          user: req.user.userId,
         });
 
         await log.save();
@@ -504,6 +505,7 @@ const accountResolvers = {
         const ipAddress = req.socket.remoteAddress;
         const log = new AdminLogs({
           ip: ipAddress,
+          action: "Restore User Account",
           description: `Hold account for user ${result.user.username}`, //this will be changed to the authenticated user creating the logs
           user: result.id,
         });
