@@ -147,8 +147,6 @@ app.use(
   })
 );
 
-// const httpServer = http.createServer(app);
-
 async function startApolloServer() {
   await server.start();
 
