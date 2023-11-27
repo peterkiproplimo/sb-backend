@@ -350,12 +350,13 @@ const playerResolvers = {
         return player.save();
       })
       .then(async (result) => {
-        console.log(123);
+        console.log(result);
         const ipAddress = req.socket.remoteAddress;
         const log = new AdminLog({
           ip: ipAddress,
+          action: result.active? "Activate Player": "Suspend Player",
           description: message, //this will be changed to the authenticated user creating the logs
-          user: req.user,
+          user: req.user.userId,
         });
 
         await log.save();
