@@ -69,7 +69,7 @@ const userResolvers = {
         // Define the filter criteria based on the search term and user ID
         const filter = {
           $or: [
-            { status:  status},
+            { status: status },
             { username: { $in: [regex] } },
             { phoneNumber: { $in: [regex] } },
             { role: { $in: [regex] } },
@@ -106,19 +106,52 @@ const userResolvers = {
     }
   },
 
-  createUser: (args, req) => {
+  updateOrCreateUser: async (args, req) => {
+    if (!req.isAuth) {
+      throw new Error("Unauthenticated");
+    }
     const phoneNumber = formatKenyanPhoneNumber(args.userInput.phoneNumber);
+    // if userid is present, update user
+    if (args.userId) {
+      // console.log(args.userId);
+
+      return User.findById(args.userId).then(async (user) => {//get user by id
+        if (user.username !== args.userInput.username) { //check if username  is new
+            taken_username = await User.findOne({username: args.userInput.username}) //find if username is taken                    
+            if (taken_username) {
+              throw new Error("Username already taken!!!");
+            }
+        }
+        user.role = args.userInput.role
+        user.username = args.userInput.username
+        user.phoneNumber = phoneNumber
+
+        await user.save()
+        const log = new AdminLog({
+          ip: req.socket.remoteAddress,
+          action : "Update User",
+          description: `Updated a user ${user.username}`, //this will be changed to the authenticated user creating the logs
+          user: req.user.userId,
+        });
+
+        await log.save();
+        return {
+          status: "success",
+          message: `${args.userInput.username} updated successfully`,
+        };
+      })
+
+    }
+    // else create user
     return User.findOne({
       username: args.userInput.username,
     })
-      .then((user) => {
+      .then(async (user) => {
         if (user) {
-          // return {
-          //   status: "error",
-          //   message: `${args.userInput.username} already exists`,
-          // };
           throw new Error("User already exists!!!");
         }
+
+
         return bcrypt.hash(args.userInput.password, 12);
       })
       .then(async (hashedPass) => {
@@ -135,14 +168,15 @@ const userResolvers = {
         const ipAddress = req.socket.remoteAddress;
         const log = new AdminLog({
           ip: ipAddress,
-          description: `Created a new user ${args.userInput.username}`, //this will be changed to the authenticated user creating the logs
-          user: result.id,
+          action : "Create User",
+          description: `Created a new user ${result.username}`, //this will be changed to the authenticated user creating the logs
+          user: req.user.userId,
         });
 
         await log.save();
         return {
           status: "success",
-          message: `${args.userInput.username} role created`,
+          message: `${result.username} role created`,
         };
         return result;
       });

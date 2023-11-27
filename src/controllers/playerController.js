@@ -332,6 +332,7 @@ const playerResolvers = {
       });
   },
   suspendPlayer: (args, req) => {
+    console.log(req.isAuth)
     if (!req.isAuth) {
       throw new Error("Unauthenticated");
     }
@@ -366,31 +367,6 @@ const playerResolvers = {
         };
       });
   },
-  // activatePlayer: (args, req) => {
-  //   return User.findById(args.userId)
-  //     .then((user) => {
-  //       if (!user) {
-  //         throw new Error("User NOT found!!");
-  //       }
-  //       user.status = true
-  //       return user.save();
-  //     })
-  //     .then(async (result) => {
-  //       console.log(123);
-  //       const ipAddress = req.socket.remoteAddress;
-  //       const log = new AdminLog({
-  //         ip: ipAddress,
-  //         description: `Deleted a user ${args.username}`, //this will be changed to the authenticated user creating the logs
-  //         user: result.id,
-  //       });
-
-  //       await log.save();
-  //       return {
-  //         status: "success",
-  //         message: `Deleted user ${args.username}`,
-  //       };
-  //     });
-  // },
 };
 
 const generateOtp = async (user, phone, type) => {

@@ -376,7 +376,7 @@ input PermissionInput {
 input CreateUserInput {
   username: String!
   phoneNumber: String!
-  password: String!
+  password: String
   role: String!
 }
 input UpdateUserInput {
@@ -607,7 +607,7 @@ type RootMutation{
   suspendPlayer(playerId:String!):Response!
 
   adminLogin(username: String!, password: String!): adminAuthData!
-  createUser(userInput: CreateUserInput): Response!
+  updateOrCreateUser(userId:String, userInput: CreateUserInput): Response!
   updateUser(userInput: UpdateUserInput): User!
   deleteUser(userId: String!): Response!
   restoreUser(userId: String!): Response!
