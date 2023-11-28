@@ -24,14 +24,9 @@ module.exports = async (req, res, next) => {
     req.isAuth = false;
     return next();
   }
-  // check if iser in db
-  // const user = await User.findById(decodedToken.userId);
-  // if (!user) {
-  //   req.isAuth = false;
-  //   return next();
-  // }
+
   req.isAuth = true;
   req.user = decodedToken;
-  console.log(req.isAuth)
+  console.log(req.isAuth);
   return next();
 };
