@@ -49,11 +49,19 @@ const authResolvers = {
 
     await log.save();
 
+    const tokenExpiresIn = 60 * 30; // in seconds
+    const expirationTime = Math.floor(Date.now() / 1000) + tokenExpiresIn;
+
     const token = await jwt.sign(
-      { userId: user.id, phone: user.phone },
-      process.env.SECRET_KEY,
-      { expiresIn: "1h" } // Set the token to expire in 1 hour
+      { userId: user.id, phone: user.phone, exp: expirationTime },
+      process.env.SECRET_KEY
     );
+
+    // const token = await jwt.sign(
+    //   { userId: user.id, phone: user.phone },
+    //   process.env.SECRET_KEY,
+    //   { expiresIn: "1h" } // Set the token to expire in 1 hour
+    // );
 
     return {
       userId: user.id,
@@ -62,7 +70,7 @@ const authResolvers = {
       phone: user.phone,
       token: token,
       dataToken: user.dataToken,
-      tokenExpiration: 24000,
+      tokenExpiration: expirationTime,
       online: user.online,
     };
     // online: user.online,

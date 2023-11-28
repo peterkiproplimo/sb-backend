@@ -11,7 +11,7 @@ const SocketSchema = new Schema(
     user: [
       {
         type: Schema.Types.ObjectId,
-        ref: "User",
+        ref: "Player",
       },
     ],
   },
