@@ -27,7 +27,7 @@ module.exports = async (socket, next) => {
   // check if iser in db
   const player = await Player.findById(decodedToken.userId)
   
-  if (!user) {
+  if (!player) {
     socket.isAuth = false;
     return next();
   }
