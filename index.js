@@ -140,8 +140,8 @@ async function startApolloServer() {
   // Start the server
   httpServer.listen(3002, async () => {
     await connectToDatabase();
-    await startGame();
-    getMultiplierValue();
+    // await startGame();
+    // getMultiplierValue();
 
     console.log(`listening on 3002`);
   });

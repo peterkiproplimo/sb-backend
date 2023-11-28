@@ -334,14 +334,14 @@ const accountResolvers = {
   //    Get the user account balance
 
   accountBalance: async (args, req) => {
-    // const currentUser = req.user;
+    const currentUser = req.user;
 
-    // if (!currentUser) {
-    //   throw new Error("Unauthorized: Missing token");
-    // }
+    if (!currentUser) {
+      throw new Error("Unauthorized: Missing token");
+    }
     try {
-      const account = await Account.findOne({ user: args.userId });
-      const user = await Player.findById(args.userId);
+      const account = await Account.findOne({ user: req.user.userId });
+      const user = await Player.findById(req.user.userId);
 
       return {
         _id: account?.id,
@@ -424,7 +424,7 @@ const accountResolvers = {
     if (!req.isAuth) {
       throw new Error("Unauthenticated");
     }
-    console.log(args.accountId)
+    console.log(args.accountId);
 
     const houseAccount = await Account.findById("6555e4028e89bb00288767eb");
     try {

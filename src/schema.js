@@ -513,7 +513,7 @@ type RootQuery{
   admins: [Admin!]!
   login(loginInput:LoginInput): AuthData!
   adminLogin(loginInput:LoginInput): AuthData!
-  accountBalance(userId:String):Account!
+  accountBalance:Account!
   accountSummary(userId:String):Account!
   transactions(userId:String):[Transaction!]!
   bets(userId:String):[Bet!]!
