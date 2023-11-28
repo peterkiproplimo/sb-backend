@@ -20,7 +20,7 @@ const Playerbet = require("../models/PlayerBet");
 const Transaction = require("../models/transactions");
 
 const connectToDatabase = require("../../config/database");
-const { AggregationCursor } = require("mongoose");
+
 const AdminLogs = require("../models/AdminLogs");
 async function fetchHouseRevenueData() {
   const today = new Date();
@@ -390,9 +390,15 @@ const adminResolvers = {
     };
   },
 
-  affiliate: async ({ userId }) => {
-    const totalearned = fetchTotalEarned(userId);
-    const totalpaid = fetchTotalPaid(userId);
+  affiliate: async (args, req) => {
+    const currentUser = req.user;
+
+    if (!currentUser) {
+      throw new Error("Unauthorized: Missing token");
+    }
+
+    const totalearned = fetchTotalEarned(req.user.userId);
+    const totalpaid = fetchTotalPaid(req.user.userId);
 
     return {
       earned: totalearned,
@@ -561,6 +567,11 @@ const adminResolvers = {
   // Get a list of all the players
 
   players: async (args, req) => {
+    const currentUser = req.user;
+
+    if (!currentUser) {
+      throw new Error("Unauthorized: Missing token");
+    }
     const users = await Player.find().sort({ createdAt: -1 });
 
     const usrs = users.filter((item) => item.type === "regular");
@@ -592,6 +603,11 @@ const adminResolvers = {
   //    Get a list of all the admins
 
   admins: async (args, req) => {
+    const currentUser = req.user;
+
+    if (!currentUser) {
+      throw new Error("Unauthorized: Missing token");
+    }
     const users = await User.find().sort({ createdAt: -1 });
 
     return users;
@@ -600,6 +616,11 @@ const adminResolvers = {
   //  Get a list of all the accounts
 
   accounts: async (args, req) => {
+    const currentUser = req.user;
+
+    if (!currentUser) {
+      throw new Error("Unauthorized: Missing token");
+    }
     const acc = await Account.find().sort({ createdAt: -1 }).populate("user");
     return acc.map(async (acc) => {
       // const user = await singleUser.bind(this, acc?._doc.user)
@@ -619,7 +640,7 @@ const adminResolvers = {
     try {
       const pageNumber = parseInt(args.page) || 1;
       const itemsPerPage = parseInt(args.per_page) || 10;
-    
+
       // Calculate skip and limit values for pagination
       const skip = (pageNumber - 1) * itemsPerPage;
       const limit = itemsPerPage;
@@ -629,7 +650,7 @@ const adminResolvers = {
 
       // Fetch logs from your data source (e.g., MongoDB)
       const logs = await AdminLogs.find()
-      .populate("user")
+        .populate("user")
         .skip(skip)
         .limit(limit) /*.populate("account").populate("bets")*/
         .sort({ createdAt: -1 });
@@ -640,13 +661,12 @@ const adminResolvers = {
           total_pages: totalPages,
           total_items: totalItems,
           per_page: itemsPerPage,
-        }
+        },
       };
     } catch (error) {
       throw new Error("Error fetching logs: " + error.message);
     }
   },
-
 
   // Get all the logs from the database
 
@@ -665,75 +685,6 @@ const adminResolvers = {
       };
     });
   },
-
-  /// Suspending a player from the system
-
-  // suspendPlayer: async (args, req) => {
-  //   let filter = { username: args.username };
-  //   let update = { active: false };
-  //   const user = await Admin.findOneAndUpdate(filter, update);
-  //   const ipAddress = req.socket.remoteAddress;
-  //   const log = new AdminLog({
-  //     ip: ipAddress,
-  //     description: `${args.initiator} suspended ${user.username}`,
-  //     user: user.id,
-  //   });
-
-  //   await log.save();
-  //   return {
-  //     ...user._doc,
-  //     _id: user.id,
-  //     createdAt: new Date(user._doc.createdAt).toISOString(),
-  //     updatedAt: new Date(user._doc.updatedAt).toISOString(),
-  //   };
-  // },
-
-  // Suspend an account
-
-  // suspendAccount: async (args, req) => {
-  //   let filter = { _id: args.accountId };
-  //   let update = { active: false };
-  //   const account = await Account.findOneAndUpdate(filter, update);
-  //   const ipAddress = req.socket.remoteAddress;
-  //   const log = new AdminLog({
-  //     ip: ipAddress,
-  //     description: `${args.initiator} suspended ${account.id}`,
-  //     user: account.user.id,
-  //   });
-
-  //   await log.save();
-
-  //   return {
-  //     ...account._doc,
-  //     _id: account.id,
-  //     user: singleUser.bind(this, account._doc.user),
-  //     createdAt: new Date(account._doc.createdAt).toISOString(),
-  //     updatedAt: new Date(account._doc.updatedAt).toISOString(),
-  //   };
-  // },
-
-  //  Activate a particular account.
-
-  // activateAccount: async (args, req) => {
-  //   let filter = { _id: args.accountId };
-  //   let update = { active: true };
-  //   const account = await Account.findOneAndUpdate(filter, update);
-  //   const ipAddress = req.socket.remoteAddress;
-  //   const log = new AdminLog({
-  //     ip: ipAddress,
-  //     description: `${args.initiator} activated ${account.id}`,
-  //     user: account.user.id,
-  //   });
-
-  //   await log.save();
-  //   return {
-  //     ...account._doc,
-  //     _id: account.id,
-  //     user: singleUser.bind(this, account._doc.user),
-  //     createdAt: new Date(account._doc.createdAt).toISOString(),
-  //     updatedAt: new Date(account._doc.updatedAt).toISOString(),
-  //   };
-  // },
 
   //  Activate a player in the system
 
@@ -1073,22 +1024,18 @@ const adminResolvers = {
   createRole: async (args, req) => {
     console.log(args.roleInput);
     try {
-
       const role = new Role({
         name: args.roleInput.name,
         description: args.roleInput.description,
       });
 
       await role.save();
-      console.log(
-        `Role "${args.roleInput.name}" created with permissions:`
-      );
+      console.log(`Role "${args.roleInput.name}" created with permissions:`);
 
       return {
         status: "success",
         message: `${args.roleInput.name} role created`,
       };
-
     } catch (error) {
       console.error("Error creating role:", error);
       throw new Error("Failed to create role");

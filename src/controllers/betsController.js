@@ -21,18 +21,19 @@ const PlayerBet = require("../models/PlayerBet");
 
 const betsResolvers = {
   createPlayerbet: async (args, req) => {
-    // const currentUser = req.user;
+    const currentUser = req.user;
 
-    // if (!currentUser) {
-    //   throw new Error("Unauthorized: Missing token");
-    // }
+    if (!currentUser) {
+      throw new Error("Unauthorized: Missing token");
+    }
 
     try {
       // Verify the token
 
       const account = await Account.findOne({
-        user: args.playerbetInput.userId,
+        user: req.user.userId,
       });
+
       if (+account.balance < 0) {
         throw new Error("Insufficient account balance");
       }
@@ -84,7 +85,7 @@ const betsResolvers = {
 
       await betrans.save();
 
-      const user = await Player.findById(args.playerbetInput.userId);
+      const user = await Player.findById(req.user.userId);
 
       // Format and return the result
       const createdBet = {
@@ -129,6 +130,12 @@ const betsResolvers = {
   },
 
   getAllPlayers: async (args, req) => {
+    const currentUser = req.user;
+
+    if (!currentUser) {
+      throw new Error("Unauthorized: Missing token");
+    }
+
     try {
       const pageNumber = parseInt(args.page) || 1;
       const itemsPerPage = parseInt(args.per_page) || 10;
@@ -309,7 +316,7 @@ const betsResolvers = {
     if (!currentUser) {
       throw new Error("Unauthorized: Missing token");
     }
-    const bets = await Playerbet.find({ userId: args.userId })
+    const bets = await Playerbet.find({ userId: req.user.userId })
       .populate("userId")
       .sort({
         createdAt: -1,
@@ -329,7 +336,12 @@ const betsResolvers = {
   //  Get bets for a paricular user
 
   bets: async (args, req) => {
-    const bets = await Playerbet.find({ user: args.userId })
+    const currentUser = req.user;
+
+    if (!currentUser) {
+      throw new Error("Unauthorized: Missing token");
+    }
+    const bets = await Playerbet.find({ user: req.user.userId })
       .sort({
         createdAt: -1,
       })
@@ -345,24 +357,12 @@ const betsResolvers = {
     });
   },
 
-  //  Get all the bets
-
-  // allBets: async (args, req) => {
-  //   const bets = await Playerbet.find()
-  //     .sort({ createdAt: -1 })
-  //     .populate("userId");
-  //   console.log(bets);
-  //   return bets.map((bet) => {
-  //     return {
-  //       ...bet?._doc,
-  //       _id: bet?.id,
-  //       // user: singleUser.bind(this, bet?._doc?.user),
-  //       createdAt: new Date(bet?._doc?.createdAt).toISOString(),
-  //       updatedAt: new Date(bet?._doc?.updatedAt).toISOString(),
-  //     };
-  //   });
-  // },
   allBets: async (args, req) => {
+    const currentUser = req.user;
+
+    if (!currentUser) {
+      throw new Error("Unauthorized: Missing token");
+    }
     try {
       let bets;
       const searchTerm = args.searchTerm;
@@ -446,6 +446,11 @@ const betsResolvers = {
   //  Get the bet history for a particular user
 
   history: async (args, req) => {
+    const currentUser = req.user;
+
+    if (!currentUser) {
+      throw new Error("Unauthorized: Missing token");
+    }
     const history = await History.find().sort({ createdAt: -1 }).limit(20);
 
     return history.map((bet) => {

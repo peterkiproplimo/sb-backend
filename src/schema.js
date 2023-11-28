@@ -514,10 +514,10 @@ type RootQuery{
   login(loginInput:LoginInput): AuthData!
   adminLogin(loginInput:LoginInput): AuthData!
   accountBalance:Account!
-  accountSummary(userId:String):Account!
+  accountSummary:Account!
   transactions(userId:String):[Transaction!]!
   bets(userId:String):[Bet!]!
-  historyBets(userId:String):[Playerbet!]!
+  historyBets:[Playerbet!]!
   allBets(searchTerm: String, win:String, page: Int, per_page: Int):BetsData!
   filteredBets:[Bet!]!
   allTransactions(searchTerm: String, page: Int, per_page: Int):TransactionsData!
@@ -562,7 +562,7 @@ type RootQuery{
   calculateBalance:AccountBalance
   getAllPlayers(username: String, active: String, page: Int, per_page: Int): PlayersData!
   Dashboard: DashboardData
-  affiliate(userId:String): affiliateProgram
+  affiliate: affiliateProgram
 
   
   getSinglePlayer(playerId: String!): SinglePlayer

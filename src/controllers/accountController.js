@@ -360,12 +360,18 @@ const accountResolvers = {
   },
 
   accountSummary: async (args, req) => {
-    const account = await Account.findOne({ user: args.userId });
-    const user = await Player.findById(args.userId);
+    const currentUser = req.user;
 
-    const loses = await fetchTotalLosesForPlayer(args.userId);
-    const wins = await fetchTotalWinsForPlayer(args.userId);
-    const deposits = await fetchTotalDeposits(args.userId);
+    if (!currentUser) {
+      throw new Error("Unauthorized: Missing token");
+    }
+
+    const account = await Account.findOne({ user: req.user.userId });
+    const user = await Player.findById(req.user.userId);
+
+    const loses = await fetchTotalLosesForPlayer(req.user.userId);
+    const wins = await fetchTotalWinsForPlayer(req.user.userId);
+    const deposits = await fetchTotalDeposits(req.user.userId);
 
     return {
       _id: account?.id,
