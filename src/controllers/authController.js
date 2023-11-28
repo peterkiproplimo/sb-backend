@@ -14,7 +14,7 @@ const authResolvers = {
   login: async (args, req) => {
     const user = await Player.findOne({ username: args.loginInput.username });
     if (!user) {
-      throw new Error("Invalid credentials. Please try again!");
+      throw new AuthenticationError("Invalid credentials. Please try again!");
     }
     if (user.online) {
       throw new Error("User cannot sign in in more than one device");
@@ -82,10 +82,7 @@ const authResolvers = {
     // if (user.online === true && user.type === "User") {
     //   throw new AuthenticationError("User already online");
     // }
-    const isEqual = await bcrypt.compare(
-      args.password,
-      user.password
-    );
+    const isEqual = await bcrypt.compare(args.password, user.password);
     if (!isEqual) {
       throw new AuthenticationError("Invalid credentials. Please try again!");
     }
@@ -108,7 +105,7 @@ const authResolvers = {
     //     expiresIn: 30,
     //   }
     // );
-    const tokenExpiresIn = 60*30; // in seconds
+    const tokenExpiresIn = 60 * 30; // in seconds
     const expirationTime = Math.floor(Date.now() / 1000) + tokenExpiresIn;
 
     const token = await jwt.sign(

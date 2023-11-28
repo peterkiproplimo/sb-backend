@@ -17,18 +17,17 @@ let unirest = require("unirest");
 
 const mpesaResolvers = {
   depositTest: async (args, req) => {
-    // const currentUser = req.user;
+    const currentUser = req.user;
 
-    // if (!currentUser) {
-    //   throw new Error("Unauthorized: Missing token");
-    // }
+    if (!currentUser) {
+      throw new Error("Unauthorized: Missing token");
+    }
     try {
       const consumer_key = "5PEvsVfLvBHx3SaJszsuJvzUEMIC3KGu";
       const consumer_secret = "lnqSApRJLo3ahd20";
       const url =
         "https://api.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials";
 
-      // const auth = btoa(`${consumer_key}:${consumer_secret}`);
       const authString = `${consumer_key}:${consumer_secret}`;
 
       // Convert the string to a Buffer
@@ -76,7 +75,7 @@ const mpesaResolvers = {
           )
           .end(async (res) => {
             if (res.body.ResponseCode == "0") {
-              const account = await Account.findOne({ user: args.userId });
+              const account = await Account.findOne({ user: req.user.userId });
               console.log(res.body);
               const trans = new Transaction({
                 type: 1,
@@ -93,12 +92,12 @@ const mpesaResolvers = {
               const transrequest = new Transrequest({
                 amount: args.amount,
                 phone: args.phone,
-                user: args.userId,
+                user: req.user.userId,
               });
 
               await transrequest.save();
 
-              const user = await Player.findById(args.userId);
+              const user = await Player.findById(req.user.userId);
 
               return {
                 _id: account?.id,
@@ -117,13 +116,13 @@ const mpesaResolvers = {
   },
 
   withdraw: async (args, req) => {
-    // const currentUser = req.user;
+    const currentUser = req.user;
 
-    // if (!currentUser) {
-    //   throw new Error("Unauthorized: Missing token");
-    // }
+    if (!currentUser) {
+      throw new Error("Unauthorized: Missing token");
+    }
 
-    const account = await Account.findOne({ user: args.userId });
+    const account = await Account.findOne({ user: req.user.userId });
 
     if (parseFloat(args.amount) > parseFloat(account.balance)) {
       throw new Error("Insufficient balance in your wallet");
@@ -180,7 +179,7 @@ const mpesaResolvers = {
           .end(async (res) => {
             console.log(res.body);
             if (res.error) throw new Error(res.error);
-            let filter = { user: args.userId };
+            let filter = { user: req.user.userId };
             let update = {
               balance: parseFloat(account?.balance) - parseFloat(args.amount),
             };

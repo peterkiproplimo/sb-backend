@@ -332,7 +332,7 @@ const playerResolvers = {
       });
   },
   suspendPlayer: (args, req) => {
-    console.log(req.isAuth)
+    console.log(req.isAuth);
     if (!req.isAuth) {
       throw new Error("Unauthenticated");
     }
@@ -355,7 +355,7 @@ const playerResolvers = {
         const ipAddress = req.socket.remoteAddress;
         const log = new AdminLog({
           ip: ipAddress,
-          action: result.active? "Activate Player": "Suspend Player",
+          action: result.active ? "Activate Player" : "Suspend Player",
           description: message, //this will be changed to the authenticated user creating the logs
           user: req.user.userId,
         });
