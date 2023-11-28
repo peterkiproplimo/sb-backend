@@ -3,7 +3,7 @@ var uniqueValidator = require("mongoose-unique-validator");
 
 const Schema = mongoose.Schema;
 
-const betSchema = new Schema(
+const gameSchema = new Schema(
   {
     bustpoint: {
       type: Number,
@@ -20,5 +20,5 @@ const betSchema = new Schema(
   },
   { timestamps: true }
 );
-betSchema.plugin(uniqueValidator);
-module.exports = mongoose.model("Game", betSchema);
+gameSchema.plugin(uniqueValidator);
+module.exports = mongoose.model("Game", gameSchema);
