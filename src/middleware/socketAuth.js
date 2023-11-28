@@ -25,23 +25,20 @@ module.exports = async (socket, next) => {
     return next();
   }
   // check if iser in db
-  const user = await User.findById(decodedToken.userId).populate([
-    "account",
-    "bets",
-  ]);
+  const player = await Player.findById(decodedToken.userId)
   
   if (!user) {
     socket.isAuth = false;
     return next();
   }
   await SocketUser.findOneAndUpdate(
-    { user: user.id },
+    { user: player.id },
     { socketId: socket.id },
     {
       upsert: true, // Make this update into an upsert
     }
   );
   socket.isAuth = true;
-  socket.user = user;
+  socket.user = decodedToken;
   return next();
 };
