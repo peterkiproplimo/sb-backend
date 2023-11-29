@@ -1,12 +1,3 @@
-// importScripts
-const connectToDatabase = require("../../config/database"); // Update the path if needed
-const Player = require("../models/Player");
-const Playerbet = require("../models/PlayerBet");
-const { ObjectId } = require("mongodb");
-const Account = require("../models/Account");
-const BetTransaction = require("../models/BetTransactions");
-const Transaction = require("../models/transactions");
-const Transrequest = require("../models/Transrequest");
 const Logs = require("../models/logs");
 async function updatePlayerAc(account, transaction) {
   try {
