@@ -6,6 +6,7 @@ const socketIO = (server) =>
   new Server(server, {
     cors: {
       origin: [
+        '*',
         "https://safaribust.techsavanna.technology",
         "http://localhost:3001",
         "https://sbadmin.techsavanna.technology",

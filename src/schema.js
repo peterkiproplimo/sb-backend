@@ -47,10 +47,20 @@ username:String!
 createdAt:String!
 updatedAt:String!
 }
+
 type GameData{
 _id: ID!
 round:String!
 level:String!
+createdAt:String!
+updatedAt:String!
+}
+
+type Game{
+_id: ID!
+bustpoint: Int!
+seedeed: String!
+played: Int!
 createdAt:String!
 updatedAt:String!
 }
@@ -327,7 +337,7 @@ _id: ID!
 betAmount: Float!
 point: Float!
 userId: Player
-round: String
+roundid: Game
 withholdingtax:Float
 winamount:Float
 possibleWin: Float
@@ -514,7 +524,7 @@ type RootQuery{
   login(loginInput:LoginInput): AuthData!
   adminLogin(loginInput:LoginInput): AuthData!
   accountBalance:Account!
-  accountSummary:Account!
+  accountSummary:Account! 
   transactions(userId:String):[Transaction!]!
   bets(userId:String):[Bet!]!
   historyBets:[Playerbet!]!

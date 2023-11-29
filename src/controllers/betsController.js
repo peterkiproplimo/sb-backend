@@ -401,7 +401,7 @@ const betsResolvers = {
 
         // Perform the search with filter      // Use lean() to convert the documents to plain JavaScript objects
         bets = await PlayerBet.find(filter)
-          .populate("userId")
+          .populate("userId").populate("roundid") 
           .skip((page - 1) * pageSize)
           .limit(pageSize)
           .sort({ createdAt: -1 })
