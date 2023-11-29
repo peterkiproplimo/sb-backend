@@ -135,8 +135,6 @@ async function startApolloServer() {
   // Apply Apollo Server middleware to the app after the server has started
   server.applyMiddleware({ app });
 
-  // Create an HTTP server with your Express app
-
   // Start the server
   httpServer.listen(3002, async () => {
     await connectToDatabase();
@@ -203,9 +201,9 @@ app.post("/mpesa-callback", async (req, res) => {
         // Save the updated transaction
         await transaction.save();
 
+        // Find the player AC
         const playeraccount = await Account.findOne({ user: transaction.user });
 
-        console.log(playeraccount);
         updatePlayerAc(playeraccount, transaction);
         const currentbalance = await Account.findOne({
           user: transaction.user,
@@ -262,6 +260,11 @@ app.post("/mpesa-result", async (req, res) => {
   res.json({ result: "Callback received and processed successfully" });
 });
 
+/*
+Check the socket ID based on the user id from the database
+Emit the account balance to the socket ID
+*/
+
 app.post("/confirmcompletedtrans", (req, res) => {
   // Handle the incoming M-Pesa callback data here
   const mpesaCallbackData = req.body;
@@ -295,7 +298,6 @@ const incrementStep = 0.01; // Step to achieve 1 decimal place
 let targetValueIndex = 0;
 
 let BET_MULTIPLIERVALUE = 0;
-let currentRound = null;
 
 setemitNextRound(false);
 setemitOngoingRound(false);
@@ -516,6 +518,6 @@ setInterval(async () => {
   io.emit("historybets", historybets);
 }, 300);
 
-// saveFakePlayers();
+saveFakePlayers();
 
 module.exports = { io };

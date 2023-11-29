@@ -11,10 +11,11 @@ const Logs = require("../models/logs");
 async function updatePlayerAc(account, transaction) {
   try {
     if (account.isfirstdebosit && parseFloat(transaction.amount) >= 100) {
-      account.karibubonus = parseFloat(args.amount) * 2;
+      account.karibubonus = parseFloat(transaction.amount) * 2;
       if (account.karibubonus >= 10000) {
         account.karibubonus = 10000;
       }
+
       account.isfirstdebosit = false;
       const currentDate = new Date();
       const sevenDaysLater = new Date(currentDate);
@@ -25,10 +26,11 @@ async function updatePlayerAc(account, transaction) {
       await account.save();
 
       const log = new Logs({
-        ip: "deposits",
+        ip: "noipbecauseofdebosit",
         description: `${account?.user?.username} deposited ${transaction.amount}- Account Name:${account?.user?.username}`,
         user: transaction.userId,
       });
+
       await log.save();
     } else {
       account.balance = (
@@ -43,7 +45,6 @@ async function updatePlayerAc(account, transaction) {
       });
       await log.save();
     }
-    // const ipAddress = req.socket.remoteAddress;
   } catch (err) {}
 }
 
@@ -95,6 +96,8 @@ async function handleKaribuBonusAndBalance(account, args) {
     await account.save();
   }
 }
+
+async function isfirstdebosit(account) {}
 
 module.exports = {
   updatePlayerAc,
