@@ -372,7 +372,7 @@ async function runMultiplierTimer(multiplier) {
 
       io.emit("livedata", playerBets);
 
-      console.log("Update game has been played");
+      // console.log("Update game has been played");/
       await setGameHasBeenPlayed(multiplier);
 
       // Generate fake players for the next round
