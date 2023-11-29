@@ -27,6 +27,6 @@ module.exports = async (req, res, next) => {
 
   req.isAuth = true;
   req.user = decodedToken;
-  console.log(req.isAuth);
+  // console.log(req.isAuth);
   return next();
 };
