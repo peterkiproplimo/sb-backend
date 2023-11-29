@@ -1,6 +1,5 @@
 require("dotenv").config();
 
-//importing mongoose models
 const Account = require("../models/Account");
 const Bet = require("../models/Bet");
 const Transaction = require("../models/transactions");
@@ -8,7 +7,6 @@ const Logs = require("../models/logs");
 const Player = require("../models/Player");
 const Playerbet = require("../models/PlayerBet");
 const AdminLogs = require("../models/AdminLogs");
-const jwt = require("jsonwebtoken");
 
 async function fetchTotalWinsForPlayer(playerId) {
   let totalWins = 0;

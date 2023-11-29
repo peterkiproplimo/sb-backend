@@ -2,7 +2,6 @@ require("dotenv").config();
 
 const moment = require("moment");
 
-const jwt = require("jsonwebtoken");
 const Account = require("../models/Account");
 const Bet = require("../models/Bet");
 const Logs = require("../models/logs");
@@ -401,7 +400,8 @@ const betsResolvers = {
 
         // Perform the search with filter      // Use lean() to convert the documents to plain JavaScript objects
         bets = await PlayerBet.find(filter)
-          .populate("userId").populate("roundid") 
+          .populate("userId")
+          .populate("roundid")
           .skip((page - 1) * pageSize)
           .limit(pageSize)
           .sort({ createdAt: -1 })

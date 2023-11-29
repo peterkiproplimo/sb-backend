@@ -4,7 +4,6 @@ const jwt = require("jsonwebtoken");
 
 //importing mongoose models
 const Player = require("../models/Player");
-const Admin = require("../models/admins");
 const Logs = require("../models/logs");
 const AdminLog = require("../models/AdminLogs");
 const User = require("../models/User");

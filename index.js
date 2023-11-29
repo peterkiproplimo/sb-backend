@@ -16,7 +16,6 @@ const house = require("./src/models/house");
 const Game = require("./src/models/Game");
 const Account = require("./src/models/Account");
 const Transaction = require("./src/models/transactions");
-const jwt = require("jsonwebtoken"); //this is not required
 const { ApolloServer } = require("apollo-server-express");
 
 // Update the path if needed

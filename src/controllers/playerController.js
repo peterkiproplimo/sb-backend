@@ -10,7 +10,6 @@ const Account = require("../models/Account");
 const AdminLog = require("../models/AdminLogs");
 const User = require("../models/User");
 const Player = require("../models/Player");
-const Admin = require("../models/admins");
 const OTP = require("../models/verifier");
 const PlayerBet = require("../models/PlayerBet");
 const Transactions = require("../models/transactions");
