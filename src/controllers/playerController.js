@@ -77,7 +77,7 @@ const playerResolvers = {
           await account.save();
 
           const ipAddress = req.socket.remoteAddress;
-          const log = new AdminLog({
+          const log = new Logs({
             ip: ipAddress,
             description: `Created a new user ${args.userInput.username}`,
             user: result.id,
@@ -85,7 +85,6 @@ const playerResolvers = {
 
           await log.save();
           return account;
-          // console.log(log);
         }
       })
       .then(async (result) => {
