@@ -71,7 +71,7 @@ const playerResolvers = {
             user: result.id,
             karibubonus: 0,
             totalbetamount: 0,
-            isfirstdebosit: false,
+            isfirstdebosit: true,
             bonusredeemed: false,
           });
           await account.save();
