@@ -251,7 +251,6 @@ async function getRoundFromDatabase() {
     const document = await collection.findOne(filter);
 
     if (document) {
-      // console.log(document);
       // Document found, return it
       return document.randomID;
     } else {

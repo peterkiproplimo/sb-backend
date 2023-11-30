@@ -85,12 +85,16 @@ const betsResolvers = {
       await betrans.save();
 
       const user = await Player.findById(req.user.userId);
+      const account2 = await Account.findOne({
+        user: req.user.userId,
+      });
 
       // Format and return the result
       const createdBet = {
         ...results._doc,
         _id: results._id.toString(),
         userId: user,
+        balance: account2.balance,
         createdAt: new Date(results._doc.createdAt).toISOString(),
         updatedAt: new Date(results._doc.updatedAt).toISOString(),
         Player: {
