@@ -3,8 +3,6 @@ require("dotenv").config();
 const axios = require("axios");
 const formatDate = require("../utils/formatDate");
 
-var mysql = require("mysql");
-
 //importing mongoose models
 const Account = require("../models/Account");
 const Transaction = require("../models/transactions");
@@ -12,12 +10,13 @@ const Transrequest = require("../models/Transrequest");
 
 const Logs = require("../models/logs");
 const Player = require("../models/Player");
-const Mpesa = require("mpesa-node");
 let unirest = require("unirest");
 
 const mpesaResolvers = {
   depositTest: async (args, req) => {
     const currentUser = req.user;
+
+    const phoneNumber = formatKenyanPhoneNumber(args.phone);
 
     if (!currentUser) {
       throw new Error("Unauthorized: Missing token");
@@ -64,19 +63,20 @@ const mpesaResolvers = {
               Timestamp: timestamp,
               TransactionType: "CustomerPayBillOnline",
               Amount: parseInt(args.amount),
-              PartyA: parseInt(args.phone),
+              PartyA: phoneNumber,
               PartyB: shortcode,
-              PhoneNumber: parseInt(args.phone),
+              PhoneNumber: phoneNumber,
               CallBackURL:
                 "https://safaribust-backend.onrender.com/mpesa-callback",
-              AccountReference: parseInt(args.phone),
+              AccountReference: phoneNumber,
               TransactionDesc: "Deposit to SAFARIBUST Account",
             })
           )
           .end(async (res) => {
+            // console.log(res);
             if (res.body.ResponseCode == "0") {
               const account = await Account.findOne({ user: req.user.userId });
-              console.log(res.body);
+
               const trans = new Transaction({
                 type: 1,
                 MerchantRequestID: res.body.MerchantRequestID,
@@ -263,5 +263,21 @@ const mpesaResolvers = {
     }
   },
 };
+
+function formatKenyanPhoneNumber(phoneNumber) {
+  // Remove any spaces and non-numeric characters
+  phoneNumber = phoneNumber.replace(/\D/g, "");
+
+  // Check if the phone number starts with "254" and has 12 digits (including the country code)
+  if (/^254\d{9}$/.test(phoneNumber)) {
+    return phoneNumber; // Phone number is already in the correct format
+  } else if (/^0\d{9}$/.test(phoneNumber)) {
+    // Add "254" in front of the phone number
+    return "254" + phoneNumber.slice(1);
+  } else {
+    // Handle invalid phone numbers
+    return "Invalid phone number";
+  }
+}
 
 module.exports = mpesaResolvers;

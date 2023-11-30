@@ -336,6 +336,8 @@ type Playerbet {
 _id: ID!
 betAmount: Float!
 point: Float!
+round:String
+balance:Float
 userId: Player
 roundid: Game
 withholdingtax:Float

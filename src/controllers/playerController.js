@@ -10,7 +10,6 @@ const Account = require("../models/Account");
 const AdminLog = require("../models/AdminLogs");
 const User = require("../models/User");
 const Player = require("../models/Player");
-const Admin = require("../models/admins");
 const OTP = require("../models/verifier");
 const PlayerBet = require("../models/PlayerBet");
 const Transactions = require("../models/transactions");
@@ -71,13 +70,13 @@ const playerResolvers = {
             user: result.id,
             karibubonus: 0,
             totalbetamount: 0,
-            isfirstdebosit: false,
+            isfirstdebosit: true,
             bonusredeemed: false,
           });
           await account.save();
 
           const ipAddress = req.socket.remoteAddress;
-          const log = new AdminLog({
+          const log = new Logs({
             ip: ipAddress,
             description: `Created a new user ${args.userInput.username}`,
             user: result.id,
@@ -85,7 +84,6 @@ const playerResolvers = {
 
           await log.save();
           return account;
-          // console.log(log);
         }
       })
       .then(async (result) => {
@@ -99,7 +97,7 @@ const playerResolvers = {
             online: result.online,
             phone: result.phone,
           },
-          "thisissupposedtobemysecret",
+          process.env.SECRET_KEY,
           {
             expiresIn: 60 * 15,
           }
@@ -184,7 +182,7 @@ const playerResolvers = {
             online: result.online,
             phone: result.phone,
           },
-          "thisissupposedtobemysecret",
+          process.env.SECRET_KEY,
           {
             expiresIn: 60 * 15,
           }

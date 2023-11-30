@@ -2,7 +2,6 @@ require("dotenv").config();
 
 const moment = require("moment");
 
-const jwt = require("jsonwebtoken");
 const Account = require("../models/Account");
 const Bet = require("../models/Bet");
 const Logs = require("../models/logs");
@@ -86,12 +85,16 @@ const betsResolvers = {
       await betrans.save();
 
       const user = await Player.findById(req.user.userId);
+      const account2 = await Account.findOne({
+        user: req.user.userId,
+      });
 
       // Format and return the result
       const createdBet = {
         ...results._doc,
         _id: results._id.toString(),
         userId: user,
+        balance: account2.balance,
         createdAt: new Date(results._doc.createdAt).toISOString(),
         updatedAt: new Date(results._doc.updatedAt).toISOString(),
         Player: {
@@ -401,7 +404,8 @@ const betsResolvers = {
 
         // Perform the search with filter      // Use lean() to convert the documents to plain JavaScript objects
         bets = await PlayerBet.find(filter)
-          .populate("userId").populate("roundid") 
+          .populate("userId")
+          .populate("roundid")
           .skip((page - 1) * pageSize)
           .limit(pageSize)
           .sort({ createdAt: -1 })

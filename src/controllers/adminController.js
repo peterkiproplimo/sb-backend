@@ -60,7 +60,7 @@ async function fetchHouseRevenueData() {
     } else {
       const sum = result.length > 0 ? result[0].totalAmount : 0;
       totalmoney = sum;
-      console.log("Sum of amount for Playerbets with win=false today:", sum);
+      // console.log("Sum of amount for Playerbets with win=false today:", sum);
     }
   });
   // console.log(total);
@@ -106,7 +106,7 @@ async function fetchHouselosesTodayData() {
       const sum = result.length > 0 ? result[0].totalAmount : 0;
 
       totalmoney = sum;
-      console.log("Sum of amount for Playerbets with win=false today:", sum);
+      // console.log("Sum of amount for Playerbets with win=false today:", sum);
     }
   });
   return { currentDay: totalmoney };
@@ -132,7 +132,7 @@ async function fetchPlayersData() {
     if (err) {
       console.error("Error counting logs:", err);
     } else {
-      console.log("Count of login logs today:", count);
+      // console.log("Count of login logs today:", count);
     }
   });
 
@@ -159,7 +159,7 @@ async function fetchWithholdingTaxData() {
     } else {
       const total = result.length > 0 ? result[0].totalWithholdingTax : 0;
       totalmoney = total;
-      console.log("Total withholding tax:", total);
+      // console.log("Total withholding tax:", total);
     }
   });
 
@@ -188,10 +188,10 @@ async function fetchWalletsTotalData() {
     } else {
       const total = result.length > 0 ? result[0].totalBalance : 0;
       totalmoney = total;
-      console.log(
-        "Aggregate balance for all accounts except the specified account:",
-        total
-      );
+      // console.log(
+      //   "Aggregate balance for all accounts except the specified account:",
+      //   total
+      // );
     }
   });
   return { grandTotal: totalmoney }; // Replace with actual data
@@ -237,10 +237,10 @@ async function fetchHouseWinsData() {
     } else {
       const sum = result.length > 0 ? result[0].totalAmount : 0;
       mytotalmoney = sum;
-      console.log(
-        "Sum of amount for Playerbets with win=false this month:",
-        sum
-      );
+      // console.log(
+      //   "Sum of amount for Playerbets with win=false this month:",
+      //   sum
+      // );
     }
   });
 
@@ -287,10 +287,10 @@ async function fetchHouseLossesData() {
     } else {
       const sum = result.length > 0 ? result[0].totalAmount : 0;
       mytotalmoney = sum;
-      console.log(
-        "Sum of amount for Playerbets with win=false this month:",
-        sum
-      );
+      // console.log(
+      //   "Sum of amount for Playerbets with win=false this month:",
+      //   sum
+      // );
     }
   });
 

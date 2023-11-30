@@ -16,7 +16,6 @@ const house = require("./src/models/house");
 const Game = require("./src/models/Game");
 const Account = require("./src/models/Account");
 const Transaction = require("./src/models/transactions");
-const jwt = require("jsonwebtoken"); //this is not required
 const { ApolloServer } = require("apollo-server-express");
 
 // Update the path if needed
@@ -135,8 +134,6 @@ async function startApolloServer() {
   // Apply Apollo Server middleware to the app after the server has started
   server.applyMiddleware({ app });
 
-  // Create an HTTP server with your Express app
-
   // Start the server
   httpServer.listen(3002, async () => {
     await connectToDatabase();
@@ -154,6 +151,7 @@ startApolloServer().catch((err) => {
 const io = socketIO(httpServer);
 
 const onConnection = (socket) => {
+  // console.log(socket.id);
   connection(io, socket);
 };
 
@@ -203,9 +201,9 @@ app.post("/mpesa-callback", async (req, res) => {
         // Save the updated transaction
         await transaction.save();
 
+        // Find the player AC
         const playeraccount = await Account.findOne({ user: transaction.user });
 
-        console.log(playeraccount);
         updatePlayerAc(playeraccount, transaction);
         const currentbalance = await Account.findOne({
           user: transaction.user,
@@ -213,7 +211,7 @@ app.post("/mpesa-callback", async (req, res) => {
 
         balance = currentbalance.balance;
 
-        io.emit(currentbalance.user, balance);
+        io.emit(currentbalance.use, balance);
       } catch (error) {
         console.error("Error updating transaction (success):", error);
       }
@@ -262,6 +260,11 @@ app.post("/mpesa-result", async (req, res) => {
   res.json({ result: "Callback received and processed successfully" });
 });
 
+/*
+Check the socket ID based on the user id from the database
+Emit the account balance to the socket ID
+*/
+
 app.post("/confirmcompletedtrans", (req, res) => {
   // Handle the incoming M-Pesa callback data here
   const mpesaCallbackData = req.body;
@@ -295,7 +298,6 @@ const incrementStep = 0.01; // Step to achieve 1 decimal place
 let targetValueIndex = 0;
 
 let BET_MULTIPLIERVALUE = 0;
-let currentRound = null;
 
 setemitNextRound(false);
 setemitOngoingRound(false);
@@ -352,7 +354,7 @@ async function runMultiplierTimer(multiplier) {
     // Increment the value by incrementStep
     setMultiplierValue((value += incrementStep));
 
-    io.emit("updateTimer", value.toFixed(2)); // Emit the updated value to all connected clients
+    io.emit("updateTimer", value.toFixed(2));
   } else {
     if (value >= multiplier.bustpoint) {
       timerPaused = true;
@@ -371,7 +373,7 @@ async function runMultiplierTimer(multiplier) {
 
       io.emit("livedata", playerBets);
 
-      console.log("Update game has been played");
+      // console.log("Update game has been played");/
       await setGameHasBeenPlayed(multiplier);
 
       // Generate fake players for the next round
@@ -444,7 +446,7 @@ async function waitCount() {
 
 //  Start the game
 async function startGame() {
-  console.log("game started successfully");
+  // console.log("game started successfully");
   await waitCount();
 }
 
