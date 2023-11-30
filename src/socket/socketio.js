@@ -31,4 +31,4 @@ const socketManager = new SocketManager();
 
 // Export the SocketManager instance
 
-module.exports = { socketIO, socketCON, app, server, socketManager };
+module.exports = { socketIO, socketCON };
