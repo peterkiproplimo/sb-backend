@@ -445,7 +445,7 @@ async function waitCount() {
 
 //  Start the game
 async function startGame() {
-  console.log("game started successfully");
+  // console.log("game started successfully");
   await waitCount();
 }
 

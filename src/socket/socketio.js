@@ -1,12 +1,15 @@
 const { Server } = require("socket.io");
-const jwt = require("jsonwebtoken");
-const User = require("../models/User");
+
+const express = require("express");
+
+const app = express();
+const server = require("http").createServer(app);
 
 const socketIO = (server) =>
   new Server(server, {
     cors: {
       origin: [
-        '*',
+        "*",
         "https://safaribust.techsavanna.technology",
         "http://localhost:3001",
         "https://sbadmin.techsavanna.technology",
@@ -23,4 +26,9 @@ const socketCON = (io) => {
   io.on;
 };
 
-module.exports = { socketIO, socketCON };
+// Create a single instance of SocketManager
+const socketManager = new SocketManager();
+
+// Export the SocketManager instance
+
+module.exports = { socketIO, socketCON, app, server, socketManager };
