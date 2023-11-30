@@ -478,7 +478,7 @@ async function emitBalances(playerBets) {
       if (account) {
         const userBalance = account.balance; // Assuming 'balance' is the field in the account schema
 
-        io.emit(userId, userBalance);
+        await emitToUser(userId, userBalance);
         // Emit the user's balance through a WebSocket
         // Replace this line with your WebSocket implementation to emit the balance
         // For example:
@@ -495,6 +495,10 @@ async function emitBalances(playerBets) {
     console.error("Error emitting balances:", error);
     // Handle errors if any occurred during the process
   }
+}
+
+async function emitToUser(userId, value) {
+  io.emit(userId, value);
 }
 // Function to emit the live data
 
