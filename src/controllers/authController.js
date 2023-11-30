@@ -16,9 +16,9 @@ const authResolvers = {
     if (!user) {
       throw new AuthenticationError("Invalid credentials. Please try again!");
     }
-    // if (user.online) {
-    //   throw new Error("User cannot sign in in more than one device");
-    // }
+    if (user.online) {
+      throw new Error("User cannot sign in in more than one device");
+    }
     if (user.active === false) {
       throw new Error("Account suspended!!!");
     }
