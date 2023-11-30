@@ -30,24 +30,20 @@ const betSchema = new Schema(
       required: false,
       // required: false,
     },
-
     roundid: {
       type: Schema.Types.ObjectId,
       ref: "Game",
       required: false,
     },
-
     played: {
       type: Number,
       required: true,
     },
-
     completed: {
       type: Number,
       required: false,
       default: 0,
     },
-
     possibleWin: {
       type: Number,
       required: false,

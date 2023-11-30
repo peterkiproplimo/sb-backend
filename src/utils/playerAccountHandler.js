@@ -45,8 +45,8 @@ async function handleKaribuBonusAndBalance(account, args) {
   const currentDate = new Date();
 
   if (
-    account.karibubonus > 0 &&
-    account.karibubonus >= parseFloat(args.playerbetInput.betAmount) &&
+    account?.karibubonus > 0 &&
+    account?.karibubonus >= parseFloat(args.playerbetInput.betAmount) &&
     currentDate <= account.bonusexpirydate
   ) {
     account.karibubonus = (

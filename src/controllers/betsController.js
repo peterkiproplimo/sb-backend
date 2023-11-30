@@ -33,10 +33,13 @@ const betsResolvers = {
         user: req.user.userId,
       });
 
-      if (+account.balance < 0) {
+      // if (!account) {
+      //   throw new Error("account not found");
+      // }
+      if (account?.balance < 0) {
         throw new Error("Insufficient account balance");
       }
-      if (account.balance < parseFloat(args.playerbetInput.betAmount)) {
+      if (account?.balance < parseFloat(args.playerbetInput.betAmount)) {
         throw new Error("Insufficient account balance");
       }
 

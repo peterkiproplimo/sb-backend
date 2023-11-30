@@ -137,8 +137,8 @@ async function startApolloServer() {
   // Start the server
   httpServer.listen(3002, async () => {
     await connectToDatabase();
-    // await startGame();
-    // getMultiplierValue();
+    await startGame();
+    getMultiplierValue();
 
     console.log(`listening on 3002`);
   });
@@ -371,7 +371,10 @@ async function runMultiplierTimer(multiplier) {
       // console.log("Get end Results");
       const playerBets = await getEndResults(multiplier, "endresults");
 
+      //Emit player balances to frontend here
+
       io.emit("livedata", playerBets);
+      await emitBalances(playerBets);
 
       // console.log("Update game has been played");/
       await setGameHasBeenPlayed(multiplier);
@@ -463,6 +466,36 @@ function getMultiplierValue() {
   return BET_MULTIPLIERVALUE;
 }
 
+async function emitBalances(playerBets) {
+  try {
+    for (const bet of playerBets) {
+      const userId = bet.userId._id;
+
+      // Find the user's account using the userId
+      const account = await Account.findOne({ user: userId });
+
+      console.log(userId);
+      if (account) {
+        const userBalance = account.balance; // Assuming 'balance' is the field in the account schema
+
+        io.emit(userId, userBalance);
+        // Emit the user's balance through a WebSocket
+        // Replace this line with your WebSocket implementation to emit the balance
+        // For example:
+        // webSocket.emit('user_balance', { userId, balance: userBalance });
+
+        console.log(
+          `Emitted balance (${userBalance}) for user ID: ${userId} through WebSocket`
+        );
+      } else {
+        console.log(`Account not found for user ID: ${userId}`);
+      }
+    }
+  } catch (error) {
+    console.error("Error emitting balances:", error);
+    // Handle errors if any occurred during the process
+  }
+}
 // Function to emit the live data
 
 setInterval(async () => {
@@ -484,6 +517,7 @@ setInterval(async () => {
 
       io.emit("livedata", playerBets);
     } else if (getemitEndRound()) {
+      // emit player balances
       // Generate fake players for the next round
     } else {
       // console.log("Ok3");
