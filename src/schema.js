@@ -520,6 +520,7 @@ type RootQuery{
   getUsers(searchTerm: String, status: String, page: Int, per_page: Int): UsersData!
   getUser(userId: String): User!
   aPlayer(username:String!):Player!
+  getPlayer: SinglePlayer
   admins: [Admin!]!
   login(loginInput:LoginInput): AuthData!
   adminLogin(loginInput:LoginInput): AuthData!

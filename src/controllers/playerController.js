@@ -306,9 +306,14 @@ const playerResolvers = {
     }
   },
 
-  // bY Machina
-  getSinglePlayer: async (args, req) => {
-    return await Player.findById(args.playerId)
+  // bY Machina  
+  getPlayer: async (args, req) => {
+    const currentPlayer = req.user;
+
+    if (!currentPlayer) {
+      throw new Error("Unauthorized: Missing token");
+    }
+    return await Player.findById(currentPlayer.userId)
       .then(async (player) => {
         if (!player) {
           throw new Error("User NOT found!!");
@@ -331,6 +336,7 @@ const playerResolvers = {
         };
       });
   },
+
   suspendPlayer: (args, req) => {
     console.log(req.isAuth);
     if (!req.isAuth) {
