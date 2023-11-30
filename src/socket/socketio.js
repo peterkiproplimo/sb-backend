@@ -26,9 +26,6 @@ const socketCON = (io) => {
   io.on;
 };
 
-// Create a single instance of SocketManager
-const socketManager = new SocketManager();
-
 // Export the SocketManager instance
 
 module.exports = { socketIO, socketCON };
