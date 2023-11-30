@@ -97,7 +97,7 @@ const playerResolvers = {
             online: result.online,
             phone: result.phone,
           },
-          "thisissupposedtobemysecret",
+          process.env.SECRET_KEY,
           {
             expiresIn: 60 * 15,
           }

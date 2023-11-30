@@ -5,8 +5,6 @@ const Playerbet = require("../models/PlayerBet");
 const { ObjectId } = require("mongodb");
 const Account = require("../models/Account");
 const History = require("../models/history");
-const BetTransaction = require("../models/BetTransactions");
-const Game = require("../models/Game");
 const { getFakePlayers, setFakePlayers } = require("../utils/fakePlayerUtils");
 
 async function checkBetsForWinsAndLosses(multipliers, gamestatus, multvalue) {
@@ -122,9 +120,11 @@ async function getEndResults(nextMultiplier, gamestatus) {
     // console.log(`Total to update, ${bets.length}`);
 
     let winAmount = 0;
-    let loseAmount = 0;
+
     const houseAccount = await Account.findById("6555e4028e89bb00288767eb");
     // Iterate through the bets and update the "win" field based on the condition
+    //  Define array here i.e const Payer
+    // Find a way to update account balance automatically
     for (const bet of bets) {
       await Playerbet.updateOne({ _id: bet._id }, { $set: { completed: 1 } });
 
@@ -139,13 +139,17 @@ async function getEndResults(nextMultiplier, gamestatus) {
         const account = await Account.findOne({
           user: bet.userId,
         });
-        
-console.log(account);
-        
+
         account.balance =
           parseFloat(account?.balance) + parseFloat(bet.possibleWin);
 
         await account.save();
+
+        const updatedAc = await Account.findOne({
+          user: bet.userId,
+        });
+
+        // Get User Id, get the Balance the put in array
 
         houseAccount.balance =
           parseFloat(houseAccount?.balance) - parseFloat(bet.possibleWin);
