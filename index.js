@@ -151,7 +151,7 @@ startApolloServer().catch((err) => {
 const io = socketIO(httpServer);
 
 const onConnection = (socket) => {
-  console.log(socket.id);
+  // console.log(socket.id);
   connection(io, socket);
 };
 
