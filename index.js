@@ -211,7 +211,7 @@ app.post("/mpesa-callback", async (req, res) => {
 
         balance = currentbalance.balance;
 
-        io.emit(currentbalance.use, balance);
+        io.emit(currentbalance.user, balance);
       } catch (error) {
         console.error("Error updating transaction (success):", error);
       }
