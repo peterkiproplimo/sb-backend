@@ -211,7 +211,11 @@ app.post("/mpesa-callback", async (req, res) => {
 
         balance = currentbalance.balance;
 
-        io.emit(currentbalance.user, balance);
+        console.log("User doing deposit", currentbalance.user);
+
+        // io.emit(currentbalance.user, balance);
+
+        await emitToUser(currentbalance.user, balance);
       } catch (error) {
         console.error("Error updating transaction (success):", error);
       }
@@ -249,6 +253,15 @@ app.post("/mpesa-result", async (req, res) => {
         // Successfull
         transaction.status = 1; // success
         transaction.ResultDesc = mpesaCallbackData.Result.ResultDesc;
+
+        // Get the user account
+        const account = await Account.findOne({
+          user: transaction.user,
+        });
+
+        // Emit the current account balance to the frontend
+        await emitToUser(transaction?.user, account?.balance);
+
         await transaction.save();
       } catch (error) {
         console.error("Error updating transaction (cancellation):", error);
@@ -474,15 +487,11 @@ async function emitBalances(playerBets) {
       // Find the user's account using the userId
       const account = await Account.findOne({ user: userId });
 
-      console.log(userId);
+      // console.log(userId);
       if (account) {
         const userBalance = account.balance; // Assuming 'balance' is the field in the account schema
 
         await emitToUser(userId, userBalance);
-        // Emit the user's balance through a WebSocket
-        // Replace this line with your WebSocket implementation to emit the balance
-        // For example:
-        // webSocket.emit('user_balance', { userId, balance: userBalance });
 
         console.log(
           `Emitted balance (${userBalance}) for user ID: ${userId} through WebSocket`
