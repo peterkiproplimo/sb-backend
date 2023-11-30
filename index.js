@@ -151,6 +151,7 @@ startApolloServer().catch((err) => {
 const io = socketIO(httpServer);
 
 const onConnection = (socket) => {
+  console.log(socket.id);
   connection(io, socket);
 };
 
@@ -353,7 +354,7 @@ async function runMultiplierTimer(multiplier) {
     // Increment the value by incrementStep
     setMultiplierValue((value += incrementStep));
 
-    io.emit("updateTimer", value.toFixed(2)); // Emit the updated value to all connected clients
+    io.emit("updateTimer", value.toFixed(2));
   } else {
     if (value >= multiplier.bustpoint) {
       timerPaused = true;
