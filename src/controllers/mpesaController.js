@@ -73,7 +73,7 @@ const mpesaResolvers = {
             })
           )
           .end(async (res) => {
-            console.log(res);
+            // console.log(res);
             if (res.body.ResponseCode == "0") {
               const account = await Account.findOne({ user: req.user.userId });
 
