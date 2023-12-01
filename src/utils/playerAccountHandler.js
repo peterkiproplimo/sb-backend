@@ -8,6 +8,10 @@ async function updatePlayerAc(account, transaction) {
         account.karibubonus = 10000;
       }
 
+      account.balance = (
+        parseFloat(account?.balance) + parseFloat(transaction.amount)
+      ).toFixed(2);
+
       account.isfirstdebosit = false;
       const currentDate = new Date();
       const sevenDaysLater = new Date(currentDate);
