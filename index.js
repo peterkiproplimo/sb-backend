@@ -204,7 +204,8 @@ app.post("/mpesa-callback", async (req, res) => {
         // Find the player AC
         const playeraccount = await Account.findOne({ user: transaction.user });
 
-        updatePlayerAc(playeraccount, transaction);
+        await updatePlayerAc(playeraccount, transaction);
+
         const currentbalance = await Account.findOne({
           user: transaction.user,
         });
