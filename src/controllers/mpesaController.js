@@ -96,12 +96,12 @@ const mpesaResolvers = {
               const transrequest = new Transrequest({
                 amount: args.amount,
                 phone: args.phone,
-                user: req.user.userId,
+                user: currentUser.userId,
               });
 
               await transrequest.save();
 
-              const user = await Player.findById(req.user.userId);
+              const user = await Player.findById(currentUser.userId);
 
               return {
                 _id: account?.id,
