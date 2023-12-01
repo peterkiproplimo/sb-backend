@@ -92,12 +92,15 @@ const betsResolvers = {
         user: req.user.userId,
       });
 
+      const totalbalance =
+        parseFloat(account2.balance) + parseFloat(account2.karibubonus);
+
       // Format and return the result
       const createdBet = {
         ...results._doc,
         _id: results._id.toString(),
         userId: user,
-        balance: account2.balance,
+        balance: totalbalance,
         createdAt: new Date(results._doc.createdAt).toISOString(),
         updatedAt: new Date(results._doc.updatedAt).toISOString(),
         Player: {

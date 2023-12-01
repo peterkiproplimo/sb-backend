@@ -211,11 +211,14 @@ app.post("/mpesa-callback", async (req, res) => {
 
         const balance = currentbalance.balance;
 
+        const totalbalance3 =
+          parseFloat(currentbalance.balance) +
+          parseFloat(currentbalance.karibubonus);
         console.log("User doing deposit", currentbalance.user);
 
         // io.emit(currentbalance.user, balance);
 
-        await emitToUser(currentbalance.user, balance);
+        await emitToUser(currentbalance.user, totalbalance3);
       } catch (error) {
         console.error("Error updating transaction (success):", error);
       }
@@ -259,8 +262,11 @@ app.post("/mpesa-result", async (req, res) => {
           user: transaction.user,
         });
 
+        const totalbalance =
+          parseFloat(account?.balance) + parseFloat(account?.karibubonus);
+
         // Emit the current account balance to the frontend
-        await emitToUser(transaction?.user, account?.balance);
+        await emitToUser(transaction?.user, totalbalance);
 
         await transaction.save();
       } catch (error) {
@@ -491,7 +497,9 @@ async function emitBalances(playerBets) {
       if (account) {
         const userBalance = account.balance; // Assuming 'balance' is the field in the account schema
 
-        await emitToUser(userId, userBalance);
+        const totalbalance2 =
+          parseFloat(account.balance) + parseFloat(account.karibubonus);
+        await emitToUser(userId, totalbalance2);
 
         console.log(
           `Emitted balance (${userBalance}) for user ID: ${userId} through WebSocket`
