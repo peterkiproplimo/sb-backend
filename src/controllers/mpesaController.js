@@ -16,6 +16,8 @@ const mpesaResolvers = {
   depositTest: async (args, req) => {
     const currentUser = req.user;
 
+    console.log(currentUser);
+
     const phoneNumber = formatKenyanPhoneNumber(args.phone);
 
     if (!currentUser) {
@@ -75,6 +77,7 @@ const mpesaResolvers = {
           .end(async (res) => {
             // console.log(res);
             if (res.body.ResponseCode == "0") {
+              // User id not found
               const account = await Account.findOne({ user: req.user.userId });
 
               const trans = new Transaction({
