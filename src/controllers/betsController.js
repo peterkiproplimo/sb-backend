@@ -173,7 +173,7 @@ const betsResolvers = {
       // Fetch players from your data source (e.g., MongoDB)
       const players = await Player.find(query)
         .skip(skip)
-        .limit(limit) /*.populate("account").populate("bets")*/
+        .limit(limit).populate("account").populate("bets")
         .sort({ createdAt: -1 });
       return {
         players: players,

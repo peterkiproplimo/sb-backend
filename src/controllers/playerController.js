@@ -305,6 +305,35 @@ const playerResolvers = {
   },
 
   // bY Machina  
+  getSinglePlayer: async (args, req) => {
+    const currentPlayer = req.user;
+
+    if (!currentPlayer) {
+      throw new Error("Unauthorized: Missing token");
+    }
+    return await Player.findById(args.playerId)
+      .then(async (player) => {
+        if (!player) {
+          throw new Error("User NOT found!!");
+        }
+        const account = await Account.findOne({ user: player.id });
+        return { account, player };
+      })
+      .then(async (result) => {
+        const bets = await PlayerBet.find({ userId: result.player.id }).sort({
+          createdAt: -1,
+        });
+        const transactions = await Transactions.find({
+          user: result.player.id,
+        }).sort({ createdAt: -1 });
+        return {
+          player: result.player,
+          account: result.account,
+          transactions,
+          bets,
+        };
+      });
+  },
   getPlayer: async (args, req) => {
     const currentPlayer = req.user;
 
