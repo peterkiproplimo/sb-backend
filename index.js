@@ -209,7 +209,7 @@ app.post("/mpesa-callback", async (req, res) => {
           user: transaction.user,
         });
 
-        balance = currentbalance.balance;
+        const balance = currentbalance.balance;
 
         console.log("User doing deposit", currentbalance.user);
 
