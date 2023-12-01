@@ -75,11 +75,10 @@ const mpesaResolvers = {
             })
           )
           .end(async (res) => {
-            // console.log(res);
             if (res.body.ResponseCode == "0") {
               // User id not found
               const account = await Account.findOne({
-                user: currentUser.userId,
+                user: args.userId,
               });
 
               const trans = new Transaction({

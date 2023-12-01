@@ -98,6 +98,7 @@ const transactionSchema = new Schema(
     account: {
       type: Schema.Types.ObjectId,
       ref: "Account",
+      required: false,
     },
   },
   { timestamps: true }
