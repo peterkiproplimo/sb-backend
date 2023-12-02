@@ -13,6 +13,7 @@ const socketIO = (server) =>
         "https://safaribust.techsavanna.technology",
         "http://localhost:3001",
         "https://sbadmin.techsavanna.technology",
+        "https://crash.safaribust.co.ke",
       ],
       //   methods: ["GET", "POST"],
       credentials: false,
