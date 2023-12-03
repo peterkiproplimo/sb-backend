@@ -139,7 +139,7 @@ async function startApolloServer() {
   httpServer.listen(3002, async () => {
     await connectToDatabase();
     await startGame();
-    getMultiplierValue();
+    await getMultiplierValue();
 
     console.log(`listening on 3002`);
   });
@@ -152,7 +152,6 @@ startApolloServer().catch((err) => {
 const io = socketIO(httpServer);
 
 const onConnection = (socket) => {
-  // console.log(socket.id);
   connection(io, socket);
 };
 
@@ -323,7 +322,7 @@ let BET_MULTIPLIERVALUE = 0;
 setemitNextRound(false);
 setemitOngoingRound(false);
 setemitEndRound(false);
-fetchMultipliersBatch();
+await fetchMultipliersBatch();
 
 // io.to('socket#id').emit('hey')
 
@@ -361,9 +360,9 @@ async function getNextMultiplier() {
     return nextMultiplier;
   } else {
     // If the batch is exhausted, fetch a new batch
-    fetchMultipliersBatch();
+    await fetchMultipliersBatch();
 
-    return getNextMultiplier();
+    return await getNextMultiplier();
   }
 }
 
