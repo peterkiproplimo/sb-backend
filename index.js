@@ -322,7 +322,7 @@ let BET_MULTIPLIERVALUE = 0;
 setemitNextRound(false);
 setemitOngoingRound(false);
 setemitEndRound(false);
-await fetchMultipliersBatch();
+fetchMultipliersBatch();
 
 // io.to('socket#id').emit('hey')
 
