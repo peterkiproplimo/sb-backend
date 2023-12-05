@@ -430,7 +430,7 @@ async function waitCount() {
 
   timerPaused = true;
   // Set the initial countdown value
-  let countdownValue = 10.0;
+  let countdownValue = 5.0;
 
   // Set the decrement interval and step
   const decrementInterval = 100; // 100 milliseconds
