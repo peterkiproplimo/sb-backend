@@ -6,7 +6,7 @@ type User {
   phoneNumber:String
   status:Boolean!
   deleted:Boolean!
-  password: String!
+  password: String
   username:String!
   role:String
   createdAt:String
@@ -585,6 +585,7 @@ type RootQuery{
   getTerms: Terms
 
   getAdminLogs(page: Int, per_page: Int): AdminLogsData!
+  getUserData: User!
 }
 
 
@@ -608,7 +609,6 @@ type RootMutation{
   
   activatePlayer(username:String,initiator:String!):User!
   changeType(username:String, type:String, initiator:String!):Admin!
-  changeAdminPassword(username:String, password:String,initiator:String!):User!
   editAdminUserPhone(username:String, phone:String, initiator:String!):User!
   editAdminUser(username:String, initiator:String!, phone:String, type:String!):Admin!
   createPlayerbet(playerbetInput: PlayerbetInput!): Playerbet
@@ -637,6 +637,9 @@ type RootMutation{
   deleteFAQ(faqId: String!): Response!
   updatePolicy(policy: String!): Response!
   updateTerms(terms: String!): Response!
+
+  changeAdminPassword(password: String): Response!
+
 }
 
 

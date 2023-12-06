@@ -356,6 +356,9 @@ const utilsResolvers = {
   // Privacy policy
   getPolicy: async () => await PrivacyPolicy.findOne(),
   updatePolicy: async (args, req) => {
+    if (!req.isAuth) {
+      throw new Error("Unauthenticated");
+    }
     return PrivacyPolicy.findOne()
       .then((policy) => {
         if (!policy) {
@@ -372,8 +375,9 @@ const utilsResolvers = {
         const ipAddress = req.socket.remoteAddress;
         const log = new AdminLog({
           ip: ipAddress,
+          action: "Update Privacy Policy",
           description: `Privacy Policy Updated`, //this will be changed to the authenticated user creating the logs
-          user: "652ea3242449fe35b70c4e9c",
+          user: req.user.userId,
         });
 
         await log.save();
@@ -387,10 +391,13 @@ const utilsResolvers = {
   // T&C
   getTerms: async () => await TermsConditions.findOne(),
   updateTerms: async (args, req) => {
+    if (!req.isAuth) {
+      throw new Error("Unauthenticated");
+    }
     return await TermsConditions.findOne()
       .then((terms) => {
         if (!terms) {
-          const policy = new PrivacyPolicy({
+          const terms = new TermsConditions({
             terms: args.terms,
           });
           terms.save();
@@ -403,8 +410,9 @@ const utilsResolvers = {
         const ipAddress = req.socket.remoteAddress;
         const log = new AdminLog({
           ip: ipAddress,
+          action: "update Terms & Conditions",
           description: `Terms & Conditions Updated`, //this will be changed to the authenticated user creating the logs
-          user: "652ea3242449fe35b70c4e9c",
+          user: req.user.userId,
         });
 
         await log.save();

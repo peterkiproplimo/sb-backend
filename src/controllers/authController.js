@@ -83,7 +83,7 @@ const authResolvers = {
     if (!user) {
       throw new AuthenticationError("Invalid credentials. Please try again!");
     }
-    if (user.active === false) {
+    if (user.status === false) {
       throw new AuthenticationError("Account suspended!!!");
     }
     // if (user.online === true && user.type === "User") {

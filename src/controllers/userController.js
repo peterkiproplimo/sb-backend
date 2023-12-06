@@ -182,6 +182,46 @@ const userResolvers = {
       });
   },
 
+  getUserData: async (args, req)=>{
+    if (!req.isAuth) {
+      throw new Error("Unauthenticated");
+    }
+    const userdata = await User.findById(req.user.userId)
+    return userdata;
+  },  
+  
+  changeAdminPassword: async (args, req) => {
+
+    if (!req.isAuth) {
+      throw new Error("Unauthenticated");
+    }
+    try {
+       const user = await User.findById(req.user.userId)
+       console.log(user)
+       hashedPass = await bcrypt.hash(args.password, 12);
+
+       user.password = hashedPass;
+
+       user.save()
+
+       const ipAddress = req.socket.remoteAddress;
+        const log = new AdminLog({
+          ip: ipAddress,
+          action : "Change Password",
+          description: `Password changed for ${user.username}`, //this will be changed to the authenticated user creating the logs
+          user: req.user.userId,
+        });
+
+        await log.save();
+       return{
+        status: "success",
+        message: `${user.username} password changed`,
+       }
+    } catch (error) {
+      throw new Error(error);
+    }  
+  },
+
   updateUser: (args, req) => {
     const phoneNumber = formatKenyanPhoneNumber(args.userInput.phoneNumber);
     return User.findOne({
@@ -265,31 +305,45 @@ const userResolvers = {
   },
 
   suspendUser: (args, req) => {
+    console.log(req.isAuth);
+    if (!req.isAuth) {
+      throw new Error("Unauthenticated");
+    }
+    var name;
+    var message;
     return User.findById(args.userId)
       .then((user) => {
         if (!user) {
-          throw new Error("User NOT found!!");
+          throw new Error("Player NOT found!!");
         }
-        user.status = false;
+        name = user.username;
+        message = user.status
+          ? `Suspended user ${name}`
+          : `Activated user ${name}`;
+        user.status = !user.status;
         return user.save();
       })
       .then(async (result) => {
-        console.log(123);
+        console.log(result);
         const ipAddress = req.socket.remoteAddress;
         const log = new AdminLog({
           ip: ipAddress,
-          description: `Deleted a user ${args.username}`, //this will be changed to the authenticated user creating the logs
-          user: result.id,
+          action: result.status ? "Activate User" : "Suspend User",
+          description: message, //this will be changed to the authenticated user creating the logs
+          user: req.user.userId,
         });
 
         await log.save();
         return {
           status: "success",
-          message: `Deleted user ${args.username}`,
+          message: message,
         };
       });
   },
   activateUser: (args, req) => {
+    if (!req.isAuth) {
+      throw new Error("Unauthenticated");
+    }
     return User.findById(args.userId)
       .then((user) => {
         if (!user) {
