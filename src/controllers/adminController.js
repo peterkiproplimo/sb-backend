@@ -854,32 +854,6 @@ const adminResolvers = {
     };
   },
 
-  //    Change admin password
-  changeAdminPassword: async (args, req) => {
-    const user = await Admin.findOne({ username: args.username });
-    if (!user) {
-      throw new Error("User does'nt exist.");
-    }
-    return bcrypt
-      .hash(args.password, 12)
-      .then((hashedPass) => {
-        user.password = hashedPass;
-        return user.save();
-      })
-      .then(async (usr) => {
-        const ipAddress = req.socket.remoteAddress;
-        const log = new AdminLog({
-          ip: ipAddress,
-          description: `${args.initiator} changed password for ${user.username}`,
-          user: usr.id,
-        });
-
-        await log.save();
-        return { ...usr._doc, _id: usr.id, password: null };
-      })
-      .catch((err) => console.log(err.message));
-  },
-
   //    Edit admin user phone number
   editAdminUserPhone: async (args, req) => {
     const user = await User.findOne({ username: args.username });
