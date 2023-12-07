@@ -36,9 +36,15 @@ const betsResolvers = {
       // if (!account) {
       //   throw new Error("account not found");
       // }
+
+      if (parseFloat(args.playerbetInput.betAmount) < 10) {
+        throw new Error("You cannot bet with any amount less than 10");
+      }
+
       if (account?.balance < 0) {
         throw new Error("Insufficient account balance");
       }
+
       if (account?.balance < parseFloat(args.playerbetInput.betAmount)) {
         throw new Error("Insufficient account balance");
       }
@@ -173,7 +179,9 @@ const betsResolvers = {
       // Fetch players from your data source (e.g., MongoDB)
       const players = await Player.find(query)
         .skip(skip)
-        .limit(limit).populate("account").populate("bets")
+        .limit(limit)
+        .populate("account")
+        .populate("bets")
         .sort({ createdAt: -1 });
       return {
         players: players,
