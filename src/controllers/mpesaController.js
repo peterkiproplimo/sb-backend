@@ -146,7 +146,7 @@ const mpesaResolvers = {
 
       // Encode the Buffer as Base64
       const auth = buffer.toString("base64");
-      console.log(auth);
+
       const { data } = await axios.get(url, {
         headers: { Authorization: "Basic" + " " + auth },
       });
@@ -173,11 +173,11 @@ const mpesaResolvers = {
               Amount: parseInt(args.amount),
               PartyA: shortcode,
               PartyB: parseInt(args.phone),
-              Remarks: `Withdrawal: ${args.username}-${args.phone}`,
+              Remarks: `Customer Withdrawal`,
               QueueTimeOutURL:
                 "https://safaribust-backend.onrender.com/mpesa-timeout",
               ResultURL: "https://safaribust-backend.onrender.com/mpesa-result",
-              Occassion: `Withdrawal: ${args.username}-${args.phone}`,
+              Occassion: `Customer Withdrawal`,
             })
           )
           .end(async (res) => {
