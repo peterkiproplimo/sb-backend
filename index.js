@@ -138,8 +138,8 @@ async function startApolloServer() {
   // Start the server
   httpServer.listen(3002, async () => {
     await connectToDatabase();
-    await startGame();
-    await getMultiplierValue();
+    // await startGame();
+    // await getMultiplierValue();
 
     console.log(`listening on 3002`);
   });
@@ -269,6 +269,15 @@ app.post("/mpesa-result", async (req, res) => {
         // Emit the current account balance to the frontend
         await emitToUser(transaction?.user, totalbalance);
 
+        await transaction.save();
+      } catch (error) {
+        console.error("Error updating transaction (cancellation):", error);
+      }
+    } else if (mpesaCallbackData.Result.ResultCode == 2001) {
+      try {
+        // Successfull
+        transaction.status = 0; //failed
+        transaction.ResultDesc = mpesaCallbackData.Result.ResultDesc;
         await transaction.save();
       } catch (error) {
         console.error("Error updating transaction (cancellation):", error);
