@@ -254,6 +254,7 @@ app.post("/mpesa-result", async (req, res) => {
       }
     } else if (mpesaCallbackData.Result.ResultCode == 0) {
       try {
+        console.log("Test if callback arrives", mpesaCallbackData);
         // Successfull
         transaction.status = 1; // success
         transaction.ResultDesc = mpesaCallbackData.Result.ResultDesc;
