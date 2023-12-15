@@ -512,15 +512,16 @@ async function emitBalances(playerBets) {
           parseFloat(account.balance) + parseFloat(account.karibubonus);
         await emitToUser(userId, totalbalance2);
 
-        console.log(
-          `Emitted balance (${userBalance}) for user ID: ${userId} through WebSocket`
-        );
+        // console.log(
+        //   `Emitted balance (${userBalance}) for user ID: ${userId} through WebSocket`
+        // );
       } else {
-        console.log(`Account not found for user ID: ${userId}`);
+        // console.log(`Account not found for user ID: ${userId}`);
       }
     }
   } catch (error) {
-    console.error("Error emitting balances:", error);
+    // do not show error
+    // console.error("Error emitting balances:", error);
     // Handle errors if any occurred during the process
   }
 }
