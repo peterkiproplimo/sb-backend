@@ -301,7 +301,7 @@ Emit the account balance to the socket ID
 app.post("/confirmcompletedtrans", async (req, res) => {
   // Handle the incoming M-Pesa callback data here
   const mpesaCallbackData = req.body;
-  console.log("Received M-Pesa Completed transaction", mpesaCallbackData);
+  // console.log("Received M-Pesa Completed transaction", mpesaCallbackData);
 
   const {
     TransactionType,
@@ -340,6 +340,8 @@ app.post("/confirmcompletedtrans", async (req, res) => {
     user: playeraccount.user,
     account: playeraccount,
   });
+
+  console.log(trans);
 
   await trans.save();
 });
