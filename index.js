@@ -341,8 +341,6 @@ app.post("/confirmcompletedtrans", async (req, res) => {
     account: playeraccount,
   });
 
-  console.log(trans);
-
   await trans.save();
 });
 
