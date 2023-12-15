@@ -298,7 +298,7 @@ Emit the account balance to the socket ID
 app.post("/confirmcompletedtrans", (req, res) => {
   // Handle the incoming M-Pesa callback data here
   const mpesaCallbackData = req.body;
-  console.log("Received M-Pesa callback:", mpesaCallbackData);
+  console.log("Received M-Pesa Completed transaction", mpesaCallbackData);
 
   res.json({ result: "Callback received and processed successfully" });
 });
@@ -306,7 +306,7 @@ app.post("/confirmcompletedtrans", (req, res) => {
 app.post("/validatecompletedtrans", (req, res) => {
   // Handle the incoming M-Pesa callback data here
   const mpesaCallbackData = req.body;
-  console.log("Received M-Pesa callback:", mpesaCallbackData);
+  console.log("Received Validate transaction:", mpesaCallbackData);
 
   res.json({ result: "Callback received and processed successfully" });
 });
