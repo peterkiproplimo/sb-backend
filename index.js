@@ -56,7 +56,10 @@ const {
   getHistory,
 } = require("./src/utils/playgamedboperations");
 
-const { updatePlayerAc } = require("./src/utils/playerAccountHandler");
+const {
+  updatePlayerAc,
+  formatPhoneNumber,
+} = require("./src/utils/playerAccountHandler");
 
 const corsOptions = {
   origin: "*",
@@ -295,7 +298,7 @@ Check the socket ID based on the user id from the database
 Emit the account balance to the socket ID
 */
 
-app.post("/confirmcompletedtrans", (req, res) => {
+app.post("/confirmcompletedtrans", async (req, res) => {
   // Handle the incoming M-Pesa callback data here
   const mpesaCallbackData = req.body;
   console.log("Received M-Pesa Completed transaction", mpesaCallbackData);
@@ -316,7 +319,18 @@ app.post("/confirmcompletedtrans", (req, res) => {
     LastName,
   } = mpesaCallbackData;
 
-  console.log("Amount:", TransAmount);
+  const phoneNumber = formatPhoneNumber(BillRefNumber);
+
+  const playeraccount = await Account.findOne({ phone: phoneNumber });
+
+  console.log("Acount:", playeraccount);
+
+  let filter = { phone: phoneNumber };
+  let update = {
+    balance: parseFloat(playeraccount?.balance) + parseFloat(TransAmount),
+  };
+
+  await Account.findOneAndUpdate(filter, update);
 });
 
 app.post("/validatecompletedtrans", (req, res) => {

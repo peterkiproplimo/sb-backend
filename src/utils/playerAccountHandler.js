@@ -93,9 +93,26 @@ async function handleKaribuBonusAndBalance(account, args) {
   }
 }
 
+function formatPhoneNumber(phoneNumber) {
+  // Remove any spaces and non-numeric characters
+  phoneNumber = phoneNumber.replace(/\D/g, "");
+
+  // Check if the phone number starts with "254" and has 12 digits (including the country code)
+  if (/^254\d{9}$/.test(phoneNumber)) {
+    return phoneNumber; // Phone number is already in the correct format
+  } else if (/^0\d{9}$/.test(phoneNumber)) {
+    // Add "254" in front of the phone number
+    return "254" + phoneNumber.slice(1);
+  } else {
+    // Handle invalid phone numbers
+    return "Invalid phone number";
+  }
+}
+
 async function isfirstdebosit(account) {}
 
 module.exports = {
   updatePlayerAc,
   handleKaribuBonusAndBalance,
+  formatPhoneNumber,
 };
