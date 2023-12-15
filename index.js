@@ -235,7 +235,7 @@ app.post("/mpesa-callback", async (req, res) => {
   res.json({ result: "Callback received and processed successfully" });
 });
 
-app.post("/mpesa-result", async (req, res) => {
+app.post("/transaction-result", async (req, res) => {
   // Handle the incoming M-Pesa callback data here
   const mpesaCallbackData = req.body;
   console.log("Received M-Pesa callback:", mpesaCallbackData);
@@ -352,7 +352,7 @@ app.post("/validatecompletedtrans", (req, res) => {
   res.json({ result: "Callback received and processed successfully" });
 });
 
-app.post("/mpesa-timeout", (req, res) => {
+app.post("/transaction-timeout", (req, res) => {
   // Handle the incoming M-Pesa callback data here
   const mpesaCallbackData = req.body;
   console.log("Received M-Pesa callback:", mpesaCallbackData);

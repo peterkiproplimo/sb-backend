@@ -175,8 +175,9 @@ const mpesaResolvers = {
               PartyB: parseInt(args.phone),
               Remarks: `Customer Withdrawal`,
               QueueTimeOutURL:
-                "https://safaribust-backend.onrender.com/mpesa-timeout",
-              ResultURL: "https://safaribust-backend.onrender.com/mpesa-result",
+                "https://safaribust-backend.onrender.com/transaction-timeout",
+              ResultURL:
+                "https://safaribust-backend.onrender.com/transaction-result",
               Occassion: `Customer Withdrawal`,
             })
           )
