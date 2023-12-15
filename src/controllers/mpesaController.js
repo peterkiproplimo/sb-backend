@@ -135,8 +135,8 @@ const mpesaResolvers = {
     const ipAddress = req.socket.remoteAddress;
 
     try {
-      const consumer_key = "qhygNtCpa5tAMxAf3sjvvxXvHTtJkoAf";
-      const consumer_secret = "gN9j1ZYPz4PBcOjr";
+      const consumer_key = "gA2VYetg7GO5FjudxZCpIk7DGJCbKwGz";
+      const consumer_secret = "SKdWCAxxcOFrmx8h";
       const url =
         "https://api.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials";
       const authString = `${consumer_key}:${consumer_secret}`;
