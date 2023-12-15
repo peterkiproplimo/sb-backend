@@ -300,7 +300,23 @@ app.post("/confirmcompletedtrans", (req, res) => {
   const mpesaCallbackData = req.body;
   console.log("Received M-Pesa Completed transaction", mpesaCallbackData);
 
-  res.json({ result: "Callback received and processed successfully" });
+  const {
+    TransactionType,
+    TransID,
+    TransTime,
+    TransAmount,
+    BusinessShortCode,
+    BillRefNumber,
+    InvoiceNumber,
+    OrgAccountBalance,
+    ThirdPartyTransID,
+    MSISDN,
+    FirstName,
+    MiddleName,
+    LastName,
+  } = mpesaCallbackData;
+
+  console.log("Amount:", TransAmount);
 });
 
 app.post("/validatecompletedtrans", (req, res) => {
