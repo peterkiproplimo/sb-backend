@@ -323,14 +323,25 @@ app.post("/confirmcompletedtrans", async (req, res) => {
 
   const playeraccount = await Account.findOne({ phone: phoneNumber });
 
-  console.log("Acount:", playeraccount);
-
   let filter = { phone: phoneNumber };
   let update = {
     balance: parseFloat(playeraccount?.balance) + parseFloat(TransAmount),
   };
 
   await Account.findOneAndUpdate(filter, update);
+
+  const trans = new Transaction({
+    type: 3,
+    TransID: TransID,
+    mpesaReceiptNumber: TransID,
+    trans_time: TransTime,
+    amount: parseFloat(TransAmount),
+    phone: phoneNumber,
+    user: playeraccount.user,
+    account: playeraccount,
+  });
+
+  await trans.save();
 });
 
 app.post("/validatecompletedtrans", (req, res) => {
