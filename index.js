@@ -234,6 +234,8 @@ app.post("/transaction-result", async (req, res) => {
   // Handle the incoming M-Pesa callback data here
   const mpesaCallbackData = req.body;
 
+  console.log("Test if callback arrives", mpesaCallbackData);
+
   const transaction = await Transaction.findOne({
     OriginatorConversationID: mpesaCallbackData.Result.OriginatorConversationID,
     ConversationID: mpesaCallbackData.Result.ConversationID,
@@ -251,7 +253,6 @@ app.post("/transaction-result", async (req, res) => {
       }
     } else if (mpesaCallbackData.Result.ResultCode == 0) {
       try {
-        console.log("Test if callback arrives", mpesaCallbackData);
         // Successfull
         transaction.status = 1; // success
         transaction.ResultDesc = mpesaCallbackData.Result.ResultDesc;
