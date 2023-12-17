@@ -342,6 +342,10 @@ app.post("/confirmcompletedtrans", async (req, res) => {
   });
 
   await trans.save();
+
+  const playeraccountbalance = await Account.findOne({ phone: phoneNumber });
+
+  await emitToUser(playeraccountbalance.user, playeraccountbalance.balance);
 });
 
 app.post("/validatecompletedtrans", (req, res) => {
