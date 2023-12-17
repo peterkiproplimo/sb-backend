@@ -42,7 +42,7 @@ const mpesaResolvers = {
       });
       if (data.access_token) {
         const timestamp = formatDate();
-        const shortcode = 200038;
+        const shortcode = process.env.MPESAEXPRESS_CODE;
         const passkey =
           "1b4a4259275aa64f74807e4bce8bd0a2f99e4059c510ebd1721af80f0d3b1a10";
         const password = Buffer.from(shortcode + passkey + timestamp).toString(
@@ -152,9 +152,8 @@ const mpesaResolvers = {
       });
       if (data.access_token) {
         const timestamp = formatDate();
-        const shortcode = 3034427;
-        const passkey =
-          "BCZcLvkd0lJU+AkbjLcbesMIdn4viqoI9B9jhiTMs2yJlxWAiLTeNm/ftOXz9rlgWdqHlMOW1JirTs/yGpH/yad/BECGKjCtrC0Wi0sj7e1vgoutLBgzXaUrNkSPQxE9aPAuw1Of4DROwy1eYtby+M0Ir/3qFDEWprkn/RRdsLGfaIv5leWGOa1SIbv0vdY13gBQAT1h2kiMWbyHZKgzcO90mZ5GerfUJk/ID4s/3DF+XkOe0Zmfg/1hX8va36SI67gY2OOlf60fYp5Ss2p1ISlE6qgudSd76Qxk3xTf9QhdoJmGPFt5Izq828h90+T139kINIkoOikMPcKYrvbCXA==";
+        const shortcode = process.env.B2C_SHORTCODE;
+        const passkey = process.env.B2C_PASSKEY;
 
         let req = unirest(
           "POST",
