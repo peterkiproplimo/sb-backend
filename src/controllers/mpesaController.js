@@ -16,8 +16,6 @@ const mpesaResolvers = {
   depositTest: async (args, req) => {
     const currentUser = req.user;
 
-    // console.log(currentUser);
-
     const phoneNumber = formatKenyanPhoneNumber(args.phone);
 
     if (!currentUser) {
