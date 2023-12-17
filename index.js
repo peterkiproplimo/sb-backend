@@ -534,17 +534,10 @@ async function emitBalances(playerBets) {
       // Find the user's account using the userId
       const account = await Account.findOne({ user: userId });
 
-      // console.log(userId);
       if (account) {
-        const userBalance = account.balance; // Assuming 'balance' is the field in the account schema
-
         const totalbalance2 =
           parseFloat(account.balance) + parseFloat(account.karibubonus);
         await emitToUser(userId, totalbalance2);
-
-        // console.log(
-        //   `Emitted balance (${userBalance}) for user ID: ${userId} through WebSocket`
-        // );
       } else {
         // console.log(`Account not found for user ID: ${userId}`);
       }
