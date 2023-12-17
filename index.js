@@ -561,6 +561,7 @@ async function emitBalances(playerBets) {
 }
 
 async function emitToUser(userId, value) {
+  console.log("Emit function called", value);
   io.emit(userId, value);
 }
 // Function to emit the live data
