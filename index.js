@@ -165,7 +165,7 @@ app.use(cors());
 app.post("/mpesa-callback", async (req, res) => {
   // Handle the incoming M-Pesa callback data here
   const mpesaCallbackData = req.body;
-  console.log("Received M-Pesa callback:", mpesaCallbackData);
+  console.log("Mpesa Online", mpesaCallbackData);
   const transaction = await Transaction.findOne({
     MerchantRequestID: mpesaCallbackData.Body.stkCallback.MerchantRequestID,
     CheckoutRequestID: mpesaCallbackData.Body.stkCallback.CheckoutRequestID,
@@ -213,14 +213,9 @@ app.post("/mpesa-callback", async (req, res) => {
           user: transaction.user,
         });
 
-        const balance = currentbalance.balance;
-
         const totalbalance3 =
           parseFloat(currentbalance.balance) +
           parseFloat(currentbalance.karibubonus);
-        console.log("User doing deposit", currentbalance.user);
-
-        // io.emit(currentbalance.user, balance);
 
         await emitToUser(currentbalance.user, totalbalance3);
       } catch (error) {
@@ -238,7 +233,6 @@ app.post("/mpesa-callback", async (req, res) => {
 app.post("/transaction-result", async (req, res) => {
   // Handle the incoming M-Pesa callback data here
   const mpesaCallbackData = req.body;
-  console.log("Received M-Pesa callback:", mpesaCallbackData);
 
   const transaction = await Transaction.findOne({
     OriginatorConversationID: mpesaCallbackData.Result.OriginatorConversationID,
@@ -292,11 +286,6 @@ app.post("/transaction-result", async (req, res) => {
   // Respond to the M-Pesa API with an appropriate response (e.g., a success message)
   res.json({ result: "Callback received and processed successfully" });
 });
-
-/*
-Check the socket ID based on the user id from the database
-Emit the account balance to the socket ID
-*/
 
 app.post("/confirmcompletedtrans", async (req, res) => {
   // Handle the incoming M-Pesa callback data here
