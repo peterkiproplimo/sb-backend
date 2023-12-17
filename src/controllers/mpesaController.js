@@ -24,8 +24,8 @@ const mpesaResolvers = {
       throw new Error("Unauthorized: Missing token");
     }
     try {
-      const consumer_key = "5PEvsVfLvBHx3SaJszsuJvzUEMIC3KGu";
-      const consumer_secret = "lnqSApRJLo3ahd20";
+      const consumer_key = process.env.PESAXPRESS_KEY;
+      const consumer_secret = process.env.PESAXPRESS_SECRET;
       const url =
         "https://api.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials";
 
@@ -135,8 +135,8 @@ const mpesaResolvers = {
     const ipAddress = req.socket.remoteAddress;
 
     try {
-      const consumer_key = "gA2VYetg7GO5FjudxZCpIk7DGJCbKwGz";
-      const consumer_secret = "SKdWCAxxcOFrmx8h";
+      const consumer_key = process.env.B2C_KEY;
+      const consumer_secret = process.env.B2C_SECRET;
       const url =
         "https://api.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials";
       const authString = `${consumer_key}:${consumer_secret}`;
