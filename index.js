@@ -262,7 +262,6 @@ app.post("/transaction-result", async (req, res) => {
           user: transaction.user,
         });
 
-        console.log("User account", account);
         const totalbalance =
           parseFloat(account?.balance) + parseFloat(account?.karibubonus);
 
@@ -558,7 +557,6 @@ async function emitBalances(playerBets) {
 }
 
 async function emitToUser(userId, value) {
-  console.log("Emit function called", value);
   io.emit(userId, value);
 }
 // Function to emit the live data
