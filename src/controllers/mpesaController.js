@@ -122,6 +122,8 @@ const mpesaResolvers = {
   withdraw: async (args, req) => {
     const currentUser = req.user;
 
+    console.log(args);
+
     if (!currentUser) {
       throw new Error("Unauthorized: Missing token");
     }
