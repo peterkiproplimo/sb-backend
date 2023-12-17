@@ -234,7 +234,7 @@ app.post("/transaction-result", async (req, res) => {
   // Handle the incoming M-Pesa callback data here
   const mpesaCallbackData = req.body;
 
-  console.log("Test if callback arrives", mpesaCallbackData);
+  console.log("Widthraw successful");
 
   const transaction = await Transaction.findOne({
     OriginatorConversationID: mpesaCallbackData.Result.OriginatorConversationID,
@@ -262,6 +262,7 @@ app.post("/transaction-result", async (req, res) => {
           user: transaction.user,
         });
 
+        console.log("User account", account);
         const totalbalance =
           parseFloat(account?.balance) + parseFloat(account?.karibubonus);
 
@@ -283,9 +284,6 @@ app.post("/transaction-result", async (req, res) => {
       }
     }
   }
-
-  // Respond to the M-Pesa API with an appropriate response (e.g., a success message)
-  res.json({ result: "Callback received and processed successfully" });
 });
 
 app.post("/confirmcompletedtrans", async (req, res) => {
@@ -341,7 +339,7 @@ app.post("/confirmcompletedtrans", async (req, res) => {
 app.post("/validatecompletedtrans", (req, res) => {
   // Handle the incoming M-Pesa callback data here
   const mpesaCallbackData = req.body;
-  console.log("Received Validate transaction:", mpesaCallbackData);
+  console.log("Validate transaction");
 
   res.json({ result: "Callback received and processed successfully" });
 });
@@ -349,9 +347,7 @@ app.post("/validatecompletedtrans", (req, res) => {
 app.post("/transaction-timeout", (req, res) => {
   // Handle the incoming M-Pesa callback data here
   const mpesaCallbackData = req.body;
-  console.log("Received M-Pesa callback:", mpesaCallbackData);
-
-  res.json({ result: "Callback received and processed successfully" });
+  console.log("Transaction timeout");
 });
 
 let timerPaused = false; // Flag t

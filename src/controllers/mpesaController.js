@@ -16,7 +16,7 @@ const mpesaResolvers = {
   depositTest: async (args, req) => {
     const currentUser = req.user;
 
-    console.log(currentUser);
+    // console.log(currentUser);
 
     const phoneNumber = formatKenyanPhoneNumber(args.phone);
 
@@ -43,8 +43,7 @@ const mpesaResolvers = {
       if (data.access_token) {
         const timestamp = formatDate();
         const shortcode = process.env.MPESAEXPRESS_CODE;
-        const passkey =
-          "1b4a4259275aa64f74807e4bce8bd0a2f99e4059c510ebd1721af80f0d3b1a10";
+        const passkey = process.env.PESAXPRESS_PASSKEY;
         const password = Buffer.from(shortcode + passkey + timestamp).toString(
           "base64"
         );
@@ -121,8 +120,6 @@ const mpesaResolvers = {
 
   withdraw: async (args, req) => {
     const currentUser = req.user;
-
-    console.log(args);
 
     if (!currentUser) {
       throw new Error("Unauthorized: Missing token");
