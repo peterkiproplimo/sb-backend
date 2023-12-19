@@ -335,6 +335,7 @@ const betsResolvers = {
     }
     const bets = await Playerbet.find({ userId: req.user.userId })
       .populate("userId")
+      .populate("roundid")
       .sort({
         createdAt: -1,
       })
