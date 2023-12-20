@@ -2,7 +2,7 @@ const Logs = require("../models/logs");
 async function updatePlayerAc(account, transaction) {
   try {
     if (account.isfirstdebosit && parseFloat(transaction.amount) >= 100) {
-      account.karibubonus = parseFloat(transaction.amount) * 2;
+      account.karibubonus = parseFloat(transaction.amount);
 
       if (account.karibubonus >= 10000) {
         account.karibubonus = 10000;
