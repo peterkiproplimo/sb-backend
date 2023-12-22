@@ -42,9 +42,6 @@ const { getLiveChat, fetchPlayersData } = require("./src/utils/livechatUtils");
 const {
   generateFakePlayersAndBets,
   setFakePlayers,
-  getFakePlayers,
-  saveFakePlayers,
-  deletePlayersByUsernames,
 } = require("./src/utils/fakePlayerUtils");
 const {
   checkBetsForWinsAndLosses,
@@ -141,8 +138,8 @@ async function startApolloServer() {
   // Start the server
   httpServer.listen(3002, async () => {
     await connectToDatabase();
-    // await startGame();
-    // await getMultiplierValue();
+    await startGame();
+    await getMultiplierValue();
 
     console.log(`listening on 3002`);
   });
@@ -234,7 +231,7 @@ app.post("/transaction-result", async (req, res) => {
   // Handle the incoming M-Pesa callback data here
   const mpesaCallbackData = req.body;
 
-  console.log("Widthraw successful");
+  console.log("Widthraw successful", mpesaCallbackData);
 
   const transaction = await Transaction.findOne({
     OriginatorConversationID: mpesaCallbackData.Result.OriginatorConversationID,

@@ -46,6 +46,7 @@ const authResolvers = {
       parseFloat(account.karibubonus) + parseFloat(account.balance);
 
     const ipAddress = req.socket.remoteAddress;
+
     const log = new Logs({
       action: "login",
       ip: ipAddress,
@@ -62,12 +63,6 @@ const authResolvers = {
       { userId: user.id, phone: user.phone, exp: expirationTime },
       process.env.SECRET_KEY
     );
-
-    // const token = await jwt.sign(
-    //   { userId: user.id, phone: user.phone },
-    //   process.env.SECRET_KEY,
-    //   { expiresIn: "1h" } // Set the token to expire in 1 hour
-    // );
 
     return {
       userId: user.id,
