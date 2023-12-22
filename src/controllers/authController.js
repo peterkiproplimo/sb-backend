@@ -40,8 +40,9 @@ const authResolvers = {
     user.online = true;
     await user.save();
 
-    const account = Account.findOne({ user: user });
-    const totalbalance = account?.karibubonus + account?.balance;
+    const account =await Account.findOne({ user: user });
+    const totalbalance =
+      parseFloat(account.karibubonus) + parseFloat(account.balance);
     const ipAddress = req.socket.remoteAddress;
     const log = new Logs({
       action: "login",
