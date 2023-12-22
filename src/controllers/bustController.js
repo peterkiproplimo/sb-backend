@@ -142,6 +142,11 @@ async function deleteGamesWithPlayedZero() {
 // Call the function to delete games where played is 0
 // deleteGamesWithPlayedZero();
 async function generateAndSaveGameResults() {
+  const maxGameId = await Game.findOne({}, { gameId: 1 }).sort({ gameId: -1 });
+
+  let gameIdCounter = maxGameId ? maxGameId.gameId + 1 : 1; // Start the counter from the maximum gameId + 1 or 1 if no gameId exists
+
+  console.log(gameIdCounter);
   try {
     await connectToDatabase();
     const results = [];
@@ -155,6 +160,7 @@ async function generateAndSaveGameResults() {
           bustpoint: saltedHash.bustpoint,
           seedeed: inputString,
           played: 0,
+          gameId: gameIdCounter++,
         });
       }
     }
@@ -206,13 +212,33 @@ async function exportToExcel() {
   }
 }
 
+async function updateGameIds() {
+  try {
+    await connectToDatabase();
+
+    let counter = 1; // Initialize the counter
+    const games = await Game.find({}).sort({ createdAt: 1 }); // Retrieve all games, sorted by createdAt field or any other suitable order
+
+    for (const game of games) {
+      game.gameId = counter++;
+      await game.save(); // Save the updated gameId
+    }
+
+    console.log("Game IDs updated successfully.");
+  } catch (error) {
+    console.error("Error:", error);
+  }
+}
+
+updateGameIds();
+
 // exportToExcel();
 
 // setInterval(async () => {
 // generateAndSaveGameResults();
 // }, 2000);
-setInterval(async () => {
-  generateAndSaveGameResults();
-}, 2000);
+// setInterval(async () => {
+//   generateAndSaveGameResults();
+// }, 2000);
 
 module.exports = bustResolvers;

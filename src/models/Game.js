@@ -13,6 +13,11 @@ const gameSchema = new Schema(
       type: String,
       required: true,
     },
+    gameId: {
+      type: Number,
+      unique: true,
+      required: true,
+    },
     played: {
       type: Number,
       required: true,
