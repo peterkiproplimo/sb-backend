@@ -8,6 +8,7 @@ const Logs = require("../models/logs");
 const AdminLog = require("../models/AdminLogs");
 const User = require("../models/User");
 const { AuthenticationError } = require("apollo-server-express");
+const Account = require("../models/Account");
 
 const authResolvers = {
   login: async (args, req) => {
@@ -28,6 +29,7 @@ const authResolvers = {
     if (!isEqual) {
       throw new Error("Invalid credentials. Please try again!");
     }
+
     const otp = otpGenerator.generate(12, {
       upperCaseAlphabets: true,
       lowerCaseAlphabets: false,
@@ -38,6 +40,8 @@ const authResolvers = {
     user.online = true;
     await user.save();
 
+    const account = Account.findOne({ user: user });
+    const totalbalance = account?.karibubonus + account?.balance;
     const ipAddress = req.socket.remoteAddress;
     const log = new Logs({
       action: "login",
@@ -65,6 +69,7 @@ const authResolvers = {
     return {
       userId: user.id,
       type: user.type,
+      balance: totalbalance,
       username: user.username,
       phone: user.phone,
       token: token,

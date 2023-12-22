@@ -196,6 +196,7 @@ type AuthData {
 userId: ID
 token: String
 type:String
+balance:Float
 username:String!
 online:Boolean
 phone:String

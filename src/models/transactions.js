@@ -5,7 +5,7 @@ const Schema = mongoose.Schema;
 const transactionSchema = new Schema(
   {
     type: {
-      type: Number,
+      type: String,
       required: true,
     },
     trans_id: {

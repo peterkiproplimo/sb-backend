@@ -610,4 +610,19 @@ setInterval(async () => {
 
 // saveFakePlayers();
 
+// async function deleteDepositTransactions() {
+//   try {
+//     // Delete transactions where type="Deposit"
+//     const deleteResult = await Transaction.deleteMany({
+//       type: "deposit",
+//     }); // Assuming "Deposit" type is represented as 1, modify accordingly if it's different
+
+//     console.log(`${deleteResult.deletedCount} transactions deleted.`);
+//   } catch (error) {
+//     console.error("Error deleting transactions:", error);
+//     // Handle errors if any occurred during the deletion process
+//   }
+// }
+// deleteDepositTransactions();
+
 module.exports = { io };
