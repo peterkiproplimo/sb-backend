@@ -131,9 +131,11 @@ async function getEndResults(nextMultiplier, gamestatus) {
       if (bet.point <= nextMultiplier.bustpoint) {
         winAmount += bet.betAmount;
         // If the condition is met, set win to true
+        const withholdingtax = ((20 / 100) * bet.winamount).toFixed(2);
+
         await Playerbet.updateOne(
           { _id: bet._id, roundid: nextMultiplier._id },
-          { $set: { busted: false, win: true } }
+          { $set: { busted: false, win: true, withholdingtax: withholdingtax } }
         );
 
         const account = await Account.findOne({

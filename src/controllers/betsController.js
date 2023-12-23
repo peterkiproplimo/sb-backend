@@ -65,10 +65,16 @@ const betsResolvers = {
         args.playerbetInput.betAmount * args.playerbetInput.point;
       const winamount = currentpossibleWin - args.playerbetInput.betAmount;
       const withholdingtax = ((20 / 100) * winamount).toFixed(2);
-      const finalwinamount = winamount - withholdingtax;
+      // const finalwinamount = winamount - withholdingtax;
+      const finalwinamount = winamount;
       let possibleWin = (
         parseFloat(args.playerbetInput.betAmount) + finalwinamount
       ).toFixed(2);
+
+      /* 
+
+      I need to save the winamount, betAmount, Winamount
+      */
 
       const bet = new Playerbet({
         betAmount: args.playerbetInput.betAmount,
@@ -79,7 +85,6 @@ const betsResolvers = {
         possibleWin: possibleWin,
         win: false,
         winamount: winamount,
-        withholdingtax: withholdingtax,
       });
 
       const results = await bet.save();
