@@ -12,7 +12,7 @@ const User = require("../models/User");
 const Player = require("../models/Player");
 const OTP = require("../models/verifier");
 const PlayerBet = require("../models/PlayerBet");
-const Transactions = require("../models/transactions");
+const Transaction = require("../models/transactions");
 const playerResolvers = {
   createPlayer: (args, req) => {
     const phoneNumber = formatKenyanPhoneNumber(args.userInput.phone);
@@ -306,11 +306,11 @@ const playerResolvers = {
 
   // bY Machina  
   getSinglePlayer: async (args, req) => {
-    const currentPlayer = req.user;
+    // const currentPlayer = req.user;
 
-    if (!currentPlayer) {
-      throw new Error("Unauthorized: Missing token");
-    }
+    // if (!currentPlayer) {
+    //   throw new Error("Unauthorized: Missing token");
+    // }
     return await Player.findById(args.playerId)
       .then(async (player) => {
         if (!player) {
@@ -320,12 +320,12 @@ const playerResolvers = {
         return { account, player };
       })
       .then(async (result) => {
-        const bets = await PlayerBet.find({ userId: result.player.id }).sort({
+        const bets = await PlayerBet.find({ userId: result.player.id }).populate("roundid").sort({
           createdAt: -1,
         });
-        const transactions = await Transactions.find({
-          user: result.player.id,
-        }).sort({ createdAt: -1 });
+        const transactions = await Transaction.find({
+          user: result.player,
+        }).sort({ createdAt: -1 }).lean();
         return {
           player: result.player,
           account: result.account,
@@ -352,7 +352,7 @@ const playerResolvers = {
         const bets = await PlayerBet.find({ userId: result.player.id }).sort({
           createdAt: -1,
         });
-        const transactions = await Transactions.find({
+        const transactions = await Transaction.find({
           user: result.player.id,
         }).sort({ createdAt: -1 });
         return {

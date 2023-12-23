@@ -58,7 +58,7 @@ updatedAt:String!
 
 type Game{
 _id: ID!
-bustpoint: Int!
+bustpoint: Float
 seedeed: String!
 played: Int!
 createdAt:String!
@@ -174,7 +174,7 @@ updatedAt:String!
 
 type Transaction {
 _id:ID!
-type: String
+type: String 
 amount: String
 user:Player
 account:Account
@@ -190,6 +190,7 @@ MerchantRequestID:String
 CheckoutRequestID:String
 mpesaReceiptNumber:String
 phone:String
+status: Int
 }
 
 type AuthData {
@@ -264,11 +265,13 @@ type WalletsTotal {
 type HouseWins {
   monthlyTotal: Float
 }
+type playerWallets {
+  totalPlayersBalance: Float
+}
 
 type HouseLosses {
   monthlyTotal: Float
 }
-
 type totalearned {
   totalearned: Float
 }
@@ -286,6 +289,7 @@ type DashboardData {
   walletsTotal: WalletsTotal
   houseWins: HouseWins
   houseLosses: HouseLosses
+  playerWallets: playerWallets
 }
 
 type affiliateProgram {
