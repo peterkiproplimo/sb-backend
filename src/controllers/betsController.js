@@ -398,6 +398,7 @@ const betsResolvers = {
         // If no input is provided, return all records with pagination
         bets = await PlayerBet.find()
           .populate("userId")
+          .populate("roundid")
           .skip((page - 1) * pageSize)
           .limit(pageSize)
           .sort({ createdAt: -1 })
@@ -424,15 +425,18 @@ const betsResolvers = {
 
         // Perform the search with filter      // Use lean() to convert the documents to plain JavaScript objects
         bets = await PlayerBet.find(filter)
-          .populate("userId")
           .populate("roundid")
+          .populate("userId")
           .skip((page - 1) * pageSize)
           .limit(pageSize)
           .sort({ createdAt: -1 })
           .lean();
       }
 
-      // console.log(bets);
+      //       const sampleBet = await PlayerBet.findById("65856b4cc03ae90034d3b5ce").populate("userId").populate("roundid").lean();
+      // console.log("Sample Bet:", sampleBet);
+
+      console.log("bets: ",bets);
 
       // Calculate pagination metadata
       const totalItems = await PlayerBet.countDocuments();
@@ -545,11 +549,10 @@ const betsResolvers = {
     const ipAddress = req.socket.remoteAddress;
     const log = new Logs({
       ip: ipAddress,
-      description: `User ${args.betInput.win ? "won " : "lost"} ${
-        args.betInput.win
+      description: `User ${args.betInput.win ? "won " : "lost"} ${args.betInput.win
           ? parseFloat(+args.betInput.amount).toFixed(2)
           : parseFloat(+args.betInput.betAmount).toFixed(2)
-      }`,
+        }`,
       user: args.betInput.user,
       round: args.betInput.round,
       won: args.betInput.win,

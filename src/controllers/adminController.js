@@ -30,7 +30,7 @@ async function fetchHouseRevenueData() {
 
   // Define the criteria for the query
   const criteria = {
-    win: false,
+    win: true,
     createdAt: { $gte: today },
   };
 
@@ -75,9 +75,9 @@ async function fetchHouselosesTodayData() {
   let totalmoney = 0;
   // Define the criteria for the query
   const criteria = {
-    win: true,
+    win: false,
     createdAt: { $gte: today },
-  };
+  }; 
 
   // Create an aggregation pipeline to calculate the sum
   const pipeline = [
@@ -88,8 +88,8 @@ async function fetchHouselosesTodayData() {
         totalAmount: {
           $sum: {
             $cond: [
-              { $ifNull: ["$betAmount", false] },
-              { $toDouble: "$betAmount" },
+              { $ifNull: ["$winAmount", false] },
+              { $toDouble: "$winAmount" },
               0, // Default value for non-numeric values
             ],
           },
@@ -114,7 +114,7 @@ async function fetchHouselosesTodayData() {
 }
 
 function fetchMPESABalanceData() {
-  return { paybillTotal: 2000.0, b2cTotal: 1500.0 }; // Replace with actual data
+  return { paybillTotal: 0.0, b2cTotal: 0.0 }; // Replace with actual data
 }
 async function fetchPlayersData() {
   const playerCount = await Player.countDocuments();
@@ -141,23 +141,37 @@ async function fetchPlayersData() {
 
 async function fetchWithholdingTaxData() {
   let totalmoney = 0;
-  const pipeline = [
-    {
-      $group: {
-        _id: null,
-        totalWithholdingTax: {
-          $sum: { $toDouble: "$withholdingtax" },
+  const today = new Date();
+    const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+
+    // Define the criteria for the query
+    const criteria = {
+      withholdingtax: { $exists: true }, // Ensure withholdingtax field exists
+      createdAt: { $gte: firstDayOfMonth, $lte: lastDayOfMonth },
+    };
+
+
+    // Create an aggregation pipeline to calculate the sum of withholdingtax
+    const pipeline = [
+      { $match: criteria },
+      {
+        $group: {
+          _id: null,
+          totalMonthlyWithholdingTax: {
+            $sum: "$withholdingtax",
+          },
         },
       },
-    },
-  ];
+    ];
 
   // Use Mongoose's aggregation framework to calculate the sum
   await Playerbet.aggregate(pipeline, (err, result) => {
     if (err) {
       console.error("Error calculating the total withholding tax:", err);
     } else {
-      const total = result.length > 0 ? result[0].totalWithholdingTax : 0;
+      // console.log(result.length);
+      const total = result.length > 0 ? result[0].totalMonthlyWithholdingTax : 0;
       totalmoney = total;
       // console.log("Total withholding tax:", total);
     }
@@ -208,7 +222,7 @@ async function fetchHouseWinsData() {
 
   // Define the criteria for the query to filter records for the current month
   const criteria = {
-    win: false,
+    win: true,
     createdAt: { $gte: firstDayOfMonth, $lt: today },
   };
 
@@ -258,7 +272,7 @@ async function fetchHouseLossesData() {
 
   // Define the criteria for the query to filter records for the current month
   const criteria = {
-    win: true,
+    win: false,
     createdAt: { $gte: firstDayOfMonth, $lt: today },
   };
 
@@ -366,17 +380,70 @@ async function fetchTotalPaid(userId) {
   }
 }
 
+async function calculateTotalBalanceForPlayers() {
+  try {
+    const excludedAccountId = "6523f69762c8841fb3313ade";
+
+    // Define the criteria for the query
+    const criteria = {
+      _id: { $ne: mongoose.Types.ObjectId(excludedAccountId) },
+    };
+
+    // Create an aggregation pipeline to calculate the sum of balance
+    const pipeline = [
+      { $match: criteria },
+      {
+        $group: {
+          _id: null,
+          totalBalance: {
+            $sum: "$balance",
+          },
+        },
+      },
+    ];
+
+    // Execute the aggregation pipeline
+    const result = await Account.aggregate(pipeline);
+
+    // Extract the total balance from the result
+    const totalBalance = result.length > 0 ? result[0].totalBalance : 0;
+
+    return {totalPlayersBalance : totalBalance};
+  } catch (error) {
+    // Handle errors here
+    console.error("Error calculating total balance for players:", error);
+    throw error;
+  }
+}
+
 const adminResolvers = {
-  Dashboard: () => {
+  Dashboard: async (args, req) => {
+    const currentUser = req.user;
+
+    if (!currentUser) {
+      throw new Error("Unauthorized: Missing token");
+    }
     // Your logic to fetch and return the data for the dashboard
-    const houseRevenueData = fetchHouseRevenueData();
-    const HouseLosesToday = fetchHouselosesTodayData();
-    const mpesaBalanceData = fetchMPESABalanceData();
-    const playersData = fetchPlayersData();
-    const withholdingTaxData = fetchWithholdingTaxData();
-    const walletsTotalData = fetchWalletsTotalData();
-    const houseWinsData = fetchHouseWinsData();
-    const houseLossesData = fetchHouseLossesData();
+    const houseRevenueData = await fetchHouseRevenueData();
+    const HouseLosesToday = await fetchHouselosesTodayData();
+    const mpesaBalanceData = await fetchMPESABalanceData();
+    const playersData = await fetchPlayersData();
+    const withholdingTaxData = await fetchWithholdingTaxData();
+    const walletsTotalData = await fetchWalletsTotalData();
+    const houseWinsData = await fetchHouseWinsData();
+    const houseLossesData = await fetchHouseLossesData();
+    const totalPlayersBalance = await calculateTotalBalanceForPlayers();
+    // console.log({
+    //   houseRevenue: houseRevenueData,
+    //   houseLose: HouseLosesToday,
+    //   mpesaBalance: mpesaBalanceData,
+    //   players: playersData,
+    //   withholdingTax: withholdingTaxData,
+    //   walletsTotal: walletsTotalData,
+    //   houseWins: houseWinsData,
+    //   houseLosses: houseLossesData,
+    //   playerWallets: totalPlayersBalance,
+    // })
 
     return {
       houseRevenue: houseRevenueData,
@@ -387,6 +454,7 @@ const adminResolvers = {
       walletsTotal: walletsTotalData,
       houseWins: houseWinsData,
       houseLosses: houseLossesData,
+      playerWallets: totalPlayersBalance,
     };
   },
 
