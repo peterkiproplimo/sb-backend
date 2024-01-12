@@ -230,7 +230,7 @@ async function updateGameIds() {
   }
 }
 
-updateGameIds();
+// updateGameIds();
 
 // exportToExcel();
 

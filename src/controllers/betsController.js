@@ -72,8 +72,10 @@ const betsResolvers = {
       ).toFixed(2);
 
       /* 
-
-      I need to save the winamount, betAmount, Winamount
+      What do we have?
+      bet amount
+      Win amount
+      Win amount - withholding tax
       */
 
       const bet = new Playerbet({
@@ -436,7 +438,7 @@ const betsResolvers = {
       //       const sampleBet = await PlayerBet.findById("65856b4cc03ae90034d3b5ce").populate("userId").populate("roundid").lean();
       // console.log("Sample Bet:", sampleBet);
 
-      console.log("bets: ",bets);
+      console.log("bets: ", bets);
 
       // Calculate pagination metadata
       const totalItems = await PlayerBet.countDocuments();
@@ -549,10 +551,11 @@ const betsResolvers = {
     const ipAddress = req.socket.remoteAddress;
     const log = new Logs({
       ip: ipAddress,
-      description: `User ${args.betInput.win ? "won " : "lost"} ${args.betInput.win
+      description: `User ${args.betInput.win ? "won " : "lost"} ${
+        args.betInput.win
           ? parseFloat(+args.betInput.amount).toFixed(2)
           : parseFloat(+args.betInput.betAmount).toFixed(2)
-        }`,
+      }`,
       user: args.betInput.user,
       round: args.betInput.round,
       won: args.betInput.win,
