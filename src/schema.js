@@ -521,6 +521,14 @@ type PaginationInfo{
   per_page: Int
 },
 
+type Settings {
+  _id: ID
+  item: String
+  value: String
+  createdAt: String
+  updatedAt: String
+}
+
 
 
 type RootQuery{
@@ -591,6 +599,9 @@ type RootQuery{
 
   getAdminLogs(page: Int, per_page: Int): AdminLogsData!
   getUserData: User!
+
+  getSettings: [Settings]!
+  getSettingById(id: ID!): Settings
 }
 
 
@@ -645,6 +656,9 @@ type RootMutation{
 
   changeAdminPassword(password: String): Response!
 
+  createSetting(item: String!, value: String!): Settings!
+  updateSetting(id: ID!, item: String!, value: String!): Settings!
+  deleteSetting(id: ID!): Settings!
 }
 
 

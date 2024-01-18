@@ -9,7 +9,7 @@ const adminResolvers = require("../src/controllers/adminController");
 const betsResolvers = require("../src/controllers/betsController");
 const mpesaResolvers = require("../src/controllers/mpesaController");
 const utilsResolvers = require("../src/controllers/utilsController");
-
+const setttingsResolvers = require("../src/controllers/settingsController");
 // Account
 // Admin
 // bets
@@ -25,7 +25,8 @@ const resolvers = merge(
   betsResolvers,
   mpesaResolvers,
   utilsResolvers,
-  playerResolvers
+  playerResolvers,
+  setttingsResolvers,
 );
 
 module.exports = resolvers;
