@@ -63,7 +63,9 @@ const userResolvers = {
         const regex = new RegExp(searchTerm, "i");
 
         // Find the player by username
-        const player = await User.findOne({ username: { $in: [regex] } }).exec();
+        const player = await User.findOne({
+          username: { $in: [regex] },
+        }).exec();
         // console.log(player)
 
         // Define the filter criteria based on the search term and user ID
@@ -115,21 +117,25 @@ const userResolvers = {
     if (args.userId) {
       // console.log(args.userId);
 
-      return User.findById(args.userId).then(async (user) => {//get user by id
-        if (user.username !== args.userInput.username) { //check if username  is new
-            taken_username = await User.findOne({username: args.userInput.username}) //find if username is taken                    
-            if (taken_username) {
-              throw new Error("Username already taken!!!");
-            }
+      return User.findById(args.userId).then(async (user) => {
+        //get user by id
+        if (user.username !== args.userInput.username) {
+          //check if username  is new
+          taken_username = await User.findOne({
+            username: args.userInput.username,
+          }); //find if username is taken
+          if (taken_username) {
+            throw new Error("Username already taken!!!");
+          }
         }
-        user.role = args.userInput.role
-        user.username = args.userInput.username
-        user.phoneNumber = phoneNumber
+        user.role = args.userInput.role;
+        user.username = args.userInput.username;
+        user.phoneNumber = phoneNumber;
 
-        await user.save()
+        await user.save();
         const log = new AdminLog({
           ip: req.socket.remoteAddress,
-          action : "Update User",
+          action: "Update User",
           description: `Updated a user ${user.username}`, //this will be changed to the authenticated user creating the logs
           user: req.user.userId,
         });
@@ -139,8 +145,7 @@ const userResolvers = {
           status: "success",
           message: `${args.userInput.username} updated successfully`,
         };
-      })
-
+      });
     }
     // else create user
     return User.findOne({
@@ -150,7 +155,6 @@ const userResolvers = {
         if (user) {
           throw new Error("User already exists!!!");
         }
-
 
         return bcrypt.hash(args.userInput.password, 12);
       })
@@ -168,7 +172,7 @@ const userResolvers = {
         const ipAddress = req.socket.remoteAddress;
         const log = new AdminLog({
           ip: ipAddress,
-          action : "Create User",
+          action: "Create User",
           description: `Created a new user ${result.username}`, //this will be changed to the authenticated user creating the logs
           user: req.user.userId,
         });
@@ -182,44 +186,43 @@ const userResolvers = {
       });
   },
 
-  getUserData: async (args, req)=>{
+  getUserData: async (args, req) => {
     if (!req.isAuth) {
       throw new Error("Unauthenticated");
     }
-    const userdata = await User.findById(req.user.userId)
+    const userdata = await User.findById(req.user.userId);
     return userdata;
-  },  
-  
-  changeAdminPassword: async (args, req) => {
+  },
 
+  changeAdminPassword: async (args, req) => {
     if (!req.isAuth) {
       throw new Error("Unauthenticated");
     }
     try {
-       const user = await User.findById(req.user.userId)
-       console.log(user)
-       hashedPass = await bcrypt.hash(args.password, 12);
+      const user = await User.findById(req.user.userId);
+      console.log(user);
+      hashedPass = await bcrypt.hash(args.password, 12);
 
-       user.password = hashedPass;
+      user.password = hashedPass;
 
-       user.save()
+      user.save();
 
-       const ipAddress = req.socket.remoteAddress;
-        const log = new AdminLog({
-          ip: ipAddress,
-          action : "Change Password",
-          description: `Password changed for ${user.username}`, //this will be changed to the authenticated user creating the logs
-          user: req.user.userId,
-        });
+      const ipAddress = req.socket.remoteAddress;
+      const log = new AdminLog({
+        ip: ipAddress,
+        action: "Change Password",
+        description: `Password changed for ${user.username}`, //this will be changed to the authenticated user creating the logs
+        user: req.user.userId,
+      });
 
-        await log.save();
-       return{
+      await log.save();
+      return {
         status: "success",
         message: `${user.username} password changed`,
-       }
+      };
     } catch (error) {
       throw new Error(error);
-    }  
+    }
   },
 
   updateUser: (args, req) => {
