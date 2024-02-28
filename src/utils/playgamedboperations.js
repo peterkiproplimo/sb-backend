@@ -130,8 +130,9 @@ async function getEndResults(nextMultiplier, gamestatus) {
 
       if (bet.point <= nextMultiplier.bustpoint) {
         winAmount += bet.betAmount;
-        // If the condition is met, set win to true
-        const withholdingtax = ((20 / 100) * bet.winamount).toFixed(2);
+        // If the condition is met, set win to true,
+        // Calculate with holding tax
+        const withholdingtax = ((20 / 100) * bet.winamount).toFixed(2); // Done
 
         await Playerbet.updateOne(
           { _id: bet._id, roundid: nextMultiplier._id },
@@ -142,8 +143,10 @@ async function getEndResults(nextMultiplier, gamestatus) {
           user: bet.userId,
         });
 
-        account.balance =
-          parseFloat(account?.balance) + parseFloat(bet.possibleWin);
+        const finalwin =
+          parseFloat(bet.possibleWin) - parseFloat(withholdingtax);
+
+        account.balance = parseFloat(account?.balance) + parseFloat(finalwin);
 
         await account.save();
 

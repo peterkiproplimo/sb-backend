@@ -60,13 +60,19 @@ const betsResolvers = {
         parseFloat(args.playerbetInput.betAmount);
       await houseAccount.save();
 
-      //  Get the possible win
+      //  Get the possible win. total win amount
       let currentpossibleWin =
         args.playerbetInput.betAmount * args.playerbetInput.point;
+
+      // /The win amount
       const winamount = currentpossibleWin - args.playerbetInput.betAmount;
       const withholdingtax = ((20 / 100) * winamount).toFixed(2);
       // const finalwinamount = winamount - withholdingtax;
+
+      //  The win amount without witholdling tax
       const finalwinamount = winamount;
+
+      // Bet amount + win amount
       let possibleWin = (
         parseFloat(args.playerbetInput.betAmount) + finalwinamount
       ).toFixed(2);
