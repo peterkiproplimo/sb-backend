@@ -37,7 +37,13 @@ const betsResolvers = {
       //   throw new Error("account not found");
       // }
 
-      if (parseFloat(args.playerbetInput.betAmount) < 10) {
+      if (parseFloat(args.playerbetInput.point) < 1.01) {
+        throw new Error("You cannot bet with a negative cashout");
+      }
+      if (
+        parseFloat(args.playerbetInput.betAmount) < 10 ||
+        parseFloat(args.playerbetInput.betAmount) > 3000
+      ) {
         throw new Error("You cannot bet with any amount less than 10");
       }
 
@@ -47,6 +53,15 @@ const betsResolvers = {
 
       if (account?.balance < parseFloat(args.playerbetInput.betAmount)) {
         throw new Error("Insufficient account balance");
+      }
+
+      const playerbet = await Playerbet.findOne({
+        userId: req.user.userId,
+        played: 0,
+      });
+
+      if (playerbet) {
+        throw new Error("Cannot place 2 rounds at once");
       }
 
       await handleKaribuBonusAndBalance(account, args);
