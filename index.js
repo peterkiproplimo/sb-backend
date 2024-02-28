@@ -418,18 +418,19 @@ async function runMultiplierTimer(multiplier) {
       io.emit("updateTimer", "");
       io.emit("loadwinners", "");
 
-      io.emit("successMessage", multiplier.bustpoint);
+      // Emit the whole multiplier object as json
+      io.emit("successMessage", multiplier);
 
       setemitEndRound(true, multiplier.bustpoint);
       setemitOngoingRound(false);
       setemitNextRound(false);
 
       // Update winners/ losers
-      // console.log("Get end Results");
       const playerBets = await getEndResults(multiplier, "endresults");
 
       //Emit player balances to frontend here
 
+      //  Emit winners / losers
       io.emit("livedata", playerBets);
       await emitBalances(playerBets);
 

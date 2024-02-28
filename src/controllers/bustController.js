@@ -234,11 +234,11 @@ async function updateGameIds() {
 
 // exportToExcel();
 
-setInterval(async () => {
-  generateAndSaveGameResults();
-}, 2000);
-setInterval(async () => {
-  generateAndSaveGameResults();
-}, 2000);
+// setInterval(async () => {
+//   generateAndSaveGameResults();
+// }, 2000);
+// setInterval(async () => {
+//   generateAndSaveGameResults();
+// }, 2000);
 
 module.exports = bustResolvers;
