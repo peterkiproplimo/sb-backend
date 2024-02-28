@@ -419,7 +419,7 @@ async function runMultiplierTimer(multiplier) {
       io.emit("loadwinners", "");
 
       // Emit the whole multiplier object as json
-      io.emit("successMessage", multiplier);
+      io.emit("successMessage", multiplier.bustpoint);
 
       setemitEndRound(true, multiplier.bustpoint);
       setemitOngoingRound(false);
