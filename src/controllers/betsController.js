@@ -44,7 +44,9 @@ const betsResolvers = {
         parseFloat(args.playerbetInput.betAmount) < 10 ||
         parseFloat(args.playerbetInput.betAmount) > 3000
       ) {
-        throw new Error("You cannot bet with any amount less than 10");
+        throw new Error(
+          "You cannot bet with any amount less than 10 or greater than 3000"
+        );
       }
 
       if (account?.balance < 0) {
