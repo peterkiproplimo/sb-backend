@@ -81,6 +81,7 @@ app.use((req, res, next) => {
   const allowedOrigins = [
     "https://safaribust.techsavanna.technology",
     "http://localhost:3001",
+    "http://localhost:3000",
     "https://sbadmin.techsavanna.technology",
     "http://localhost:5173",
     "https://crash.safaribust.co.ke",
