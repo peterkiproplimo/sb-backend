@@ -12,6 +12,7 @@ const socketIO = (server) =>
         "*",
         "https://safaribust.techsavanna.technology",
         "http://localhost:3001",
+        "http://localhost:3000",
         "https://sbadmin.techsavanna.technology",
         "https://crash.safaribust.co.ke",
       ],
