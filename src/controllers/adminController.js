@@ -128,13 +128,16 @@ async function fetchPlayersData() {
     action: "login",
     createdAt: { $gte: today },
   };
-  const todayUserCount = Logs.countDocuments(criteria, (err, count) => {
-    if (err) {
-      console.error("Error counting logs:", err);
-    } else {
-      // console.log("Count of login logs today:", count);
-    }
-  });
+
+  const todayUserCount = 0;
+
+  // Logs.countDocuments(criteria, (err, count) => {
+  //   if (err) {
+  //     console.error("Error counting logs:", err);
+  //   } else {
+  //     // console.log("Count of login logs today:", count);
+  //   }
+  // });
 
   return { total: playerCount, onlineToday: todayUserCount }; // Replace with actual data
 }
@@ -424,38 +427,46 @@ const adminResolvers = {
       throw new Error("Unauthorized: Missing token");
     }
     // Your logic to fetch and return the data for the dashboard
-    const houseRevenueData = await fetchHouseRevenueData();
-    const HouseLosesToday = await fetchHouselosesTodayData();
-    const mpesaBalanceData = await fetchMPESABalanceData();
-    const playersData = await fetchPlayersData();
-    const withholdingTaxData = await fetchWithholdingTaxData();
-    const walletsTotalData = await fetchWalletsTotalData();
-    const houseWinsData = await fetchHouseWinsData();
-    const houseLossesData = await fetchHouseLossesData();
-    const totalPlayersBalance = await calculateTotalBalanceForPlayers();
-    // console.log({
-    //   houseRevenue: houseRevenueData,
-    //   houseLose: HouseLosesToday,
-    //   mpesaBalance: mpesaBalanceData,
-    //   players: playersData,
-    //   withholdingTax: withholdingTaxData,
-    //   walletsTotal: walletsTotalData,
-    //   houseWins: houseWinsData,
-    //   houseLosses: houseLossesData,
-    //   playerWallets: totalPlayersBalance,
-    // })
+    try {
+      // Execute all asynchronous functions concurrently
+      const [
+        houseRevenueData,
+        HouseLosesToday,
+        mpesaBalanceData,
+        playersData,
+        withholdingTaxData,
+        walletsTotalData,
+        houseWinsData,
+        houseLossesData,
+        totalPlayersBalance,
+      ] = await Promise.all([
+        fetchHouseRevenueData(),
+        fetchHouselosesTodayData(),
+        fetchMPESABalanceData(),
+        fetchPlayersData(),
+        fetchWithholdingTaxData(),
+        fetchWalletsTotalData(),
+        fetchHouseWinsData(),
+        fetchHouseLossesData(),
+        calculateTotalBalanceForPlayers(),
+      ]);
 
-    return {
-      houseRevenue: houseRevenueData,
-      houseLose: HouseLosesToday,
-      mpesaBalance: mpesaBalanceData,
-      players: playersData,
-      withholdingTax: withholdingTaxData,
-      walletsTotal: walletsTotalData,
-      houseWins: houseWinsData,
-      houseLosses: houseLossesData,
-      playerWallets: totalPlayersBalance,
-    };
+      // Return the data after all promises are resolved
+      return {
+        houseRevenue: houseRevenueData,
+        houseLose: HouseLosesToday,
+        mpesaBalance: mpesaBalanceData,
+        players: playersData,
+        withholdingTax: withholdingTaxData,
+        walletsTotal: walletsTotalData,
+        houseWins: houseWinsData,
+        houseLosses: houseLossesData,
+        playerWallets: totalPlayersBalance,
+      };
+    } catch (error) {
+      // Handle errors if any of the promises fail
+      throw new Error(`Error fetching data: ${error.message}`);
+    }
   },
 
   affiliate: async (args, req) => {
