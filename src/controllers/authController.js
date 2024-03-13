@@ -84,15 +84,15 @@ const authResolvers = {
     const user = await User.findOne({
       username: args.username,
     });
+
     if (!user) {
-      throw new AuthenticationError("Invalid credentials. Please try again!");
+      throw new AuthenticationError("Invalid credddentials. Please try again!");
     }
+
     if (user.status === false) {
       throw new AuthenticationError("Account suspended!!!");
     }
-    // if (user.online === true && user.type === "User") {
-    //   throw new AuthenticationError("User already online");
-    // }
+
     const isEqual = await bcrypt.compare(args.password, user.password);
     if (!isEqual) {
       throw new AuthenticationError("Invalid credentials. Please try again!");

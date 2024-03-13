@@ -77,7 +77,7 @@ async function fetchHouselosesTodayData() {
   const criteria = {
     win: false,
     createdAt: { $gte: today },
-  }; 
+  };
 
   // Create an aggregation pipeline to calculate the sum
   const pipeline = [
@@ -117,7 +117,7 @@ function fetchMPESABalanceData() {
   return { paybillTotal: 0.0, b2cTotal: 0.0 }; // Replace with actual data
 }
 async function fetchPlayersData() {
-  const playerCount = await Player.countDocuments();
+  const playerCount = await Player.countDocuments({ type: "regular" });
   // const onlineUserCount = await Player.countDocuments({ online: true });
   const today = new Date();
   // Set the time to midnight (00:00:00)
@@ -142,28 +142,27 @@ async function fetchPlayersData() {
 async function fetchWithholdingTaxData() {
   let totalmoney = 0;
   const today = new Date();
-    const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-    const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+  const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+  const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
 
-    // Define the criteria for the query
-    const criteria = {
-      withholdingtax: { $exists: true }, // Ensure withholdingtax field exists
-      createdAt: { $gte: firstDayOfMonth, $lte: lastDayOfMonth },
-    };
+  // Define the criteria for the query
+  const criteria = {
+    withholdingtax: { $exists: true }, // Ensure withholdingtax field exists
+    createdAt: { $gte: firstDayOfMonth, $lte: lastDayOfMonth },
+  };
 
-
-    // Create an aggregation pipeline to calculate the sum of withholdingtax
-    const pipeline = [
-      { $match: criteria },
-      {
-        $group: {
-          _id: null,
-          totalMonthlyWithholdingTax: {
-            $sum: "$withholdingtax",
-          },
+  // Create an aggregation pipeline to calculate the sum of withholdingtax
+  const pipeline = [
+    { $match: criteria },
+    {
+      $group: {
+        _id: null,
+        totalMonthlyWithholdingTax: {
+          $sum: "$withholdingtax",
         },
       },
-    ];
+    },
+  ];
 
   // Use Mongoose's aggregation framework to calculate the sum
   await Playerbet.aggregate(pipeline, (err, result) => {
@@ -171,7 +170,8 @@ async function fetchWithholdingTaxData() {
       console.error("Error calculating the total withholding tax:", err);
     } else {
       // console.log(result.length);
-      const total = result.length > 0 ? result[0].totalMonthlyWithholdingTax : 0;
+      const total =
+        result.length > 0 ? result[0].totalMonthlyWithholdingTax : 0;
       totalmoney = total;
       // console.log("Total withholding tax:", total);
     }
@@ -408,7 +408,7 @@ async function calculateTotalBalanceForPlayers() {
     // Extract the total balance from the result
     const totalBalance = result.length > 0 ? result[0].totalBalance : 0;
 
-    return {totalPlayersBalance : totalBalance};
+    return { totalPlayersBalance: totalBalance };
   } catch (error) {
     // Handle errors here
     console.error("Error calculating total balance for players:", error);
