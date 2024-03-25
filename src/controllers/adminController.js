@@ -182,6 +182,7 @@ async function fetchWithholdingTaxData() {
 
   return { total: totalmoney }; // Replace with actual data
 }
+
 async function fetchWalletsTotalData() {
   let totalmoney = 0;
   const pipeline = [
